@@ -1,0 +1,17 @@
+{
+    "name": "Packages.UnityTools.PcdTools.Editor",
+    "references": [
+        "GUID:b5c62eb754ce83c44bb1f80fe195fa99"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": []
+}
