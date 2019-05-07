@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace Packages.UnityTools.VectorMapTools
 {
-    class WhiteLine : AutoHeightBezier
+    public class Curb : AutoHeightBezier
     {
         class PointObject { public Vector3 Position { get; set; } }
         class BeginPointObject : PointObject { }
@@ -21,7 +21,7 @@ namespace Packages.UnityTools.VectorMapTools
         public float autoConnectDistance = 2;
         [Range(0, 1)]
         public float displayWidth = 0.2f;
-        public static List<WhiteLine> List { get; set; } = new List<WhiteLine>();
+        public static List<Curb> List { get; set; } = new List<Curb>();
         public override Vector3 StartPoint
         {
             set
@@ -64,7 +64,7 @@ namespace Packages.UnityTools.VectorMapTools
             List.Add(this);
             LineRenderer.sharedMaterial = new Material(Shader.Find("Unlit/Color"))
             {
-                color = Color.white
+                color = Color.cyan
             };
             LineRenderer.startWidth = LineRenderer.endWidth = displayWidth;
         }

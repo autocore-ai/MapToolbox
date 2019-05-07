@@ -33,6 +33,18 @@ namespace Packages.UnityTools.VectorMapTools
             get => LineRenderer.positionCount;
             set => LineRenderer.positionCount = value;
         }
+        [SerializeField]
+        public float StartWidth
+        {
+            get => LineRenderer.startWidth;
+            set => LineRenderer.startWidth = value;
+        }
+        [SerializeField]
+        public float EndWidth
+        {
+            get => LineRenderer.endWidth;
+            set => LineRenderer.endWidth = value;
+        }
         protected virtual void Awake()
         {
             LineRenderer = GetComponent<LineRenderer>();

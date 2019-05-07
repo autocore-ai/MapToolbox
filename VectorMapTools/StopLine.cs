@@ -23,7 +23,10 @@ namespace Packages.UnityTools.VectorMapTools
         {
             base.Awake();
             List.Add(this);
-            LineRenderer.sharedMaterial = Resources.Load<Material>("UnityToolsForAutoware/White");
+            LineRenderer.sharedMaterial = new Material(Shader.Find("Unlit/Color"))
+            {
+                color = Color.white
+            };
             LineRenderer.startWidth = LineRenderer.endWidth = displayWidth;
         }
         private void Update()

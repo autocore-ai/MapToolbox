@@ -13,7 +13,7 @@ namespace Packages.UnityTools.VectorMapTools.Editor
 {
     class EditorMenuExterns
     {
-        [MenuItem("Autoware Toolkit/Create VectorMap/Lane #a")]
+        [MenuItem("Autoware Toolkit/Create VectorMap/Lane #q")]
         private static void CreateLane()
         {
             var go = new GameObject("New Lane", typeof(Lane));
@@ -31,7 +31,16 @@ namespace Packages.UnityTools.VectorMapTools.Editor
             (SceneView.currentDrawingSceneView ?? SceneView.lastActiveSceneView)?.MoveToView(go.transform);
         }
 
-        [MenuItem("Autoware Toolkit/Create VectorMap/StopLine #s")]
+        //[MenuItem("Autoware Toolkit/Create VectorMap/RoadEdge #e")]
+        private static void CreateRoadEdge()
+        {
+            var go = new GameObject("New RoadEdge", typeof(RoadEdge));
+            Undo.RegisterCreatedObjectUndo(go, "CreateRoadEdge");
+            Selection.activeGameObject = go;
+            (SceneView.currentDrawingSceneView ?? SceneView.lastActiveSceneView)?.MoveToView(go.transform);
+        }
+
+        [MenuItem("Autoware Toolkit/Create VectorMap/StopLine #a")]
         private static void CreateStopLine()
         {
             var go = new GameObject("New StopLine", typeof(StopLine));

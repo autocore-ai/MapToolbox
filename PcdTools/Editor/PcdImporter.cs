@@ -6,6 +6,7 @@
 
 using System.IO;
 using UnityEditor.Experimental.AssetImporters;
+using UnityEditorInternal;
 using UnityEngine;
 
 namespace Packages.UnityTools.PcdTools.Editor
@@ -24,7 +25,7 @@ namespace Packages.UnityTools.PcdTools.Editor
                     DestroyImmediate(go.GetComponent<BoxCollider>());
                     go.GetComponent<MeshFilter>().mesh = pointsMesh;
                     pointsMesh.name = "points";
-                    var material = new Material(Shader.Find("UI/Default"));
+                    var material = new Material(Shader.Find("Particles/Standard Unlit"));
                     material.name = "material";
                     go.GetComponent<MeshRenderer>().sharedMaterial = material;
                     var heightMesh = pointsMesh.GetHeightMesh();
@@ -32,7 +33,7 @@ namespace Packages.UnityTools.PcdTools.Editor
                     var goHeightMesh = new GameObject(heightMesh.name);
                     goHeightMesh.transform.parent = go.transform;
                     goHeightMesh.AddComponent<MeshFilter>().sharedMesh = heightMesh;
-                    goHeightMesh.AddComponent<MeshCollider>();
+                    InternalEditorUtility.SetIsInspectorExpanded(goHeightMesh.AddComponent<MeshCollider>(), false);
                     ctx.AddObjectToAsset(pointsMesh.name, pointsMesh);
                     ctx.AddObjectToAsset(material.name, material);
                     ctx.AddObjectToAsset(heightMesh.name, heightMesh);
