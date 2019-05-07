@@ -16,7 +16,7 @@ This project is under developing and will have first release soon !
 * Add two lines below to Packages/manifest.json dependencies
   
 ``` json
-"com.autocore.unity-tools": "https://github.com/autocore-ai/UnityTools.git",
+"com.autocore.unity-tools": "https://github.com/autocore-ai/UnityTools.git#upm",
 "com.nition.unity-octree": "https://github.com/autocore-ai/UnityOctree.git#upm",
 ```
 
