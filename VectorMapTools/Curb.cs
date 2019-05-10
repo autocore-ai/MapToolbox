@@ -64,7 +64,7 @@ namespace Packages.UnityTools.VectorMapTools
             List.Add(this);
             LineRenderer.sharedMaterial = new Material(Shader.Find("Unlit/Color"))
             {
-                color = Color.cyan
+                color = Color.red
             };
             LineRenderer.startWidth = LineRenderer.endWidth = displayWidth;
         }

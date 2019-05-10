@@ -118,8 +118,55 @@ namespace Packages.UnityTools.VectorMapTools.Export
                         csvLine.LineLast = csvLines.Last();
                     }
                     csvLines.Add(csvLine);
-                    var csvWhiteLine = new CsvWhiteLine() { Line = csvLine, Width = whiteLine.displayWidth };
-                    csvWhiteLines.Add(csvWhiteLine);
+                    csvWhiteLines.Add(new CsvWhiteLine() { Line = csvLine, Width = whiteLine.displayWidth });
+                }
+            }
+        }
+        public static void GetCsvData(this RoadEdge roadEdge,
+            out List<CsvPoint> csvPoints,
+            out List<CsvLine> csvLines,
+            out List<CsvRoadEdge> csvRoadEdges)
+        {
+            csvPoints = new List<CsvPoint>();
+            csvLines = new List<CsvLine>();
+            csvRoadEdges = new List<CsvRoadEdge>();
+            for (int i = 0; i < roadEdge.Points.Length; i++)
+            {
+                var csvPoint = new CsvPoint() { Position = roadEdge.Points[i] };
+                csvPoints.Add(csvPoint);
+                if (i > 0)
+                {
+                    var csvLine = new CsvLine() { PointBegin = csvPoints[i - 1], PointFinal = csvPoint };
+                    if (i > 1)
+                    {
+                        csvLine.LineLast = csvLines.Last();
+                    }
+                    csvLines.Add(csvLine);
+                    csvRoadEdges.Add(new CsvRoadEdge() { Line = csvLine });
+                }
+            }
+        }
+        public static void GetCsvData(this Curb curb,
+            out List<CsvPoint> csvPoints,
+            out List<CsvLine> csvLines,
+            out List<CsvCurb> csvCurbs)
+        {
+            csvPoints = new List<CsvPoint>();
+            csvLines = new List<CsvLine>();
+            csvCurbs = new List<CsvCurb>();
+            for (int i = 0; i < curb.Points.Length; i++)
+            {
+                var csvPoint = new CsvPoint() { Position = curb.Points[i] };
+                csvPoints.Add(csvPoint);
+                if (i > 0)
+                {
+                    var csvLine = new CsvLine() { PointBegin = csvPoints[i - 1], PointFinal = csvPoint };
+                    if (i > 1)
+                    {
+                        csvLine.LineLast = csvLines.Last();
+                    }
+                    csvLines.Add(csvLine);
+                    csvCurbs.Add(new CsvCurb() { Line = csvLine });
                 }
             }
         }

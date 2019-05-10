@@ -25,6 +25,8 @@ namespace Packages.UnityTools.VectorMapTools.Export
             List<CsvSignalLight> csvSignalLights = new List<CsvSignalLight>();
             List<CsvStopLine> csvStopLines = new List<CsvStopLine>();
             List<CsvWhiteLine> csvWhiteLines = new List<CsvWhiteLine>();
+            List<CsvRoadEdge> csvRoadEdges = new List<CsvRoadEdge>();
+            List<CsvCurb> csvCurbs = new List<CsvCurb>();
             var lastLane = csvLanes.LastOrDefault();
             foreach (var item in Lane.List)
             {
@@ -63,6 +65,26 @@ namespace Packages.UnityTools.VectorMapTools.Export
                 csvLines.AddRange(lines);
                 csvWhiteLines.AddRange(whiteLines);
             }
+            foreach (var item in RoadEdge.List)
+            {
+                item.GetCsvData(
+                    out List<CsvPoint> points,
+                    out List<CsvLine> lines,
+                    out List<CsvRoadEdge> roadEdges);
+                csvPoints.AddRange(points);
+                csvLines.AddRange(lines);
+                csvRoadEdges.AddRange(roadEdges);
+            }
+            foreach (var item in Curb.List)
+            {
+                item.GetCsvData(
+                    out List<CsvPoint> points,
+                    out List<CsvLine> lines,
+                    out List<CsvCurb> curbs);
+                csvPoints.AddRange(points);
+                csvLines.AddRange(lines);
+                csvCurbs.AddRange(curbs);
+            }
             for (int i = 0; i < csvPoints.Count; i++)
             {
                 csvPoints[i].PID = i + 1;
@@ -98,6 +120,14 @@ namespace Packages.UnityTools.VectorMapTools.Export
             for (int i = 0; i < csvWhiteLines.Count; i++)
             {
                 csvWhiteLines[i].ID = i + 1;
+            }
+            for (int i = 0; i < csvRoadEdges.Count; i++)
+            {
+                csvRoadEdges[i].ID = i + 1;
+            }
+            for (int i = 0; i < csvCurbs.Count; i++)
+            {
+                csvCurbs[i].ID = i + 1;
             }
             if (csvPoints.Count > 0)
             {
@@ -152,6 +182,18 @@ namespace Packages.UnityTools.VectorMapTools.Export
                 var ls = new List<string>() { CsvWhiteLine.header };
                 ls.AddRange(csvWhiteLines.Select(_ => _.CsvString));
                 File.WriteAllLines(Path.Combine(folder, CsvWhiteLine.fileName), ls);
+            }
+            if (csvRoadEdges.Count > 0)
+            {
+                var ls = new List<string>() { CsvRoadEdge.header };
+                ls.AddRange(csvRoadEdges.Select(_ => _.CsvString));
+                File.WriteAllLines(Path.Combine(folder, CsvRoadEdge.fileName), ls);
+            }
+            if (csvCurbs.Count > 0)
+            {
+                var ls = new List<string>() { CsvCurb.header };
+                ls.AddRange(csvCurbs.Select(_ => _.CsvString));
+                File.WriteAllLines(Path.Combine(folder, CsvCurb.fileName), ls);
             }
         }
     }

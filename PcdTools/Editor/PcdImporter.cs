@@ -33,6 +33,7 @@ namespace Packages.UnityTools.PcdTools.Editor
                     var goHeightMesh = new GameObject(heightMesh.name);
                     goHeightMesh.transform.parent = go.transform;
                     goHeightMesh.AddComponent<MeshFilter>().sharedMesh = heightMesh;
+                    InternalEditorUtility.SetIsInspectorExpanded(goHeightMesh.GetComponent<MeshFilter>(), false);
                     InternalEditorUtility.SetIsInspectorExpanded(goHeightMesh.AddComponent<MeshCollider>(), false);
                     ctx.AddObjectToAsset(pointsMesh.name, pointsMesh);
                     ctx.AddObjectToAsset(material.name, material);

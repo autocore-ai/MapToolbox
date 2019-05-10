@@ -21,7 +21,6 @@ namespace Packages.UnityTools.VectorMapTools.Editor
             Selection.activeGameObject = go;
             (SceneView.currentDrawingSceneView ?? SceneView.lastActiveSceneView)?.MoveToView(go.transform);
         }
-
         [MenuItem("Autoware Toolkit/Create VectorMap/WhiteLine #w")]
         private static void CreateWhiteLine()
         {
@@ -30,8 +29,7 @@ namespace Packages.UnityTools.VectorMapTools.Editor
             Selection.activeGameObject = go;
             (SceneView.currentDrawingSceneView ?? SceneView.lastActiveSceneView)?.MoveToView(go.transform);
         }
-
-        //[MenuItem("Autoware Toolkit/Create VectorMap/RoadEdge #e")]
+        [MenuItem("Autoware Toolkit/Create VectorMap/RoadEdge #e")]
         private static void CreateRoadEdge()
         {
             var go = new GameObject("New RoadEdge", typeof(RoadEdge));
@@ -39,7 +37,14 @@ namespace Packages.UnityTools.VectorMapTools.Editor
             Selection.activeGameObject = go;
             (SceneView.currentDrawingSceneView ?? SceneView.lastActiveSceneView)?.MoveToView(go.transform);
         }
-
+        [MenuItem("Autoware Toolkit/Create VectorMap/Curb #r")]
+        private static void CreateCurb()
+        {
+            var go = new GameObject("New Curb", typeof(Curb));
+            Undo.RegisterCreatedObjectUndo(go, "CreateCurb");
+            Selection.activeGameObject = go;
+            (SceneView.currentDrawingSceneView ?? SceneView.lastActiveSceneView)?.MoveToView(go.transform);
+        }
         [MenuItem("Autoware Toolkit/Create VectorMap/StopLine #a")]
         private static void CreateStopLine()
         {
@@ -48,7 +53,6 @@ namespace Packages.UnityTools.VectorMapTools.Editor
             Selection.activeGameObject = go;
             (SceneView.currentDrawingSceneView ?? SceneView.lastActiveSceneView)?.MoveToView(go.transform);
         }
-
         [MenuItem("Autoware Toolkit/Create VectorMap/SignalLight #s")]
         private static void CreateSignalLight()
         {
@@ -57,7 +61,6 @@ namespace Packages.UnityTools.VectorMapTools.Editor
             Selection.activeGameObject = go;
             (SceneView.currentDrawingSceneView ?? SceneView.lastActiveSceneView)?.MoveToView(go.transform);
         }
-
         [MenuItem("Autoware Toolkit/Export VectorMap #m")]
         private static void ExportVectorMap()
         {
