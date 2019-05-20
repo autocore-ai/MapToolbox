@@ -6,7 +6,7 @@
 
 using UnityEngine;
 
-namespace Packages.UnityTools.VectorMapTools
+namespace Packages.AutowareUnityTools.VectorMapTools
 {
     [ExecuteInEditMode]
     public class SignalLight : MonoBehaviour

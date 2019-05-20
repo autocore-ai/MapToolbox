@@ -4,7 +4,7 @@
  */
 #endregion
 
-namespace Packages.UnityTools.VectorMapTools.Export
+namespace Packages.AutowareUnityTools.VectorMapTools.Export
 {
     class CsvNode
     {
@@ -12,7 +12,7 @@ namespace Packages.UnityTools.VectorMapTools.Export
         internal const string header = "NID,PID";
         public CsvPoint Point { get; set; }
         public int NID { get; set; }
-        public int PID => Point.PID;
-        public string CsvString => $"{NID},{PID}";
+        public int? PID => Point?.PID;
+        public string CsvString => $"{NID},{PID ?? 0}";
     }
 }

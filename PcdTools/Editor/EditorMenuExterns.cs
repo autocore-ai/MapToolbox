@@ -8,7 +8,7 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace Packages.UnityTools.PcdTools.Editor
+namespace Packages.AutowareUnityTools.PcdTools.Editor
 {
     class EditorMenuExterns
     {

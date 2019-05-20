@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Packages.UnityTools.VectorMapTools
+namespace Packages.AutowareUnityTools.VectorMapTools
 {
     public class StopLine : AutoHeightLine
     {
@@ -53,7 +53,7 @@ namespace Packages.UnityTools.VectorMapTools
             var finalPoints = Lane.FinalPoints.GetNearby(vector3, distance_autoConnectLane);
             if (finalPoints != null && finalPoints.Length > 0)
             {
-                return finalPoints.OrderBy(_ => Vector3.Distance(vector3, _.EndPoint)).First();
+                return finalPoints.OrderBy(_ => Vector3.Distance(vector3, _.endPosition)).First();
             }
             return null;
         }

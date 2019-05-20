@@ -9,7 +9,7 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 
-namespace Packages.UnityTools.VectorMapTools.Export
+namespace Packages.AutowareUnityTools.VectorMapTools.Export
 {
     public class VectorMapExporter
     {

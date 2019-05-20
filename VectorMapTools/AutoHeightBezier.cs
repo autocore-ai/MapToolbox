@@ -6,15 +6,13 @@
 
 using UnityEngine;
 
-namespace Packages.UnityTools.VectorMapTools
+namespace Packages.AutowareUnityTools.VectorMapTools
 {
     public class AutoHeightBezier : Bezier
     {
         readonly float maxHeight = 500;
-        public override Vector3 StartPoint { set => base.StartPoint = SetHeight(value, maxHeight); }
-        public override Vector3 EndPoint { set => base.EndPoint = SetHeight(value, maxHeight); }
-        public override Vector3 StartTangent { set => base.StartTangent = SetHeight(value, maxHeight); }
-        public override Vector3 EndTangent { set => base.EndTangent = SetHeight(value, maxHeight); }
+        public override Vector3 StartPosition { set => base.StartPosition = SetHeight(value, maxHeight); }
+        public override Vector3 EndPosition { set => base.EndPosition = SetHeight(value, maxHeight); }
         public override Vector3[] Points
         {
             set

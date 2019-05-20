@@ -12,7 +12,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace Packages.UnityTools.PcdTools
+namespace Packages.AutowareUnityTools.PcdTools
 {
     public static class PointsMeshBuild
     {
@@ -73,7 +73,6 @@ namespace Packages.UnityTools.PcdTools
                 return new Mesh();
             }
         }
-
         [BurstCompile]
         struct Ros2Unity_xyz : IJobParallelFor
         {
@@ -81,7 +80,6 @@ namespace Packages.UnityTools.PcdTools
             [WriteOnly] internal NativeArray<Vector3> vertices;
             public void Execute(int index) => vertices[index] = new Vector3(-pcd[index].y, pcd[index].z, pcd[index].x);
         }
-
         [BurstCompile]
         struct Ros2Unity_xyz_rgb : IJobParallelFor
         {
@@ -94,7 +92,6 @@ namespace Packages.UnityTools.PcdTools
                 colors[index] = new Color32(pcd[index].r, pcd[index].g, pcd[index].b, 255);
             }
         }
-
         [BurstCompile]
         struct Ros2Unity_xyz_intensity : IJobParallelFor
         {

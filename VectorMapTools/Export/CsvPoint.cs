@@ -6,7 +6,7 @@
 
 using UnityEngine;
 
-namespace Packages.UnityTools.VectorMapTools.Export
+namespace Packages.AutowareUnityTools.VectorMapTools.Export
 {
     class CsvPoint
     {

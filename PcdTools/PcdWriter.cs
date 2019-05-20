@@ -9,7 +9,7 @@ using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
 
-namespace Packages.UnityTools.PcdTools
+namespace Packages.AutowareUnityTools.PcdTools
 {
     public class PcdWriter : StreamWriter
     {

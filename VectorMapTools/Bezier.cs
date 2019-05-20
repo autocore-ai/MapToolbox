@@ -6,61 +6,55 @@
 
 using UnityEngine;
 
-namespace Packages.UnityTools.VectorMapTools
+namespace Packages.AutowareUnityTools.VectorMapTools
 {
-    [RequireComponent(typeof(LineRenderer)), ExecuteInEditMode]
-    public class Bezier : MonoBehaviour
+    public class Bezier : LRMapElement
     {
-        public Vector3 startTangentOffset;
-        public Vector3 endTangentOffset;
+        [HideInInspector]
+        public Vector3 startPosition;
+        [HideInInspector]
         public Vector3 endPosition;
-        public virtual Vector3 StartPoint
+        [HideInInspector]
+        public Vector3 startTangent;
+        [HideInInspector] 
+        public Vector3 endTangent;
+        protected Vector3 startPositionMove;
+        protected Vector3 endPositionMove;
+        public virtual Vector3 StartPosition
         {
-            get => transform.position;
-            set => transform.position = value;
+            set
+            {
+                startPositionMove = value - startPosition;
+                startPosition = value;
+                startTangent += startPositionMove;
+            }
         }
-        public virtual Vector3 EndPoint
+        public virtual Vector3 EndPosition
         {
-            get => endPosition;
-            set => endPosition = value;
+            set
+            {
+                endPositionMove = value - endPosition;
+                endPosition = value;
+                endTangent += endPositionMove;
+            }
         }
-        public virtual Vector3 StartTangent
+        internal override Vector3? Pivot
         {
-            get => transform.position + startTangentOffset;
-            set => startTangentOffset = value - transform.position;
-        }
-        public virtual Vector3 EndTangent
-        {
-            get => EndPoint + endTangentOffset;
-            set => endTangentOffset = value - EndPoint;
+            set
+            {
+                base.Pivot = value;
+                startPosition += value ?? Vector3.zero;
+                endPosition += value ?? Vector3.zero;
+                startTangent += value ?? Vector3.zero;
+                endTangent += value ?? Vector3.zero;
+            }
         }
         public virtual Vector3[] Points
         {
-            get
-            {
-                var ret = new Vector3[LineRenderer.positionCount];
-                LineRenderer.GetPositions(ret);
-                return ret;
-            }
             set
             {
                 LineRenderer.positionCount = value.Length;
                 LineRenderer.SetPositions(value);
-            }
-        }
-        protected LineRenderer LineRenderer { get; private set; }
-        protected virtual void Awake()
-        {
-            LineRenderer = GetComponent<LineRenderer>();
-            LineRenderer.useWorldSpace = true;
-        }
-        protected virtual void Start()
-        {
-            if (!StartPoint.Equals(Vector3.zero) && EndPoint.Equals(Vector3.zero))
-            {
-                EndPoint = StartPoint + Vector3.right * 20;
-                StartTangent = StartPoint + Vector3.right * 5;
-                EndTangent = EndPoint + Vector3.left * 5;
             }
         }
     }
