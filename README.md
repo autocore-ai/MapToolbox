@@ -4,8 +4,6 @@
 [![GitHub release](https://img.shields.io/github/release/autocore-ai/AutowareUnityTools.svg)](https://github.com/autocore-ai/AutowareUnityTools/releases)
 [![Unity version](https://img.shields.io/badge/unity-2019.1%2B-green.svg)](https://unity3d.com/unity/whats-new/2019.1.0)
 
-This project is under developing and will have first release soon !
-
 ## Requirements
 
 * [Unity 2019.1](https://store.unity.com/download?ref=personal)
@@ -21,4 +19,4 @@ This project is under developing and will have first release soon !
 "com.nition.unity-octree": "https://github.com/autocore-ai/UnityOctree.git#upm",
 ```
 
-More tutorials will be provided.
+[![Watch the video](https://img.youtube.com/vi/WTRHPs8pN04/0.jpg)](https://youtu.be/WTRHPs8pN04)
