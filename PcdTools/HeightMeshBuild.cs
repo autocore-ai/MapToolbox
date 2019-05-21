@@ -12,7 +12,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace Packages.UnityTools.PcdTools
+namespace Packages.AutowareUnityTools.PcdTools
 {
     public static class HeightMeshBuild
     {

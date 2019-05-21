@@ -6,10 +6,8 @@
 
 using UnityEditor;
 
-namespace Packages.UnityTools.VectorMapTools.Editor
+namespace Packages.AutowareUnityTools.VectorMapTools.Editor
 {
     [CustomEditor(typeof(RoadEdge))]
-    class RoadEdgeEditor : BezierEditor
-    {
-    }
+    class RoadEdgeEditor : BezierEditor { }
 }

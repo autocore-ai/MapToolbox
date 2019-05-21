@@ -4,7 +4,7 @@
  */
 #endregion
 
-namespace Packages.UnityTools.VectorMapTools.Export
+namespace Packages.AutowareUnityTools.VectorMapTools.Export
 {
     class CsvStopLine
     {

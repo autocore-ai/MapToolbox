@@ -1,7 +1,7 @@
 {
-    "name": "Packages.UnityTools.PcdTools.Editor",
+    "name": "Packages.AutowareUnityTools.PcdTools.Editor",
     "references": [
-        "GUID:b5c62eb754ce83c44bb1f80fe195fa99"
+        "GUID:cd0649983cd757844b054cdf8cb16a56"
     ],
     "optionalUnityReferences": [],
     "includePlatforms": [

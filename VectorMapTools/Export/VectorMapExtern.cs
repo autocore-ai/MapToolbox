@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Packages.UnityTools.VectorMapTools.Export
+namespace Packages.AutowareUnityTools.VectorMapTools.Export
 {
     static class VectorMapExtern
     {
@@ -22,9 +22,9 @@ namespace Packages.UnityTools.VectorMapTools.Export
             csvNodes = new List<CsvNode>();
             csvDtLanes = new List<CsvDtLane>();
             csvLanes = new List<CsvLane>();
-            for (int i = 0; i < lane.Points.Length; i++)
+            for (int i = 0; i < lane.LineRenderer.positionCount; i++)
             {
-                var csvPoint = new CsvPoint() { Position = lane.Points[i] };
+                var csvPoint = new CsvPoint() { Position = lane.LineRenderer.GetPosition(i) };
                 csvPoints.Add(csvPoint);
                 var csvNode = new CsvNode() { Point = csvPoint };
                 csvNodes.Add(csvNode);
@@ -45,7 +45,7 @@ namespace Packages.UnityTools.VectorMapTools.Export
                     {
                         csvLane.AddPreLane(csvLanes[i - 2]);
                     }
-                    csvLane.Velocity = Mathf.Lerp(lane.velocityBegin, lane.velocityFinal, (float)i / (lane.Points.Length - 1));
+                    csvLane.Velocity = Mathf.Lerp(lane.velocityBegin, lane.velocityFinal, (float)i / (lane.LineRenderer.positionCount - 1));
                     csvLanes.Add(csvLane);
                 }
             }
@@ -66,7 +66,7 @@ namespace Packages.UnityTools.VectorMapTools.Export
             csvSignalLights = new List<CsvSignalLight>();
             for (int i = 0; i < stopLine.Count; i++)
             {
-                var csvPoint = new CsvPoint() { Position = stopLine.Points[i] };
+                var csvPoint = new CsvPoint() { Position = stopLine.LineRenderer.GetPosition(i) };
                 csvPoints.Add(csvPoint);
                 if (i > 0)
                 {
@@ -79,7 +79,7 @@ namespace Packages.UnityTools.VectorMapTools.Export
                     var signalLight = stopLine.signalLights[i - 1];
                     var csvSLPoint = new CsvPoint() { Position = signalLight.transform.position };
                     csvSLPoints.Add(csvSLPoint);
-                    var csvVector = new CsvVector() { Point = csvSLPoint, rotation = signalLight.transform.rotation };
+                    var csvVector = new CsvVector() { Point = csvSLPoint, Rotation = signalLight.transform.rotation };
                     csvVectors.Add(csvVector);
                     var csvSignalLight = new CsvSignalLight() { Vector = csvVector  };
                     csvSignalLights.Add(csvSignalLight);
@@ -106,9 +106,9 @@ namespace Packages.UnityTools.VectorMapTools.Export
             csvPoints = new List<CsvPoint>();
             csvLines = new List<CsvLine>();
             csvWhiteLines = new List<CsvWhiteLine>();
-            for (int i = 0; i < whiteLine.Points.Length; i++)
+            for (int i = 0; i < whiteLine.LineRenderer.positionCount; i++)
             {
-                var csvPoint = new CsvPoint() { Position = whiteLine.Points[i] };
+                var csvPoint = new CsvPoint() { Position = whiteLine.LineRenderer.GetPosition(i) };
                 csvPoints.Add(csvPoint);
                 if (i > 0)
                 {
@@ -118,7 +118,7 @@ namespace Packages.UnityTools.VectorMapTools.Export
                         csvLine.LineLast = csvLines.Last();
                     }
                     csvLines.Add(csvLine);
-                    csvWhiteLines.Add(new CsvWhiteLine() { Line = csvLine, Width = whiteLine.displayWidth });
+                    csvWhiteLines.Add(new CsvWhiteLine() { Line = csvLine, Width = whiteLine.width });
                 }
             }
         }
@@ -130,9 +130,9 @@ namespace Packages.UnityTools.VectorMapTools.Export
             csvPoints = new List<CsvPoint>();
             csvLines = new List<CsvLine>();
             csvRoadEdges = new List<CsvRoadEdge>();
-            for (int i = 0; i < roadEdge.Points.Length; i++)
+            for (int i = 0; i < roadEdge.LineRenderer.positionCount; i++)
             {
-                var csvPoint = new CsvPoint() { Position = roadEdge.Points[i] };
+                var csvPoint = new CsvPoint() { Position = roadEdge.LineRenderer.GetPosition(i) };
                 csvPoints.Add(csvPoint);
                 if (i > 0)
                 {
@@ -154,9 +154,9 @@ namespace Packages.UnityTools.VectorMapTools.Export
             csvPoints = new List<CsvPoint>();
             csvLines = new List<CsvLine>();
             csvCurbs = new List<CsvCurb>();
-            for (int i = 0; i < curb.Points.Length; i++)
+            for (int i = 0; i < curb.LineRenderer.positionCount; i++)
             {
-                var csvPoint = new CsvPoint() { Position = curb.Points[i] };
+                var csvPoint = new CsvPoint() { Position = curb.LineRenderer.GetPosition(i) };
                 csvPoints.Add(csvPoint);
                 if (i > 0)
                 {

@@ -6,7 +6,7 @@
 
 using Unity.Mathematics;
 
-namespace Packages.UnityTools.PcdTools
+namespace Packages.AutowareUnityTools.PcdTools
 {
     public struct float3byte4
     {

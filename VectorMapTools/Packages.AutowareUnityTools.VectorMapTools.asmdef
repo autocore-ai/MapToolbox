@@ -1,5 +1,5 @@
 {
-    "name": "Packages.UnityTools.VectorMapTools",
+    "name": "Packages.AutowareUnityTools.VectorMapTools",
     "references": [
         "GUID:872f384eb6e02634984918469fc493a7"
     ],

@@ -8,53 +8,57 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Packages.UnityTools.VectorMapTools
+namespace Packages.AutowareUnityTools.VectorMapTools
 {
     public class Lane : AutoHeightBezier
     {
         static PointOctree<Lane> BeginPoints { get; set; } = new PointOctree<Lane>(1000, Vector3.zero, 100);
         internal static PointOctree<Lane> FinalPoints { get; set; } = new PointOctree<Lane>(1000, Vector3.zero, 100);
         public static List<Lane> List { get; set; } = new List<Lane>();
-        [Range(0,20)]
+        [Range(0, 20)]
         public float velocityBegin = 10;
         [Range(0, 20)]
         public float velocityFinal = 10;
         [Range(0, 5)]
-        public float autoConnectDistance = 2;
-        [Range(0, 5)]
-        public float displayWidth = 2;
-        public override Vector3 StartPoint
+        public static float autoConnectDistance = 2;
+        public override Vector3 StartPosition
         {
             set
             {
-                var laneToConnect = FinalPoints.GetNearby(value, autoConnectDistance)?.OrderBy(_ => Vector3.Distance(value, _.EndPoint))?.FirstOrDefault();
-                if (laneToConnect)
+                base.StartPosition = value;
+                if (!startPositionMove.Equals(Vector3.zero))
                 {
-                    base.StartPoint = laneToConnect.EndPoint;
+                    var target = FinalPoints.GetNearby(startPosition, autoConnectDistance)
+                        ?.Where(_ => !_.Equals(this))
+                        ?.OrderBy(_ => Vector3.Distance(startPosition, _.endPosition))
+                        ?.FirstOrDefault();
+                    if (target)
+                    {
+                        base.StartPosition = target.endPosition;
+                    }
+                    BeginPoints.Remove(this);
+                    BeginPoints.Add(this, startPosition);
                 }
-                else
-                {
-                    base.StartPoint = value;
-                }
-                BeginPoints.Remove(this);
-                BeginPoints.Add(this, StartPoint);
             }
         }
-        public override Vector3 EndPoint
+        public override Vector3 EndPosition
         {
             set
             {
-                var laneToConnect = BeginPoints.GetNearby(value, autoConnectDistance)?.OrderBy(_ => Vector3.Distance(value, _.StartPoint))?.FirstOrDefault();
-                if (laneToConnect)
+                base.EndPosition = value;
+                if (!endPositionMove.Equals(Vector3.zero))
                 {
-                    base.EndPoint = laneToConnect.StartPoint;
+                    var target = BeginPoints.GetNearby(endPosition, autoConnectDistance)
+                        ?.Where(_ => !_.Equals(this))
+                        ?.OrderBy(_ => Vector3.Distance(endPosition, _.startPosition))
+                        ?.FirstOrDefault();
+                    if (target)
+                    {
+                        base.EndPosition = target.startPosition;
+                    }
+                    FinalPoints.Remove(this);
+                    FinalPoints.Add(this, endPosition);
                 }
-                else
-                {
-                    base.EndPoint = value;
-                }
-                FinalPoints.Remove(this);
-                FinalPoints.Add(this, EndPoint);
             }
         }
         protected override void Awake()
@@ -62,20 +66,18 @@ namespace Packages.UnityTools.VectorMapTools
             base.Awake();
             LineRenderer.textureMode = LineTextureMode.Tile;
             LineRenderer.sharedMaterial = Resources.Load<Material>("UnityToolsForAutoware/Lane");
-            LineRenderer.startWidth = LineRenderer.endWidth = displayWidth;
         }
-        protected override void Start()
+        protected virtual void Start()
         {
-            base.Start();
             List.Add(this);
-            BeginPoints.Add(this, StartPoint);
-            FinalPoints.Add(this, EndPoint);
+            BeginPoints.Add(this, startPosition);
+            FinalPoints.Add(this, endPosition);
         }
         private void OnDestroy()
         {
+            List.Remove(this);
             BeginPoints.Remove(this);
             FinalPoints.Remove(this);
-            List.Remove(this);
         }
     }
 }

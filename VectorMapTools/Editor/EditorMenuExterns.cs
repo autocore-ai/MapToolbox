@@ -4,46 +4,42 @@
  */
 #endregion
 
-using Packages.UnityTools.VectorMapTools.Export;
+using Packages.AutowareUnityTools.VectorMapTools.Export;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace Packages.UnityTools.VectorMapTools.Editor
+namespace Packages.AutowareUnityTools.VectorMapTools.Editor
 {
     class EditorMenuExterns
     {
         [MenuItem("Autoware Toolkit/Create VectorMap/Lane #q")]
         private static void CreateLane()
         {
-            var go = new GameObject("New Lane", typeof(Lane));
-            Undo.RegisterCreatedObjectUndo(go, "CreateLane");
-            Selection.activeGameObject = go;
-            (SceneView.currentDrawingSceneView ?? SceneView.lastActiveSceneView)?.MoveToView(go.transform);
+            Selection.activeGameObject = new GameObject("New Lane");
+            Selection.activeGameObject.AddComponent<Lane>().Pivot = (SceneView.currentDrawingSceneView ?? SceneView.lastActiveSceneView)?.pivot;
+            Undo.RegisterCreatedObjectUndo(Selection.activeGameObject, "CreateLane");
         }
         [MenuItem("Autoware Toolkit/Create VectorMap/WhiteLine #w")]
         private static void CreateWhiteLine()
         {
-            var go = new GameObject("New WhiteLine", typeof(WhiteLine));
-            Undo.RegisterCreatedObjectUndo(go, "CreateWhiteLine");
-            Selection.activeGameObject = go;
-            (SceneView.currentDrawingSceneView ?? SceneView.lastActiveSceneView)?.MoveToView(go.transform);
+            Selection.activeGameObject = new GameObject("New WhiteLine");
+            Selection.activeGameObject.AddComponent<WhiteLine>().Pivot = (SceneView.currentDrawingSceneView ?? SceneView.lastActiveSceneView)?.pivot;
+            Undo.RegisterCreatedObjectUndo(Selection.activeGameObject, "CreateWhiteLine");
         }
         [MenuItem("Autoware Toolkit/Create VectorMap/RoadEdge #e")]
         private static void CreateRoadEdge()
         {
-            var go = new GameObject("New RoadEdge", typeof(RoadEdge));
-            Undo.RegisterCreatedObjectUndo(go, "CreateRoadEdge");
-            Selection.activeGameObject = go;
-            (SceneView.currentDrawingSceneView ?? SceneView.lastActiveSceneView)?.MoveToView(go.transform);
+            Selection.activeGameObject = new GameObject("New RoadEdge");
+            Selection.activeGameObject.AddComponent<RoadEdge>().Pivot = (SceneView.currentDrawingSceneView ?? SceneView.lastActiveSceneView)?.pivot;
+            Undo.RegisterCreatedObjectUndo(Selection.activeGameObject, "CreateRoadEdge");
         }
         [MenuItem("Autoware Toolkit/Create VectorMap/Curb #r")]
         private static void CreateCurb()
         {
-            var go = new GameObject("New Curb", typeof(Curb));
-            Undo.RegisterCreatedObjectUndo(go, "CreateCurb");
-            Selection.activeGameObject = go;
-            (SceneView.currentDrawingSceneView ?? SceneView.lastActiveSceneView)?.MoveToView(go.transform);
+            Selection.activeGameObject = new GameObject("New Curb");
+            Selection.activeGameObject.AddComponent<Curb>().Pivot = (SceneView.currentDrawingSceneView ?? SceneView.lastActiveSceneView)?.pivot;
+            Undo.RegisterCreatedObjectUndo(Selection.activeGameObject, "CreateCurb");
         }
         [MenuItem("Autoware Toolkit/Create VectorMap/StopLine #a")]
         private static void CreateStopLine()
@@ -64,7 +60,7 @@ namespace Packages.UnityTools.VectorMapTools.Editor
         [MenuItem("Autoware Toolkit/Export VectorMap #m")]
         private static void ExportVectorMap()
         {
-            var folder = EditorUtility.SaveFolderPanel("Save VectorMap At", PlayerPrefs.GetString("ExportVectorMap", Directory.GetCurrentDirectory()), "");
+            var folder = EditorUtility.SaveFolderPanel("Save VectorMaps At", PlayerPrefs.GetString("ExportVectorMap", Directory.GetCurrentDirectory()), "");
             if (!string.IsNullOrEmpty(folder))
             {
                 PlayerPrefs.SetString("ExportVectorMap", folder);

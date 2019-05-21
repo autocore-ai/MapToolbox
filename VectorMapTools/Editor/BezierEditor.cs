@@ -7,26 +7,26 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Packages.UnityTools.VectorMapTools.Editor
+namespace Packages.AutowareUnityTools.VectorMapTools.Editor
 {
     [CustomEditor(typeof(Bezier))]
-    class BezierEditor : UnityEditor.Editor
+    class BezierEditor : LRMapElementEditor
     {
-        private void DuringSceneGUI(SceneView sv)
+        internal virtual void OnSceneGUI()
         {
             Tools.current = Tool.Custom;
-            Bezier be = target as Bezier;
-            Undo.RecordObject(be, "Bezier");
-            be.StartPoint = Handles.PositionHandle(be.StartPoint, Quaternion.identity);
-            be.EndPoint = Handles.PositionHandle(be.EndPoint, Quaternion.identity);
-            be.StartTangent = Handles.PositionHandle(be.StartTangent, Quaternion.identity);
-            be.EndTangent = Handles.PositionHandle(be.EndTangent, Quaternion.identity);
-            if (!be.StartPoint.Equals(Vector3.zero) && !be.EndPoint.Equals(Vector3.zero))
+            Bezier t = target as Bezier;
+            EditorGUI.BeginChangeCheck();
+            t.StartPosition = Handles.PositionHandle(t.startPosition, Quaternion.identity);
+            t.EndPosition = Handles.PositionHandle(t.endPosition, Quaternion.identity);
+            t.startTangent = Handles.PositionHandle(t.startTangent, Quaternion.identity);
+            t.endTangent = Handles.PositionHandle(t.endTangent, Quaternion.identity);
+            if (EditorGUI.EndChangeCheck())
             {
-                be.Points = Handles.MakeBezierPoints(be.StartPoint, be.EndPoint, be.StartTangent, be.EndTangent, Mathf.CeilToInt(Vector3.Distance(be.StartPoint, be.EndPoint)));
+                EditorUtility.SetDirty(t);
+                if (!t.startPosition.Equals(t.endPosition))
+                    t.Points = Handles.MakeBezierPoints(t.startPosition, t.endPosition, t.startTangent, t.endTangent, Mathf.CeilToInt(Vector3.Distance(t.startPosition, t.endPosition)));
             }
         }
-        void OnEnable() => SceneView.duringSceneGui += DuringSceneGUI;
-        void OnDisable() => SceneView.duringSceneGui -= DuringSceneGUI;
     }
 }

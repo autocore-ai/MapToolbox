@@ -9,7 +9,7 @@ using UnityEditor.Experimental.AssetImporters;
 using UnityEditorInternal;
 using UnityEngine;
 
-namespace Packages.UnityTools.PcdTools.Editor
+namespace Packages.AutowareUnityTools.PcdTools.Editor
 {
     [ScriptedImporter(1, "pcd")]
     class PcdImporter : ScriptedImporter
