@@ -1,7 +1,7 @@
 {
   "name": "com.autocore.unity-tools",
   "displayName": "Unity tools for Autoware",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "unity": "2019.1",
   "description": "Unity tools for Autoware",
   "dependencies": {
