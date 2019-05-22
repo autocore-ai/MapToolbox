@@ -39,7 +39,7 @@ This plugin helps user create vector maps for [Autoware](https://github.com/auto
 * Add two lines below to Packages/manifest.json dependencies
   
 ``` json
-"com.autocore.unity-tools": "https://github.com/autocore-ai/UnityTools.git#upm",
+"com.autocore.map-toolbox": "https://github.com/autocore-ai/MapToolbox.git",
 "com.nition.unity-octree": "https://github.com/autocore-ai/UnityOctree.git#upm",
 ```
 
