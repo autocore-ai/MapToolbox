@@ -1,8 +1,32 @@
-# Unity tools for Autoware
+# Map Toolbox
 
 [![GitHub license](https://img.shields.io/github/license/autocore-ai/AutowareUnityTools.svg)](https://github.com/autocore-ai/AutowareUnityTools)
 [![GitHub release](https://img.shields.io/github/release/autocore-ai/AutowareUnityTools.svg)](https://github.com/autocore-ai/AutowareUnityTools/releases)
 [![Unity version](https://img.shields.io/badge/unity-2019.1%2B-green.svg)](https://unity3d.com/unity/whats-new/2019.1.0)
+
+## Description
+
+This plugin helps user create vector maps for [Autoware](https://github.com/autowarefoundation/autoware) efficiently. 
+
+## Features
+
+* pcd import
+  * binary pcd
+    * ✔️ x y z intensity
+    * ✔️ x y z color
+* vector maps export
+  * Autoware
+    * ✔️ lane merge and branch
+    * ✔️ lane speed
+    * ✔️ white line
+    * ✔️ stop line
+    * ✔️ traffic signal
+    * ✔️ road edge
+    * ✔️ curb
+
+## Roadmap
+
+* export zone type for Autoware
 
 ## Requirements
 
