@@ -77,7 +77,7 @@ namespace Packages.AutowareUnityTools.VectorMapTools
         {
             base.Awake();
             LineRenderer.textureMode = LineTextureMode.Tile;
-            LineRenderer.sharedMaterial = Resources.Load<Material>("UnityToolsForAutoware/Lane");
+            LineRenderer.sharedMaterial = Resources.Load<Material>("MapToolbox/Lane");
         }
         protected virtual void Start()
         {
