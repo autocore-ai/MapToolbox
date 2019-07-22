@@ -16,28 +16,19 @@
 *****************************************************************************/
 #endregion
 
-using Roslin.Msg.vector_map_msgs;
+using Unity.Mathematics;
 
-namespace Packages.MapToolbox.VectorMapTools.Export
+namespace Packages.MapToolbox.PcdTools
 {
-    class CsvSignalLight
+    /// <summary>
+    /// Pcd format https://github.com/autocore-ai/MapToolbox/issues/6
+    /// </summary>
+    public struct xyz_intensity_ring
     {
-        internal const string fileName = "signaldata.csv";
-        internal const string header = "ID,VID,PLID,Type,LinkID";
-        public CsvVector Vector { get; set; }
-        public int ID { get; set; }
-        public int? VID => Vector.VID;
-        public string CsvString => $"{ID},{VID ?? 0},0,2,0";
-        public static implicit operator Signal(CsvSignalLight csvSignalLight)
-        {
-            return new Signal
-            {
-                id = csvSignalLight.ID,
-                vid = csvSignalLight.VID ?? 0,
-                plid = 0,
-                type = 2,
-                linkid = 0
-            };
-        }
+        public float3 point;
+        public byte _0;
+        public float intensity;
+        public ushort ring;
+        public byte _1;
     }
 }

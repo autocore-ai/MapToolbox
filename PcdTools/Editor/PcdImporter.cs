@@ -21,7 +21,7 @@ using UnityEditor.Experimental.AssetImporters;
 using UnityEditorInternal;
 using UnityEngine;
 
-namespace Packages.AutowareUnityTools.PcdTools.Editor
+namespace Packages.MapToolbox.PcdTools.Editor
 {
     [ScriptedImporter(1, "pcd")]
     class PcdImporter : ScriptedImporter

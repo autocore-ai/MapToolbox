@@ -18,7 +18,7 @@
 
 using Unity.Mathematics;
 
-namespace Packages.AutowareUnityTools.PcdTools
+namespace Packages.MapToolbox.PcdTools
 {
     public struct float3byte4
     {

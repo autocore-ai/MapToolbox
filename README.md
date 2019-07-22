@@ -12,8 +12,10 @@ This a unity plugin helps user create vector maps for [Autoware](https://github.
 
 * pcd import
   * binary pcd
-    * ✔️ x y z intensity
+    * ✔️ x y z
     * ✔️ x y z color
+    * ✔️ x y z intensity
+    * ✔️ x y z intensity ring
 * vector maps export
   * Autoware
     * ✔️ lane merge and branch
@@ -43,6 +45,7 @@ This a unity plugin helps user create vector maps for [Autoware](https://github.
 "com.autocore.map-toolbox": "https://github.com/autocore-ai/MapToolbox.git",
 "com.nition.unity-octree": "https://github.com/autocore-ai/UnityOctree.git#upm",
 ```
-## user manual
+## User manual
 * please check video. docs will be provided soon.
+
 [![Watch the video](https://img.youtube.com/vi/WTRHPs8pN04/0.jpg)](https://youtu.be/WTRHPs8pN04)

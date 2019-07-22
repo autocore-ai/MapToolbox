@@ -18,7 +18,7 @@
 
 using UnityEngine;
 
-namespace Packages.AutowareUnityTools.VectorMapTools
+namespace Packages.MapToolbox.VectorMapTools
 {
     [RequireComponent(typeof(LineRenderer)), ExecuteInEditMode]
     public class Line : MonoBehaviour

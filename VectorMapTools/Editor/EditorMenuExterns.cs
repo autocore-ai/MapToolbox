@@ -16,12 +16,12 @@
 *****************************************************************************/
 #endregion
 
-using Packages.AutowareUnityTools.VectorMapTools.Export;
+using Packages.MapToolbox.VectorMapTools.Export;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace Packages.AutowareUnityTools.VectorMapTools.Editor
+namespace Packages.MapToolbox.VectorMapTools.Editor
 {
     class EditorMenuExterns
     {
@@ -76,7 +76,7 @@ namespace Packages.AutowareUnityTools.VectorMapTools.Editor
             if (!string.IsNullOrEmpty(folder))
             {
                 PlayerPrefs.SetString("ExportVectorMap", folder);
-                VectorMapExporter.ExportMaps(folder);
+                new VectorMapCollection().WriteFiles(folder);
             }
         }
     }

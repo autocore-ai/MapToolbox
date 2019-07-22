@@ -18,7 +18,7 @@
 
 using UnityEngine;
 
-namespace Packages.AutowareUnityTools.VectorMapTools
+namespace Packages.MapToolbox.VectorMapTools
 {
     public class Bezier : LRMapElement
     {
@@ -50,7 +50,7 @@ namespace Packages.AutowareUnityTools.VectorMapTools
                 endTangent += endPositionMove;
             }
         }
-        internal override Vector3? Pivot
+        public override Vector3? Pivot
         {
             set
             {

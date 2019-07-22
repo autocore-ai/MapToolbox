@@ -19,7 +19,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Packages.AutowareUnityTools.VectorMapTools.Export
+namespace Packages.MapToolbox.VectorMapTools.Export
 {
     class CsvLane
     {
@@ -62,5 +62,34 @@ namespace Packages.AutowareUnityTools.VectorMapTools.Export
         public int? FNID => FinalNode?.NID;
         public float Velocity { get; set; }
         public string CsvString => $"{LnID},{DID ?? 0},{BLID ?? 0},{FLID ?? 0},{BNID ?? 0},{FNID ?? 0},0,{BLID2 ?? 0},{BLID3 ?? 0},{BLID4 ?? 0},{FLID2 ?? 0},{FLID3 ?? 0},{FLID4 ?? 0},0,1,1,1,0,{Velocity:f3},{Velocity:f3},0,0";
+        public static implicit operator Roslin.Msg.vector_map_msgs.Lane(CsvLane csvLane)
+        {
+            return new Roslin.Msg.vector_map_msgs.Lane
+            {
+                lnid = csvLane.LnID,
+                did = csvLane.DID ?? 0,
+                blid = csvLane.BLID ?? 0,
+                flid = csvLane.FLID ?? 0,
+                bnid = csvLane.BNID ?? 0,
+                fnid = csvLane.FNID ?? 0,
+                jct = 0,
+                blid2 = csvLane.BLID2 ?? 0,
+                blid3 = csvLane.BLID3 ?? 0,
+                blid4 = csvLane.BLID4 ?? 0,
+                flid2 = csvLane.FLID2 ?? 0,
+                flid3 = csvLane.FLID3 ?? 0,
+                flid4 = csvLane.FLID4 ?? 0,
+                clossid = 0,
+                span = 1,
+                lcnt = 1,
+                lno = 1,
+                lanetype = 0,
+                limitvel = (int)csvLane.Velocity,
+                refvel = (int)csvLane.Velocity,
+                roadsecid = 0,
+                lanecfgfg = 0,
+                linkwaid = 0
+            };
+        }
     }
 }

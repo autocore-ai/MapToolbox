@@ -20,7 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Packages.AutowareUnityTools.VectorMapTools
+namespace Packages.MapToolbox.VectorMapTools
 {
     public class Lane : AutoHeightBezier
     {

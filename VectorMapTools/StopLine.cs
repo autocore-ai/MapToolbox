@@ -20,7 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Packages.AutowareUnityTools.VectorMapTools
+namespace Packages.MapToolbox.VectorMapTools
 {
     public class StopLine : AutoHeightLine
     {
@@ -34,12 +34,16 @@ namespace Packages.AutowareUnityTools.VectorMapTools
         protected override void Awake()
         {
             base.Awake();
-            List.Add(this);
             LineRenderer.sharedMaterial = new Material(Shader.Find("Unlit/Color"))
             {
                 color = Color.white
             };
             LineRenderer.startWidth = LineRenderer.endWidth = displayWidth;
+        }
+        protected override void Start()
+        {
+            base.Start();
+            List.Add(this);
         }
         private void Update()
         {

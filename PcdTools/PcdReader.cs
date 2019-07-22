@@ -22,7 +22,7 @@ using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
 using UnityEngine;
 
-namespace Packages.AutowareUnityTools.PcdTools
+namespace Packages.MapToolbox.PcdTools
 {
     public class PcdReader : StreamReader
     {
@@ -30,6 +30,7 @@ namespace Packages.AutowareUnityTools.PcdTools
         public NativeArray<float3byte4> PcdData_xyz_rgb { get; set; }
         public NativeArray<float4> PcdData_xyz_intensity { get; set; }
         public NativeArray<float3> PcdData_xyz { get; private set; }
+        public NativeArray<xyz_intensity_ring> PcdData_xyz_intensity_ring { get; set; }
         public PcdReader(string filePath) : base(filePath)
         {
             FilePath = filePath;
@@ -87,6 +88,16 @@ namespace Packages.AutowareUnityTools.PcdTools
                                 }
                             }
                             break;
+                        case "x y z _ intensity ring _":
+                            PcdData_xyz_intensity_ring = new NativeArray<xyz_intensity_ring>(pointsCount, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
+                            unsafe
+                            {
+                                fixed (byte* data = new BinaryReader(BaseStream).ReadBytes(pointsCount * sizeof(xyz_intensity_ring)))
+                                {
+                                    UnsafeUtility.MemCpy(PcdData_xyz_intensity_ring.GetUnsafePtr(), data, pointsCount * sizeof(xyz_intensity_ring));
+                                }
+                            }
+                            break;
                         default:
                             Debug.LogError($"Unknow field type {fields}");
                             break;
@@ -94,7 +105,7 @@ namespace Packages.AutowareUnityTools.PcdTools
                 }
                 else
                 {
-                    Debug.LogError("Binary format pcd surported only currently !");
+                    Debug.LogError("Binary format pcd supported only currently !");
                 }
             }
             else
@@ -110,6 +121,8 @@ namespace Packages.AutowareUnityTools.PcdTools
                 PcdData_xyz_rgb.Dispose();
             if (PcdData_xyz_intensity.IsCreated)
                 PcdData_xyz_intensity.Dispose();
+            if (PcdData_xyz_intensity_ring.IsCreated)
+                PcdData_xyz_intensity_ring.Dispose();
             base.Dispose(disposing);
         }
     }

@@ -18,7 +18,7 @@
 
 using UnityEditor;
 
-namespace Packages.AutowareUnityTools.VectorMapTools.Editor
+namespace Packages.MapToolbox.VectorMapTools.Editor
 {
     [CustomEditor(typeof(StopLine))]
     class StopLineEditor : LineEditor

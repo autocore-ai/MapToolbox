@@ -16,7 +16,7 @@
 *****************************************************************************/
 #endregion
 
-namespace Packages.AutowareUnityTools.VectorMapTools.Export
+namespace Packages.MapToolbox.VectorMapTools.Export
 {
     class CsvLine
     {
@@ -50,5 +50,16 @@ namespace Packages.AutowareUnityTools.VectorMapTools.Export
         public int? BLID => LineLast?.LID;
         public int? FLID => LineNext?.LID;
         public string CsvString => $"{LID},{BPID ?? 0},{FPID ?? 0},{BLID ?? 0},{FLID ?? 0}";
+        public static implicit operator Roslin.Msg.vector_map_msgs.Line(CsvLine csvLine)
+        {
+            return new Roslin.Msg.vector_map_msgs.Line
+            {
+                lid = csvLine.LID,
+                bpid = csvLine.BPID ?? 0,
+                fpid = csvLine.FPID ?? 0,
+                blid = csvLine.BLID ?? 0,
+                flid = csvLine.FLID ?? 0
+            };
+        }
     }
 }

@@ -16,7 +16,7 @@
 *****************************************************************************/
 #endregion
 
-namespace Packages.AutowareUnityTools.VectorMapTools.Export
+namespace Packages.MapToolbox.VectorMapTools.Export
 {
     class CsvStopLine
     {
@@ -30,5 +30,16 @@ namespace Packages.AutowareUnityTools.VectorMapTools.Export
         public int? TLID => SignalLight?.ID;
         public int? LinkID => Lane?.LnID;
         public string CsvString => $"{ID},{LID ?? 0},{TLID ?? 0},0,{LinkID ?? 0}";
+        public static implicit operator Roslin.Msg.vector_map_msgs.StopLine (CsvStopLine csvStopLine)
+        {
+            return new Roslin.Msg.vector_map_msgs.StopLine
+            {
+                id = csvStopLine.ID,
+                lid = csvStopLine.LID ?? 0,
+                tlid = csvStopLine.TLID ?? 0,
+                signid = 0,
+                linkid = csvStopLine.LinkID ?? 0
+            };
+        }
     }
 }

@@ -18,23 +18,23 @@
 
 using UnityEngine;
 
-namespace Packages.AutowareUnityTools.VectorMapTools
+namespace Packages.MapToolbox.VectorMapTools
 {
     [RequireComponent(typeof(LineRenderer)), ExecuteInEditMode]
     public class LRMapElement : MonoBehaviour
     {
         public LineRenderer LineRenderer { get; private set; }
         [HideInInspector] public float width = 1;
-        internal float WidthMin { get; set; } = 0.1f;
-        internal float WidthMax { get; set; } = 1;
-        internal virtual Vector3? Pivot { get; set; }
+        public float WidthMin { get; set; } = 0.1f;
+        public float WidthMax { get; set; } = 1;
+        public virtual Vector3? Pivot { get; set; }
         protected virtual void Awake()
         {
             LineRenderer = GetComponent<LineRenderer>();
             LineRenderer.useWorldSpace = true;
             SetLineRendererWidth(width);
         }
-        internal void SetLineRendererWidth(float width)
+        public void SetLineRendererWidth(float width)
         {
             if (LineRenderer)
             {

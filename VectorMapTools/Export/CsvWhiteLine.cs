@@ -16,7 +16,7 @@
 *****************************************************************************/
 #endregion
 
-namespace Packages.AutowareUnityTools.VectorMapTools.Export
+namespace Packages.MapToolbox.VectorMapTools.Export
 {
     class CsvWhiteLine
     {
@@ -26,6 +26,18 @@ namespace Packages.AutowareUnityTools.VectorMapTools.Export
         public int ID { get; set; }
         public int? LID => Line?.LID;
         public float Width { get; set; }
-        public string CsvString => $"{ID},{LID ?? 0},{Width:F3},W,0,1";
+        public string CsvString => $"{ID},{LID ?? 0},{Width:F3},W,0,0";
+        public static implicit operator Roslin.Msg.vector_map_msgs.WhiteLine(CsvWhiteLine csvWhiteLine)
+        {
+            return new Roslin.Msg.vector_map_msgs.WhiteLine
+            {
+                id = csvWhiteLine.ID,
+                lid = csvWhiteLine.LID ?? 0,
+                width = csvWhiteLine.Width,
+                color = (sbyte)'w',
+                type = 0,
+                linkid = 0,
+            };
+        }
     }
 }

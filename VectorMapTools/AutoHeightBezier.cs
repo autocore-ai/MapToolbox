@@ -18,7 +18,7 @@
 
 using UnityEngine;
 
-namespace Packages.AutowareUnityTools.VectorMapTools
+namespace Packages.MapToolbox.VectorMapTools
 {
     public class AutoHeightBezier : Bezier
     {

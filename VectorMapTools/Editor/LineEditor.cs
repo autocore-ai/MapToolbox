@@ -19,7 +19,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace Packages.AutowareUnityTools.VectorMapTools.Editor
+namespace Packages.MapToolbox.VectorMapTools.Editor
 {
     [CustomEditor(typeof(Line))]
     class LineEditor : UnityEditor.Editor

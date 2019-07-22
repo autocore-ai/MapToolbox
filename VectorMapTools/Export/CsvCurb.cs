@@ -16,7 +16,7 @@
 *****************************************************************************/
 #endregion
 
-namespace Packages.AutowareUnityTools.VectorMapTools.Export
+namespace Packages.MapToolbox.VectorMapTools.Export
 {
     class CsvCurb
     {
@@ -29,5 +29,17 @@ namespace Packages.AutowareUnityTools.VectorMapTools.Export
         internal float Width { get; set; } = 0.15f;
         internal float Dir { get; set; } = 1;
         internal string CsvString => $"{ID},{LID ?? 0},{Height},{Width},{Dir},0";
+        public static implicit operator Roslin.Msg.vector_map_msgs.Curb( CsvCurb csvCurb)
+        {
+            return new Roslin.Msg.vector_map_msgs.Curb
+            {
+                id = csvCurb.ID,
+                lid = csvCurb.LID ?? 0,
+                height = csvCurb.Height,
+                width = csvCurb.Width,
+                dir = (int)csvCurb.Dir,
+                linkid = 0
+            };
+        }
     }
 }

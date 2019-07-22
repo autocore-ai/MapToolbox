@@ -21,7 +21,7 @@ using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
 
-namespace Packages.AutowareUnityTools.PcdTools
+namespace Packages.MapToolbox.PcdTools
 {
     public class PcdWriter : StreamWriter
     {

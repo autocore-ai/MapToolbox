@@ -20,7 +20,7 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace Packages.AutowareUnityTools.PcdTools.Editor
+namespace Packages.MapToolbox.PcdTools.Editor
 {
     class EditorMenuExterns
     {

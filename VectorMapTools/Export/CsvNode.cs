@@ -16,7 +16,9 @@
 *****************************************************************************/
 #endregion
 
-namespace Packages.AutowareUnityTools.VectorMapTools.Export
+using Roslin.Msg.vector_map_msgs;
+
+namespace Packages.MapToolbox.VectorMapTools.Export
 {
     class CsvNode
     {
@@ -26,5 +28,13 @@ namespace Packages.AutowareUnityTools.VectorMapTools.Export
         public int NID { get; set; }
         public int? PID => Point?.PID;
         public string CsvString => $"{NID},{PID ?? 0}";
+        public static implicit operator Node(CsvNode csvNode)
+        {
+            return new Node
+            {
+                nid = csvNode.NID,
+                pid = csvNode.PID ?? 0
+            };
+        }
     }
 }

@@ -1,0 +1,17 @@
+{
+    "name": "Packages.AutowareUnityTools.VectorMapTools.Editor",
+    "references": [
+        "GUID:8eabb44705a93db47bc5b2b6feda08e3"
+    ],
+    "optionalUnityReferences": [],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": []
+}

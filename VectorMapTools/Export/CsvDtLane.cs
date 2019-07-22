@@ -16,9 +16,10 @@
 *****************************************************************************/
 #endregion
 
+using Roslin.Msg.vector_map_msgs;
 using UnityEngine;
 
-namespace Packages.AutowareUnityTools.VectorMapTools.Export
+namespace Packages.MapToolbox.VectorMapTools.Export
 {
     class CsvDtLane
     {
@@ -43,5 +44,21 @@ namespace Packages.AutowareUnityTools.VectorMapTools.Export
         private float AddSegmentDistance(float currentDistance) => lastDtLane == null ? currentDistance : (Vector3.Distance(lastDtLane.Point.Position, Point.Position) + lastDtLane.AddSegmentDistance(currentDistance));
         private float DirectionFrom(CsvDtLane target) => Vector3.SignedAngle(Point.Position - target.Point.Position, Vector3.forward, Vector3.up) / 180 * Mathf.PI;
         public string CsvString => $"{DID},{Dist:F2},{PID ?? 0},{Dir ?? lastDtLane.Dir:F2},0,90000000000,0,0,2,2";
+        public static implicit operator DTLane(CsvDtLane csvDtLane)
+        {
+            return new DTLane
+            {
+                did = csvDtLane.DID,
+                dist = csvDtLane.Dist,
+                pid = csvDtLane.PID ?? 0,
+                dir = (double)(csvDtLane.Dir ?? csvDtLane.lastDtLane.Dir),
+                apara = 0,
+                r = 90000000000,
+                slope = 0,
+                cant = 0,
+                lw = 2,
+                rw = 2
+            };
+        }
     }
 }

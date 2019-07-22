@@ -24,10 +24,11 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace Packages.AutowareUnityTools.PcdTools
+namespace Packages.MapToolbox.PcdTools
 {
     public static class PointsMeshBuild
     {
+        const float max_intensity = 100;
         public static Mesh PointsMesh(this PcdReader pcdReader)
         {
             if (pcdReader.PcdData_xyz.IsCreated)
@@ -80,6 +81,24 @@ namespace Packages.AutowareUnityTools.PcdTools
                     }
                 }
             }
+            else if (pcdReader.PcdData_xyz_intensity_ring.IsCreated)
+            {
+                using (var vertices = new NativeArray<Vector3>(pcdReader.PcdData_xyz_intensity_ring.Length, Allocator.TempJob, NativeArrayOptions.UninitializedMemory))
+                {
+                    using (var colors = new NativeArray<Color32>(pcdReader.PcdData_xyz_intensity_ring.Length, Allocator.TempJob, NativeArrayOptions.UninitializedMemory))
+                    {
+                        new Ros2Unity_xyz_intensity_ring() { pcd = pcdReader.PcdData_xyz_intensity_ring, vertices = vertices, colors = colors }.Schedule(vertices.Length, 128).Complete();
+                        Mesh mesh = new Mesh()
+                        {
+                            indexFormat = vertices.Length > 65535 ? IndexFormat.UInt32 : IndexFormat.UInt16,
+                            vertices = vertices.ToArray(),
+                            colors32 = colors.ToArray()
+                        };
+                        mesh.SetIndices(Enumerable.Range(0, mesh.vertexCount).ToArray(), MeshTopology.Points, 0);
+                        return mesh;
+                    }
+                }
+            }
             else
             {
                 return new Mesh();
@@ -113,7 +132,19 @@ namespace Packages.AutowareUnityTools.PcdTools
             public void Execute(int index)
             {
                 vertices[index] = new Vector3(-pcd[index].y, pcd[index].z, pcd[index].x);
-                colors[index] = Color32.Lerp(Color.red, Color.green, pcd[index].w / 100);
+                colors[index] = Color32.Lerp(Color.red, Color.green, pcd[index].w / max_intensity);
+            }
+        }
+        [BurstCompile]
+        struct Ros2Unity_xyz_intensity_ring : IJobParallelFor
+        {
+            [ReadOnly] internal NativeArray<xyz_intensity_ring> pcd;
+            [WriteOnly] internal NativeArray<Vector3> vertices;
+            [WriteOnly] internal NativeArray<Color32> colors;
+            public void Execute(int index)
+            {
+                vertices[index] = new Vector3(-pcd[index].point.y, pcd[index].point.z, pcd[index].point.x);
+                colors[index] = Color32.Lerp(Color.red, Color.green, pcd[index].intensity / max_intensity);
             }
         }
     }

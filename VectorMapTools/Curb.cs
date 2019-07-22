@@ -19,7 +19,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Packages.AutowareUnityTools.VectorMapTools
+namespace Packages.MapToolbox.VectorMapTools
 {
     public class Curb : DoubleConnectBezier
     {
@@ -27,7 +27,6 @@ namespace Packages.AutowareUnityTools.VectorMapTools
         protected override void Awake()
         {
             base.Awake();
-            List.Add(this);
             LineRenderer.sharedMaterial = new Material(Shader.Find("Unlit/Color"))
             {
                 color = Color.red

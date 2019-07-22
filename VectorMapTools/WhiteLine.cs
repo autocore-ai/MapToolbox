@@ -19,15 +19,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Packages.AutowareUnityTools.VectorMapTools
+namespace Packages.MapToolbox.VectorMapTools
 {
-    class WhiteLine : DoubleConnectBezier
+    public class WhiteLine : DoubleConnectBezier
     {
         public static List<WhiteLine> List { get; set; } = new List<WhiteLine>();
         protected override void Awake()
         {
             base.Awake();
-            List.Add(this);
             LineRenderer.sharedMaterial = new Material(Shader.Find("Unlit/Color"))
             {
                 color = Color.white

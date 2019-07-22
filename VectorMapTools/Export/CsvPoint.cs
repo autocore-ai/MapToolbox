@@ -16,9 +16,10 @@
 *****************************************************************************/
 #endregion
 
+using Roslin.Msg.vector_map_msgs;
 using UnityEngine;
 
-namespace Packages.AutowareUnityTools.VectorMapTools.Export
+namespace Packages.MapToolbox.VectorMapTools.Export
 {
     class CsvPoint
     {
@@ -30,5 +31,21 @@ namespace Packages.AutowareUnityTools.VectorMapTools.Export
         public float Bx => -Position.x;
         public float Ly => Position.z;
         public string CsvString => $"{PID},0,0,{H:F2},{Bx:F2},{Ly:F2},0,0,0,0";
+        public static implicit operator Point(CsvPoint csvPoint)
+        {
+            return new Point
+            {
+                pid = csvPoint.PID,
+                b = 0,
+                l = 0,
+                h = csvPoint.H,
+                bx = csvPoint.Bx,
+                ly = csvPoint.Ly,
+                @ref = 0,
+                mcode1 = 0,
+                mcode2 = 0,
+                mcode3 = 0
+            };
+        }
     }
 }

@@ -24,7 +24,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace Packages.AutowareUnityTools.PcdTools
+namespace Packages.MapToolbox.PcdTools
 {
     public static class HeightMeshBuild
     {

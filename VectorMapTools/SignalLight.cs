@@ -16,18 +16,40 @@
 *****************************************************************************/
 #endregion
 
+using System.Collections.Generic;
 using UnityEngine;
 
-namespace Packages.AutowareUnityTools.VectorMapTools
+namespace Packages.MapToolbox.VectorMapTools
 {
     [ExecuteInEditMode]
     public class SignalLight : MonoBehaviour
     {
+        public enum LightColor
+        {
+            Red,
+            Yellow,
+            Green
+        }
+        public LightColor lightColor = LightColor.Green;
+        public static List<SignalLight> List { get; set; } = new List<SignalLight>();
+        private void Start() => List.Add(this);
         private void OnDrawGizmos()
         {
-            Gizmos.color = Color.green;
+            if (lightColor == LightColor.Green)
+            {
+                Gizmos.color = Color.green;
+            }
+            else if (lightColor == LightColor.Yellow)
+            {
+                Gizmos.color = Color.yellow;
+            }
+            else
+            {
+                Gizmos.color = Color.red;
+            }
             Gizmos.matrix = transform.localToWorldMatrix;
             Gizmos.DrawFrustum(Vector3.zero, 30, 10, 0.2f, 1);
         }
+        private void OnDestroy() => List.Remove(this);
     }
 }

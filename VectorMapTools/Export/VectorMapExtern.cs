@@ -20,7 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Packages.AutowareUnityTools.VectorMapTools.Export
+namespace Packages.MapToolbox.VectorMapTools.Export
 {
     static class VectorMapExtern
     {
