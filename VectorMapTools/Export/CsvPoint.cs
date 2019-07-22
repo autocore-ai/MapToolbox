@@ -16,36 +16,19 @@
 *****************************************************************************/
 #endregion
 
-using Roslin.Msg.vector_map_msgs;
 using UnityEngine;
 
 namespace Packages.MapToolbox.VectorMapTools.Export
 {
-    class CsvPoint
+    public class CsvPoint
     {
-        internal const string fileName = "point.csv";
-        internal const string header = "PID,B,L,H,Bx,Ly,ReF,MCODE1,MCODE2,MCODE3";
+        public const string fileName = "point.csv";
+        public const string header = "PID,B,L,H,Bx,Ly,ReF,MCODE1,MCODE2,MCODE3";
         public Vector3 Position { get; set; }
         public int PID { get; set; }
         public float H => Position.y;
         public float Bx => -Position.x;
         public float Ly => Position.z;
         public string CsvString => $"{PID},0,0,{H:F2},{Bx:F2},{Ly:F2},0,0,0,0";
-        public static implicit operator Point(CsvPoint csvPoint)
-        {
-            return new Point
-            {
-                pid = csvPoint.PID,
-                b = 0,
-                l = 0,
-                h = csvPoint.H,
-                bx = csvPoint.Bx,
-                ly = csvPoint.Ly,
-                @ref = 0,
-                mcode1 = 0,
-                mcode2 = 0,
-                mcode3 = 0
-            };
-        }
     }
 }

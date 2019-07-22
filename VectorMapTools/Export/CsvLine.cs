@@ -18,12 +18,12 @@
 
 namespace Packages.MapToolbox.VectorMapTools.Export
 {
-    class CsvLine
+    public class CsvLine
     {
-        internal const string fileName = "line.csv";
-        internal const string header = "LID,BPID,FPID,BLID,FLID";
-        private CsvLine lineLast;
-        private CsvLine lineNext;
+        public const string fileName = "line.csv";
+        public const string header = "LID,BPID,FPID,BLID,FLID";
+        public CsvLine lineLast;
+        public CsvLine lineNext;
         public CsvPoint PointBegin { get; set; }
         public CsvPoint PointFinal { get; set; }
         public CsvLine LineLast
@@ -50,16 +50,5 @@ namespace Packages.MapToolbox.VectorMapTools.Export
         public int? BLID => LineLast?.LID;
         public int? FLID => LineNext?.LID;
         public string CsvString => $"{LID},{BPID ?? 0},{FPID ?? 0},{BLID ?? 0},{FLID ?? 0}";
-        public static implicit operator Roslin.Msg.vector_map_msgs.Line(CsvLine csvLine)
-        {
-            return new Roslin.Msg.vector_map_msgs.Line
-            {
-                lid = csvLine.LID,
-                bpid = csvLine.BPID ?? 0,
-                fpid = csvLine.FPID ?? 0,
-                blid = csvLine.BLID ?? 0,
-                flid = csvLine.FLID ?? 0
-            };
-        }
     }
 }

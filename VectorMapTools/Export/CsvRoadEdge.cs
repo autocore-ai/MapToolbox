@@ -18,22 +18,13 @@
 
 namespace Packages.MapToolbox.VectorMapTools.Export
 {
-    class CsvRoadEdge
+    public class CsvRoadEdge
     {
-        internal const string fileName = "roadedge.csv";
-        internal const string header = "ID,LID,LinkID";
-        internal CsvLine Line { get; set; }
+        public const string fileName = "roadedge.csv";
+        public const string header = "ID,LID,LinkID";
+        public CsvLine Line { get; set; }
         public int ID { get; set; }
         public int? LID => Line?.LID;
         public string CsvString => $"{ID},{LID ?? 0},0";
-        public static implicit operator Roslin.Msg.vector_map_msgs.RoadEdge(CsvRoadEdge csvRoadEdge)
-        {
-            return new Roslin.Msg.vector_map_msgs.RoadEdge
-            {
-                id = csvRoadEdge.ID,
-                lid = csvRoadEdge.LID ?? 0,
-                linkid = 0
-            };
-        }
     }
 }

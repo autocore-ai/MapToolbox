@@ -16,15 +16,14 @@
 *****************************************************************************/
 #endregion
 
-using Roslin.Msg.vector_map_msgs;
 using UnityEngine;
 
 namespace Packages.MapToolbox.VectorMapTools.Export
 {
-    class CsvVector
+    public class CsvVector
     {
-        internal const string fileName = "vector.csv";
-        internal const string header = "VID,PID,Hang,Vang";
+        public const string fileName = "vector.csv";
+        public const string header = "VID,PID,Hang,Vang";
         public Quaternion Rotation { get; set; }
         public CsvPoint Point { get; set; }
         public int VID { get; set; }
@@ -32,15 +31,5 @@ namespace Packages.MapToolbox.VectorMapTools.Export
         public float Hang => Rotation.eulerAngles.y + 90;
         public float Vang => Rotation.eulerAngles.x + 90;
         public string CsvString => $"{VID},{PID ?? 0},{Hang:F2},{Vang:F2}";
-        public static implicit operator Vector(CsvVector csvVector)
-        {
-            return new Vector
-            {
-                vid = csvVector.VID,
-                pid = csvVector.PID ?? 0,
-                hang = csvVector.Hang,
-                vang = csvVector.Vang
-            };
-        }
     }
 }

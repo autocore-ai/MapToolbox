@@ -16,9 +16,6 @@
 *****************************************************************************/
 #endregion
 
-using Roslin.Msg.std_msgs;
-using Roslin.Msg.vector_map_msgs;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -28,18 +25,18 @@ namespace Packages.MapToolbox.VectorMapTools.Export
 {
     public class VectorMapCollection
     {
-        PointOctree<CsvLane> finalLanes;
-        List<CsvPoint> csvPoints;
-        List<CsvNode> csvNodes;
-        List<CsvDtLane> csvDtLanes;
-        List<CsvLane> csvLanes;
-        List<CsvLine> csvLines;
-        List<CsvVector> csvVectors;
-        List<CsvSignalLight> csvSignalLights;
-        List<CsvStopLine> csvStopLines;
-        List<CsvWhiteLine> csvWhiteLines;
-        List<CsvRoadEdge> csvRoadEdges;
-        List<CsvCurb> csvCurbs;
+        public PointOctree<CsvLane> finalLanes;
+        public List<CsvPoint> csvPoints;
+        public List<CsvNode> csvNodes;
+        public List<CsvDtLane> csvDtLanes;
+        public List<CsvLane> csvLanes;
+        public List<CsvLine> csvLines;
+        public List<CsvVector> csvVectors;
+        public List<CsvSignalLight> csvSignalLights;
+        public List<CsvStopLine> csvStopLines;
+        public List<CsvWhiteLine> csvWhiteLines;
+        public List<CsvRoadEdge> csvRoadEdges;
+        public List<CsvCurb> csvCurbs;
         public VectorMapCollection()
         {
             ClearAll();
@@ -274,82 +271,6 @@ namespace Packages.MapToolbox.VectorMapTools.Export
                 ls.AddRange(csvCurbs.Select(_ => _.CsvString));
                 File.WriteAllLines(Path.Combine(folder, CsvCurb.fileName), ls);
             }
-        }
-        public void GetTopics(
-            out PointArray pointArray,
-            out NodeArray nodeArray,
-            out DTLaneArray dTLaneArray,
-            out LaneArray laneArray,
-            out LineArray lineArray,
-            out VectorArray vectorArray,
-            out SignalArray signalArray,
-            out StopLineArray stopLineArray,
-            out WhiteLineArray whiteLineArray,
-            out RoadEdgeArray roadEdgeArray,
-            out CurbArray curbArray)
-        {
-            const string frameID = "map";
-            Header header = new Header
-            {
-                seq = 0,
-                stamp = DateTime.UtcNow,
-                frame_id = frameID
-            };
-            pointArray = new PointArray
-            {
-                header = header,
-                data = csvPoints.Select(_ => (Point)_).ToArray()
-            };
-            nodeArray = new NodeArray
-            {
-                header = header,
-                data = csvNodes.Select(_ => (Node)_).ToArray()
-            };
-            dTLaneArray = new DTLaneArray
-            {
-                header = header,
-                data = csvDtLanes.Select(_ => (DTLane)_).ToArray()
-            };
-            laneArray = new LaneArray
-            {
-                header = header,
-                data = csvLanes.Select(_ => (Roslin.Msg.vector_map_msgs.Lane)_).ToArray()
-            };
-            lineArray = new LineArray
-            {
-                header = header,
-                data = csvLines.Select(_ => (Roslin.Msg.vector_map_msgs.Line)_).ToArray()
-            };
-            vectorArray = new VectorArray
-            {
-                header = header,
-                data = csvVectors.Select(_ => (Vector)_).ToArray()
-            };
-            signalArray = new SignalArray
-            {
-                header = header,
-                data = csvSignalLights.Select(_ => (Signal)_).ToArray()
-            };
-            stopLineArray = new StopLineArray
-            {
-                header = header,
-                data = csvStopLines.Select(_ => (Roslin.Msg.vector_map_msgs.StopLine)_).ToArray()
-            };
-            whiteLineArray = new WhiteLineArray
-            {
-                header = header,
-                data = csvWhiteLines.Select(_ => (Roslin.Msg.vector_map_msgs.WhiteLine)_).ToArray()
-            };
-            roadEdgeArray = new RoadEdgeArray
-            {
-                header = header,
-                data = csvRoadEdges.Select(_ => (Roslin.Msg.vector_map_msgs.RoadEdge)_).ToArray()
-            };
-            curbArray = new CurbArray
-            {
-                header = header,
-                data = csvCurbs.Select(_ => (Roslin.Msg.vector_map_msgs.Curb)_).ToArray()
-            };
         }
     }
 }

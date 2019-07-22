@@ -16,25 +16,16 @@
 *****************************************************************************/
 #endregion
 
-using Roslin.Msg.vector_map_msgs;
 
 namespace Packages.MapToolbox.VectorMapTools.Export
 {
-    class CsvNode
+    public class CsvNode
     {
-        internal const string fileName = "node.csv";
-        internal const string header = "NID,PID";
+        public const string fileName = "node.csv";
+        public const string header = "NID,PID";
         public CsvPoint Point { get; set; }
         public int NID { get; set; }
         public int? PID => Point?.PID;
         public string CsvString => $"{NID},{PID ?? 0}";
-        public static implicit operator Node(CsvNode csvNode)
-        {
-            return new Node
-            {
-                nid = csvNode.NID,
-                pid = csvNode.PID ?? 0
-            };
-        }
     }
 }

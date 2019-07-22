@@ -16,28 +16,15 @@
 *****************************************************************************/
 #endregion
 
-using Roslin.Msg.vector_map_msgs;
-
 namespace Packages.MapToolbox.VectorMapTools.Export
 {
-    class CsvSignalLight
+    public class CsvSignalLight
     {
-        internal const string fileName = "signaldata.csv";
-        internal const string header = "ID,VID,PLID,Type,LinkID";
+        public const string fileName = "signaldata.csv";
+        public const string header = "ID,VID,PLID,Type,LinkID";
         public CsvVector Vector { get; set; }
         public int ID { get; set; }
         public int? VID => Vector.VID;
         public string CsvString => $"{ID},{VID ?? 0},0,2,0";
-        public static implicit operator Signal(CsvSignalLight csvSignalLight)
-        {
-            return new Signal
-            {
-                id = csvSignalLight.ID,
-                vid = csvSignalLight.VID ?? 0,
-                plid = 0,
-                type = 2,
-                linkid = 0
-            };
-        }
     }
 }
