@@ -38,11 +38,11 @@ namespace Packages.MapToolbox.PcdTools
                 var originVertices = new NativeArray<Vector3>(pointsMesh.vertices, Allocator.TempJob);
                 var hashMap = new NativeMultiHashMap<int, int>(pointsMesh.vertices.Length, Allocator.TempJob);
                 var minHeightIndex = new NativeArray<int>(originVertices.Length, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
-                new GetHashMap() { min = minInt, size = sizeInt, vertices = originVertices, hashMap = hashMap.ToConcurrent(), minHeightIndex = minHeightIndex }.Schedule(originVertices.Length, 128).Complete();
+                new GetHashMap() { min = minInt, size = sizeInt, vertices = originVertices, hashMap = hashMap.AsParallelWriter(), minHeightIndex = minHeightIndex }.Schedule(originVertices.Length, 128).Complete();
                 new GetMinHeightIndex() { vertices = originVertices, minHeightIndex = minHeightIndex }.Schedule(hashMap, 128).Complete();
                 hashMap.Dispose();
                 var list = new NativeList<int>(originVertices.Length, Allocator.TempJob);
-                new FilterMinHeightPoints() { minHeightIndex = minHeightIndex }.ScheduleAppend(list, list.Capacity, 128).Complete();
+                new FilterMinHeightPoints() { minHeightIndex = minHeightIndex }.ScheduleAppend(list, originVertices.Length, 128).Complete();
                 var minHeightPoints = new NativeArray<Vector3>(list.Length, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
                 new GetMinHeightPoints() { vertices = originVertices, list = list, minHeightIndex = minHeightIndex, minHeightPoints = minHeightPoints }.Schedule(minHeightPoints.Length, 128).Complete();
                 minHeightIndex.Dispose();
@@ -51,7 +51,7 @@ namespace Packages.MapToolbox.PcdTools
                 var flatMeshVertices = new NativeArray<Vector3>((sizeInt.x + 1) * (sizeInt.y + 1), Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
                 new InitHeightMeshVertices() { min = minInt, size = sizeInt, flatMeshVertices = flatMeshVertices }.Schedule(flatMeshVertices.Length, 128).Complete();
                 var indicesHeightMap = new NativeHashMap<int, float>(minHeightPoints.Length, Allocator.TempJob);
-                new InsertIndicesHeightMap() { min = minInt, size = sizeInt, indicesHeightMap = indicesHeightMap.ToConcurrent(), minHeightPoints = minHeightPoints }.Schedule(indicesHeightMap.Capacity, 128).Complete();
+                new InsertIndicesHeightMap() { min = minInt, size = sizeInt, indicesHeightMap = indicesHeightMap.AsParallelWriter(), minHeightPoints = minHeightPoints }.Schedule(indicesHeightMap.Capacity, 128).Complete();
                 minHeightPoints.Dispose();
                 new AddMinHeightPointsOffset() { flatMeshVertices = flatMeshVertices, indicesHeightMap = indicesHeightMap }.Schedule(flatMeshVertices.Length, 128).Complete();
                 indicesHeightMap.Dispose();
@@ -88,7 +88,7 @@ namespace Packages.MapToolbox.PcdTools
             [ReadOnly] internal int2 min;
             [ReadOnly] internal int2 size;
             [ReadOnly] internal NativeArray<Vector3> vertices;
-            [WriteOnly] internal NativeMultiHashMap<int, int>.Concurrent hashMap;
+            [WriteOnly] internal NativeMultiHashMap<int, int>.ParallelWriter hashMap;
             [WriteOnly] internal NativeArray<int> minHeightIndex;
             public void Execute(int index)
             {
@@ -144,7 +144,7 @@ namespace Packages.MapToolbox.PcdTools
         {
             [ReadOnly] internal int2 min;
             [ReadOnly] internal int2 size;
-            [WriteOnly] internal NativeHashMap<int, float>.Concurrent indicesHeightMap;
+            [WriteOnly] internal NativeHashMap<int, float>.ParallelWriter indicesHeightMap;
             [ReadOnly] internal NativeArray<Vector3> minHeightPoints;
             public void Execute(int index)
             {
