@@ -28,7 +28,7 @@ namespace Packages.MapToolbox.PcdTools
 {
     public static class PointsMeshBuild
     {
-        const float max_intensity = 100;
+        const float max_intensity = 50;
         public static Mesh PointsMesh(this PcdReader pcdReader)
         {
             if (pcdReader.PcdData_xyz.IsCreated)
