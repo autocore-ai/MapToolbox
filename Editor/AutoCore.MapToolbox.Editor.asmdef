@@ -1,0 +1,10 @@
+{
+    "name": "AutoCore.MapToolbox.Editor",
+    "references": [
+      "AutoCore.MapToolbox"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": []
+}

@@ -1,9 +1,8 @@
 {
     "name": "Packages.AutowareUnityTools.VectorMapTools",
     "references": [
-        "GUID:872f384eb6e02634984918469fc493a7"
+        "Packages.Nition.UnityOctree"
     ],
-    "optionalUnityReferences": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
@@ -11,5 +10,6 @@
     "precompiledReferences": [],
     "autoReferenced": true,
     "defineConstraints": [],
-    "versionDefines": []
+    "versionDefines": [],
+    "noEngineReferences": false
 }

@@ -1,0 +1,11 @@
+{
+    "name": "AutoCore.MapToolbox.Tests",
+    "references": [
+        "AutoCore.MapToolbox"
+    ],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": []
+}

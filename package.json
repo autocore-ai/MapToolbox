@@ -1,14 +1,13 @@
 {
-  "name": "com.autocore.map-toolbox",
-  "displayName": "Map Toolbox",
-  "version": "0.0.9",
-  "unity": "2019.1",
+  "name": "com.autocore.autoware-map-toolbox",
+  "displayName": "Autoware Map Toolbox",
+  "version": "0.0.10-preview.1",
+  "unity": "2019.3",
   "description": "Map tools for Autoware",
   "dependencies": {
-    "com.unity.mathematics": "1.1.0",
-    "com.unity.collections": "0.1.1-preview",
-    "com.unity.burst": "1.1.2",
-    "com.unity.jobs": "0.1.1-preview"
+    "com.nition.unity-octree": "https://github.com/UnityOpenSource/UnityOctree.git#0.0.1-preview",
+    "com.moelang.pcl": "https://github.com/MoeLang/PCL4Unity.git#0.0.1-preview.1",
+    "com.yasirkula.unity-bezier-solution": "https://github.com/UnityOpenSource/UnityBezierSolution.git#1.26.0"
   },
   "type": "tool"
 }
