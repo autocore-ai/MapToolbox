@@ -23,16 +23,16 @@ using UnityEngine;
 
 namespace AutoCore.MapToolbox.Editor.Autoware
 {
-    [CustomEditor(typeof(CollectionADASGoLane))]
-    class CollectionADASGoLaneEditor :UnityEditor.Editor
+    [CustomEditor(typeof(CollectionADASLane))]
+    class CollectionADASGoLaneEditor : UnityEditor.Editor
     {
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
             GUI.color = Color.yellow;
-            if (GUILayout.Button("Add Lane"))
+            if (GUILayout.Button(Const.AddLane))
             {
-                (target as CollectionADASGoLane).AddLane(SceneView.lastActiveSceneView.pivot);
+                (target as CollectionADASLane).AddLane(SceneView.lastActiveSceneView.pivot);
             }
         }
     }

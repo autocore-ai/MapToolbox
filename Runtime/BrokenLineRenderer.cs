@@ -17,13 +17,15 @@
 #endregion
 
 
+using System;
+using System.Linq;
 using UnityEngine;
 
 namespace AutoCore.MapToolbox
 {
     [ExecuteInEditMode]
     [RequireComponent(typeof(LineRenderer))]
-    class BrokenLineRenderer : MonoBehaviour
+    class BrokenLineRenderer<T> : SiblingParent where T : LineSegment<T>
     {
         LineRenderer lineRenderer;
         public LineRenderer LineRenderer
@@ -37,26 +39,56 @@ namespace AutoCore.MapToolbox
                 return lineRenderer;
             }
         }
-        protected LineSegment[] lineSegments;
-        public virtual void Refresh()
+
+        T[] children;
+        T[] Children
         {
-            lineSegments = GetComponentsInChildren<LineSegment>();
-            LineRenderer.positionCount = lineSegments.Length;
-            if (lineSegments.Length > 0)
+            get
             {
-                LineRenderer.positionCount++;
-                foreach (var item in lineSegments)
+                if (children == null)
                 {
-                    item.UpdateLineRendererPosition();
+                    children = GetComponentsInChildren<T>();
                 }
+                return children;
             }
         }
-        protected virtual void OnDestroy()
+        public Vector3 From
         {
-            foreach (var item in GetComponentsInChildren<LineSegment>())
+            set => Children.First().From = value;
+            get => Children.First().From;
+        }
+
+        public Vector3 To
+        {
+            set => Children.Last().To = value;
+            get => Children.Last().To;
+        }
+
+        public virtual void UpdateRenderer()
+        {
+            children = GetComponentsInChildren<T>();
+            if (children.Length > 0)
             {
-                DestroyImmediate(item);
+                LineRenderer.positionCount = children.Length + 1;
+                LineRenderer.SetPositions(children.Select(_ => _.From).ToArray());
+                LineRenderer.SetPosition(children.Length, children.Last().To);
             }
+            else
+            {
+                LineRenderer.positionCount = 0;
+            }
+        }
+
+        internal void Reverse()
+        {
+            foreach (var item in Children)
+            {
+                var to = item.to;
+                item.to = item.from;
+                item.from = to;
+                item.transform.SetAsFirstSibling();
+            }
+            UpdateRenderer();
         }
     }
 }

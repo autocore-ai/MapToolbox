@@ -17,7 +17,6 @@
 #endregion
 
 
-using System.Linq;
 using UnityEngine;
 
 namespace AutoCore.MapToolbox.Autoware
@@ -26,22 +25,130 @@ namespace AutoCore.MapToolbox.Autoware
     class AutowareADASMap : MonoBehaviour
     {
         #region Collection
-        CollectionADASGoLane laneCollection;
-        public CollectionADASGoLane CollectionLane
+        CollectionADASLane laneCollection;
+        public CollectionADASLane CollectionLane
         {
             set => laneCollection = value;
             get
             {
                 if (laneCollection == null)
                 {
-                    laneCollection = GetComponentInChildren<CollectionADASGoLane>();
+                    laneCollection = GetComponentInChildren<CollectionADASLane>();
                     if (laneCollection == null)
                     {
-                        laneCollection = new GameObject(typeof(ADASMapLane).Name).AddComponent<CollectionADASGoLane>();
+                        laneCollection = new GameObject(typeof(ADASMapLane).Name).AddComponent<CollectionADASLane>();
                         laneCollection.transform.SetParent(transform);
                     }
                 }
                 return laneCollection;
+            }
+        }
+        CollectionADASPole poleCollection;
+        public CollectionADASPole CollectionPole
+        {
+            set => poleCollection = value;
+            get
+            {
+                if (poleCollection == null)
+                {
+                    poleCollection = GetComponentInChildren<CollectionADASPole>();
+                    if (poleCollection == null)
+                    {
+                        poleCollection = new GameObject(typeof(ADASMapPole).Name).AddComponent<CollectionADASPole>();
+                        poleCollection.transform.SetParent(transform);
+                    }
+                }
+                return poleCollection;
+            }
+        }
+        CollectionADASSignal signalCollection;
+        public CollectionADASSignal CollectionSignal
+        {
+            set => signalCollection = value;
+            get
+            {
+                if (signalCollection == null)
+                {
+                    signalCollection = GetComponentInChildren<CollectionADASSignal>();
+                    if (signalCollection == null)
+                    {
+                        signalCollection = new GameObject(typeof(ADASMapSignal).Name).AddComponent<CollectionADASSignal>();
+                        signalCollection.transform.SetParent(transform);
+                    }
+                }
+                return signalCollection;
+            }
+        }
+        CollectionADASRoadSign roadSignCollection;
+        public CollectionADASRoadSign CollectionRoadSign
+        {
+            set => roadSignCollection = value;
+            get
+            {
+                if (roadSignCollection == null)
+                {
+                    roadSignCollection = GetComponentInChildren<CollectionADASRoadSign>();
+                    if (roadSignCollection == null)
+                    {
+                        roadSignCollection = new GameObject(typeof(ADASMapRoadSign).Name).AddComponent<CollectionADASRoadSign>();
+                        roadSignCollection.transform.SetParent(transform);
+                    }
+                }
+                return roadSignCollection;
+            }
+        }
+        CollectionADASStopLine stopLineCollection;
+        public CollectionADASStopLine CollectionStopLine
+        {
+            set => stopLineCollection = value;
+            get
+            {
+                if (stopLineCollection == null)
+                {
+                    stopLineCollection = GetComponentInChildren<CollectionADASStopLine>();
+                    if (stopLineCollection == null)
+                    {
+                        stopLineCollection = new GameObject(typeof(ADASMapStopLine).Name).AddComponent<CollectionADASStopLine>();
+                        stopLineCollection.transform.SetParent(transform);
+                    }
+                }
+                return stopLineCollection;
+            }
+        }
+        CollectionADASWhiteLine whiteLineCollection;
+        public CollectionADASWhiteLine CollectionWhiteLine
+        {
+            set => whiteLineCollection = value;
+            get
+            {
+                if (whiteLineCollection == null)
+                {
+                    whiteLineCollection = GetComponentInChildren<CollectionADASWhiteLine>();
+                    if (whiteLineCollection == null)
+                    {
+                        whiteLineCollection = new GameObject(typeof(ADASMapWhiteLine).Name).AddComponent<CollectionADASWhiteLine>();
+                        whiteLineCollection.transform.SetParent(transform);
+                    }
+                }
+                return whiteLineCollection;
+            }
+        }
+        CollectionADASRoadEdge roadEdgeCollection;
+        public CollectionADASRoadEdge CollectionRoadEdge
+        {
+            set => roadEdgeCollection = value;
+            get
+            {
+                if (roadEdgeCollection == null)
+                {
+                    roadEdgeCollection = GetComponentInChildren<CollectionADASRoadEdge>();
+                    if (roadEdgeCollection == null)
+                    {
+                        roadEdgeCollection = new GameObject(typeof(ADASMapRoadEdge).Name).AddComponent<CollectionADASRoadEdge>();
+                        roadEdgeCollection.transform.SetParent(transform);
+                    }
+                }
+                return roadEdgeCollection;
             }
         }
         #endregion
@@ -53,141 +160,63 @@ namespace AutoCore.MapToolbox.Autoware
             }
             ReadCsv(folder);
         }
-        public ADASGoLane AddLane(Vector3 position) => CollectionLane.AddLane(position);
+        public void AddLane(Vector3 position) => CollectionLane.AddLane(position);
+        public void AddSignal(Vector3 position) => CollectionSignal.AddSignal(position);
+        public void AddStopLine(Vector3 position) => CollectionStopLine.AddStopLine(position);
+        public void AddWhiteLine(Vector3 position) => CollectionWhiteLine.AddWhiteLine(position);
+        public void AddRoadEdge(Vector3 position) => CollectionRoadEdge.AddRoadEdge(position);
         public void Save(string folder) => WriteCsv(folder);
         private void ReadCsv(string path)
         {
-            CollectionLane.ReadCsv(path);
-            //VectorMapVector.ReadCsv(path);
-            //VectorMapSignal.ReadCsv(path);
-            //VectorMapRoadSign.ReadCsv(path);
-            //VectorMapLine.ReadCsv(path);
-            //VectorMapStopLine.ReadCsv(path);
-            //VectorMapWhiteLine.ReadCsv(path);
-            //VectorMapCurb.ReadCsv(path);
-            //VectorMapArea.ReadCsv(path);
-            //VectorMapRoadMark.ReadCsv(path);
-            //VectorMapZebraZone.ReadCsv(path);
-            //VectorMapCrossWalk.ReadCsv(path);
+            ADASMapPoint.ReadCsv(path);
+            ADASMapNode.ReadCsv(path);
+            ADASMapDTLane.ReadCsv(path);
+            ADASMapLane.ReadCsv(path);
+            ADASMapVector.ReadCsv(path);
+            ADASMapPole.ReadCsv(path);
+            ADASMapSignal.ReadCsv(path);
+            ADASMapRoadSign.ReadCsv(path);
+            ADASMapLine.ReadCsv(path);
+            ADASMapStopLine.ReadCsv(path);
+            ADASMapWhiteLine.ReadCsv(path);
+            ADASMapRoadEdge.ReadCsv(path);
+            CollectionLane.Csv2Go();
+            CollectionPole.Csv2Go();
+            CollectionSignal.Csv2Go();
+            CollectionRoadSign.Csv2Go();
+            CollectionStopLine.Csv2Go();
+            CollectionWhiteLine.Csv2Go();
+            CollectionRoadEdge.Csv2Go();
         }
         private void WriteCsv(string path)
         {
-            CollectionLane.WriteCsv(path);
-        }
-
-        private void AddRenderer()
-        {
-            //AddRendererSignal();
-            //AddRendererRoadSignal();
-            //AddRendererStopLine();
-            //AddRendererWhiteLine();
-            //AddRendererCurb();
-            //AddRendererRoadMark();
-            //AddRendererZebraZone();
-            //AddRendererCrossWalk();
-        }
-
-        private void AddRendererSignal()
-        {
-            var root = new GameObject(typeof(Signal).Name, typeof(CollectionADASMapGo));
-            root.transform.SetParent(transform);
-            foreach (var item in ADASMapSignal.List)
-            {
-                var renderer = new GameObject().AddComponent<Signal>();
-                renderer.transform.SetParent(root.transform);
-                renderer.VectorMapSignal = item;
-            }
-        }
-
-        private void AddRendererRoadSignal()
-        {
-            var root = new GameObject(typeof(RoadSign).Name, typeof(CollectionADASMapGo));
-            root.transform.SetParent(transform);
-            foreach (var item in ADASMapRoadSign.List)
-            {
-                var renderer = new GameObject().AddComponent<RoadSign>();
-                renderer.transform.SetParent(root.transform);
-                renderer.SetData(item);
-            }
-        }
-
-        private void AddRendererStopLine()
-        {
-            var root = new GameObject(typeof(SlicesStopLine).Name, typeof(CollectionADASMapGo));
-            root.transform.SetParent(transform);
-            foreach (var item in ADASMapStopLine.List.GroupBy(_ => _.Line.FirstLine))
-            {
-                var renderer = new GameObject().AddComponent<SlicesStopLine>();
-                renderer.transform.SetParent(root.transform);
-                renderer.VectorMapStopLines = item;
-                renderer.CollectionLane = CollectionLane;
-                renderer.Init();
-            }
-        }
-
-        private void AddRendererWhiteLine()
-        {
-            var root = new GameObject(typeof(SlicesWhiteLine).Name, typeof(CollectionADASMapGo));
-            root.transform.SetParent(transform);
-            foreach (var item in ADASMapWhiteLine.List.GroupBy(_ => _.Line.FirstLine))
-            {
-                var renderer = new GameObject().AddComponent<SlicesWhiteLine>();
-                renderer.transform.SetParent(root.transform);
-                renderer.VectorMapWhiteLines = item;
-                renderer.Init();
-            }
-        }
-
-        private void AddRendererCurb()
-        {
-            var root = new GameObject(typeof(SlicesCurb).Name, typeof(CollectionADASMapGo));
-            root.transform.SetParent(transform);
-            foreach (var item in ADASMapCurb.List.GroupBy(_ => _.Line.FirstLine))
-            {
-                var renderer = new GameObject().AddComponent<SlicesCurb>();
-                renderer.transform.SetParent(root.transform);
-                renderer.VectorMapCurbs = item;
-                renderer.Init();
-            }
-        }
-
-        private void AddRendererRoadMark()
-        {
-            var root = new GameObject(typeof(RoadMark).Name, typeof(CollectionADASMapGo));
-            root.transform.SetParent(transform);
-            foreach (var item in ADASMapRoadMark.List)
-            {
-                var renderer = new GameObject().AddComponent<RoadMark>();
-                renderer.transform.SetParent(root.transform);
-                renderer.VectorMapRoadMark = item;
-                renderer.Init();
-            }
-        }
-
-        private void AddRendererZebraZone()
-        {
-            var root = new GameObject(typeof(ZebraZone).Name, typeof(CollectionADASMapGo));
-            root.transform.SetParent(transform);
-            foreach (var item in ADASMapZebraZone.List)
-            {
-                var renderer = new GameObject().AddComponent<ZebraZone>();
-                renderer.transform.SetParent(root.transform);
-                renderer.VectorMapZebraZone = item;
-                renderer.Init();
-            }
-        }
-
-        private void AddRendererCrossWalk()
-        {
-            var root = new GameObject(typeof(CrossWalk).Name, typeof(CollectionADASMapGo));
-            root.transform.SetParent(transform);
-            foreach (var item in ADASMapCrossWalk.List)
-            {
-                var renderer = new GameObject().AddComponent<CrossWalk>();
-                renderer.transform.SetParent(root.transform);
-                renderer.VectorMapCrossWalk = item;
-                renderer.Init();
-            }
+            ADASMapPoint.Reset();
+            ADASMapNode.Reset();
+            ADASMapDTLane.Reset();
+            ADASMapLane.Reset();
+            ADASMapLine.Reset();
+            ADASMapVector.Reset();
+            ADASMapSignal.Reset();
+            ADASMapStopLine.Reset();
+            ADASMapWhiteLine.Reset();
+            ADASMapRoadEdge.Reset();
+            CollectionLane.Go2Csv();
+            CollectionPole.Go2Csv();
+            CollectionSignal.Go2Csv();
+            CollectionRoadSign.Go2Csv();
+            CollectionStopLine.Go2Csv();
+            CollectionWhiteLine.Go2Csv();
+            CollectionRoadEdge.Go2Csv();
+            ADASMapPoint.WriteCsv(path);
+            ADASMapNode.WriteCsv(path);
+            ADASMapDTLane.WriteCsv(path);
+            ADASMapLane.WriteCsv(path);
+            ADASMapLine.WriteCsv(path);
+            ADASMapVector.WriteCsv(path);
+            ADASMapSignal.WriteCsv(path);
+            ADASMapStopLine.WriteCsv(path);
+            ADASMapWhiteLine.WriteCsv(path);
+            ADASMapRoadEdge.WriteCsv(path);
         }
     }
 }

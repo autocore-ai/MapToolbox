@@ -17,107 +17,102 @@
 #endregion
 
 
-using AutoCore.MapToolbox.Autoware;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using static AutoCore.MapToolbox.Editor.Utils;
 
 namespace AutoCore.MapToolbox.Editor
 {
     [CanEditMultipleObjects]
-    [CustomEditor(typeof(LineSegment))]
-    class LineSegmentEditor : SiblingIndexEditor<LineSegment>
+    class LineSegmentEditor<T> : SiblingChildEditor<T> where T : LineSegment<T>
     {
-        const string MultipleMove = "Multiple Move";
-        IEnumerable<LineSegment> Selected { get; set; }
+        bool BezierEditing { get; set; } = false;
+        Vector3 StartTangent { get; set; }
+        Vector3 EndTangent { get; set; }
+        protected override void AfterDefaultInspectorDraw()
+        {
+            base.AfterDefaultInspectorDraw();
+            if (Targets != null && Targets.Length == 1)
+            {
+                Target.From = EditorGUILayout.Vector3Field(GetMemberName((T t) => t.From), Target.From);
+                Target.To = EditorGUILayout.Vector3Field(GetMemberName((T t) => t.To), Target.To);
+                if (BezierEditing)
+                {
+                    StartTangent = EditorGUILayout.Vector3Field(GetMemberName((LineSegmentEditor<T> t) => t.StartTangent), StartTangent);
+                    EndTangent = EditorGUILayout.Vector3Field(GetMemberName((LineSegmentEditor<T> t) => t.EndTangent), EndTangent);
+                }
+            }
+        }
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
-            if (targets.Length > 1)
+            if (Targets != null)
             {
-                var i = PlayerPrefs.GetInt(MultipleMove, 0);
-                var t = GUILayout.Toggle(i > 0, MultipleMove);
-                if (i > 0 != t)
+                if (Targets.Length == 1)
                 {
-                    PlayerPrefs.SetInt(MultipleMove, t ? 1 : 0);
-                }
-                if (t)
-                {
-                    Selected = targets.Cast<LineSegment>();
+                    InspectorGUIAddButton();
+                    BezierEditorGUI();
                 }
                 else
                 {
-                    Selected = null;
+                    GUI.color = Color.yellow;
+                    if (GUILayout.Button(GetMethodName<T[]>(Target.Merge)))
+                    {
+                        Target.Merge(Targets);
+                        GUI.color = Color.white;
+                        return;
+                    }
+                    GUI.color = Color.white;
                 }
             }
+            InspectorGUIRemoveButton();
         }
-        protected virtual void OnSceneGUI()
+
+        private void BezierEditorGUI()
         {
-            Tools.current = Tool.None;
-            var point = target as LineSegment;
-            Handles.color = Color.cyan;
-            Handles.ArrowHandleCap(0, point.From, Quaternion.FromToRotation(Vector3.forward, point.To - point.From), 1, EventType.Repaint);
-            var pos1 = Handles.PositionHandle(point.From, Quaternion.identity);
-            var pos2 = Handles.PositionHandle(point.To, Quaternion.identity);
-            var move1 = pos1 - point.From;
-            var move2 = pos2 - point.To;
-            if (Selected?.Count() > 1)
+            if (BezierEditing)
             {
-                if (!move1.Equals(Vector3.zero))
+                GUILayout.BeginHorizontal();
+                GUI.color = Color.yellow;
+                if (GUILayout.Button("Apply"))
                 {
-                    foreach (var item in Selected)
-                    {
-                        item.From += move1;
-                    }
+                    BezierEditing = false;
+                    Target.ApplyBezierPoints(Handles.MakeBezierPoints(Target.from, Target.to, StartTangent, EndTangent, (int)(Target.from - Target.to).magnitude * 10));
                 }
-                if (!move2.Equals(Vector3.zero))
+                GUI.color = Color.white;
+                if (GUILayout.Button("Cancel"))
                 {
-                    foreach (var item in Selected)
-                    {
-                        item.To += move2;
-                    }
+                    BezierEditing = false;
                 }
-                if (!(move1.Equals(Vector3.zero) && move2.Equals(Vector3.zero)))
-                {
-                    foreach (var item in Selected)
-                    {
-                        item.UpdateLineRendererPosition();
-                    }
-                }
+                GUILayout.EndHorizontal();
             }
             else
             {
-                if (!move1.Equals(Vector3.zero))
+                if (GUILayout.Button("Bezier Edit"))
                 {
-                    point.From += move1;
-                }
-                if (!move2.Equals(Vector3.zero))
-                {
-                    point.To += move2;
-                }
-                if (!(move1.Equals(Vector3.zero) && move2.Equals(Vector3.zero)))
-                {
-                    point.UpdateLineRendererPosition();
+                    BezierEditing = true;
+                    StartTangent = Target.from + (Target.to - Target.from) / 4;
+                    EndTangent = Target.from + 3 * (Target.to - Target.from) / 4;
                 }
             }
         }
-        private void OnDestroy() => Selected = null;
+
+        protected virtual void OnSceneGUI()
+        {
+            Tools.current = Tool.None;
+            if (BezierEditing)
+            {
+                StartTangent = Handles.PositionHandle(StartTangent, Quaternion.identity);
+                EndTangent = Handles.PositionHandle(EndTangent, Quaternion.identity);
+                Handles.DrawBezier(Target.from, Target.to, StartTangent, EndTangent, Color.green, null, (Target.from - Target.to).magnitude / 10);
+            }
+            else
+            {
+                Handles.color = Color.cyan;
+                Handles.ArrowHandleCap(0, Target.From, Quaternion.FromToRotation(Vector3.forward, Target.To - Target.From), (Target.To - Target.From).magnitude, EventType.Repaint);
+                Target.From = Handles.PositionHandle(Target.From, Quaternion.identity);
+                Target.To = Handles.PositionHandle(Target.To, Quaternion.identity);
+            }
+        }
     }
-
-    [CanEditMultipleObjects]
-    [CustomEditor(typeof(Line))]
-    class LineEditor : LineSegmentEditor { }
-
-    [CanEditMultipleObjects]
-    [CustomEditor(typeof(WhiteLine))]
-    class WhiteLineEditor : LineEditor { }
-
-    [CanEditMultipleObjects]
-    [CustomEditor(typeof(StopLine))]
-    class StopLineEditor : LineEditor { }
-
-    [CanEditMultipleObjects]
-    [CustomEditor(typeof(Curb))]
-    class CurbEditor : LineEditor { }
 }

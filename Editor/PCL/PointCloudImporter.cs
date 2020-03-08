@@ -49,11 +49,8 @@ namespace AutoCore.MapToolbox.Editor.PCL
             DestroyImmediate(go.GetComponent<BoxCollider>());
             go.GetComponent<MeshFilter>().mesh = mesh;
             mesh.name = "points";
-            var material = new Material(Shader.Find("Particles/Standard Unlit"));
-            material.name = "material";
-            go.GetComponent<MeshRenderer>().sharedMaterial = material;
+            go.GetComponent<MeshRenderer>().sharedMaterial = Resources.Load<Material>("MapToolbox/PointCloud");
             ctx.AddObjectToAsset(mesh.name, mesh);
-            ctx.AddObjectToAsset(material.name, material);
             ctx.AddObjectToAsset(go.name, go);
             ctx.SetMainObject(go);
         }

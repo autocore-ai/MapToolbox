@@ -18,6 +18,7 @@
 
 
 using AutoCore.MapToolbox.Autoware;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Windows;
@@ -42,9 +43,25 @@ namespace AutoCore.MapToolbox.Editor.Autoware
         {
             base.OnInspectorGUI();
             GUI.color = Color.yellow;
-            if (GUILayout.Button("Add Lane"))
+            if (GUILayout.Button(Const.AddLane))
             {
                 (target as AutowareADASMap).AddLane(SceneView.lastActiveSceneView.pivot);
+            }
+            else if (GUILayout.Button(Const.AddSignal))
+            {
+                (target as AutowareADASMap).AddSignal(SceneView.lastActiveSceneView.pivot);
+            }
+            else if (GUILayout.Button(Const.AddStopLine))
+            {
+                (target as AutowareADASMap).AddStopLine(SceneView.lastActiveSceneView.pivot);
+            }
+            else if (GUILayout.Button(Const.AddWhiteLine))
+            {
+                (target as AutowareADASMap).AddWhiteLine(SceneView.lastActiveSceneView.pivot);
+            }
+            else if (GUILayout.Button(Const.AddRoadEdge))
+            {
+                (target as AutowareADASMap).AddRoadEdge(SceneView.lastActiveSceneView.pivot);
             }
             GUI.color = Color.green;
             if (GUILayout.Button(LoadFromFolder))
@@ -54,6 +71,14 @@ namespace AutoCore.MapToolbox.Editor.Autoware
                 {
                     PlayerPrefs.SetString(LoadFromFolder, folder);
                     (target as AutowareADASMap).Load(folder);
+                    Undo.IncrementCurrentGroup();
+                    Undo.SetCurrentGroupName(LoadFromFolder);
+                    int undoGroupIndex = Undo.GetCurrentGroup();
+                    foreach (var go in (target as AutowareADASMap).GetComponentsInChildren<CollectionADASMapGo>().Select(_ => _.gameObject))
+                    {
+                        Undo.RegisterCreatedObjectUndo(go, string.Empty);
+                    }
+                    Undo.CollapseUndoOperations(undoGroupIndex);
                 }
             }
             GUI.color = Color.red;

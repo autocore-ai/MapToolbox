@@ -17,114 +17,163 @@
 #endregion
 
 
+using System.Linq;
 using UnityEngine;
 
 namespace AutoCore.MapToolbox
 {
     [ExecuteInEditMode]
-    class LineSegment : SiblingIndex<LineSegment>
+    class LineSegment<T> : SiblingChild<T> where T : LineSegment<T>
     {
-        BrokenLineRenderer brokenLineRenderer;
-        public BrokenLineRenderer BrokenLineRenderer
+        BrokenLineRenderer<T> parent;
+        public BrokenLineRenderer<T> Parent
         {
             get
             {
-                if (brokenLineRenderer == null)
+                if (parent == null)
                 {
-                    brokenLineRenderer = GetComponentInParent<BrokenLineRenderer>();
+                    parent = GetComponentInParent<BrokenLineRenderer<T>>();
                 }
-                return brokenLineRenderer;
+                return parent;
             }
         }
-        public LineRenderer LineRenderer => BrokenLineRenderer.LineRenderer;
-        public override bool EnableMove => false;
-        [ReadOnly] [SerializeField] protected Vector3 to;
+        [HideInInspector] public Vector3 from;
+        [HideInInspector] public Vector3 to;
         public Vector3 From
         {
-            get => transform.position;
+            get => from;
             set
             {
-                transform.position = value;
-                if (Last)
+                if (from != value)
                 {
-                    Last.to = value;
+                    from = value;
+                    UpdateRef();
+                    if (last)
+                    {
+                        last.GetComponent<T>().to = from;
+                    }
+                    else
+                    {
+                        if (Parent.From != from)
+                        {
+                            Parent.From = from;
+                        }
+                    }
+                    Parent.UpdateRenderer();
                 }
             }
         }
+
         public Vector3 To
         {
             get => to;
             set
             {
-                to = value;
-                if (Next)
+                if (to != value)
                 {
-                    Next.From = value;
+                    to = value;
+                    UpdateRef();
+                    if (next)
+                    {
+                        next.GetComponent<T>().from = to;
+                    }
+                    else
+                    {
+                        if (Parent.To != to)
+                        {
+                            Parent.To = to;
+                        }
+                    }
+                    Parent.UpdateRenderer();
                 }
             }
         }
-        public void UpdateLineRendererPosition()
+
+        public override void UpdateRef()
         {
-            if (this.AllParentActived())
+            base.UpdateRef();
+            transform.position = (from + to) / 2;
+        }
+
+        private void OnDestroy()
+        {
+            if (Parent != null && Parent.isActiveAndEnabled)
             {
-                if (LineRenderer.useWorldSpace)
-                {
-                    LineRenderer.SetPosition(Index, From);
-                    LineRenderer.SetPosition(Index + 1, To);
-                }
-                else
-                {
-                    LineRenderer.SetPosition(Index, transform.parent.InverseTransformPoint(From));
-                    LineRenderer.SetPosition(Index + 1, transform.parent.InverseTransformPoint(To));
-                }
+                Parent.UpdateRenderer();
             }
         }
-        protected override void Awake()
+        internal override GameObject AddBefore()
         {
-            base.Awake();
-            BrokenLineRenderer?.Refresh();
-        }
-        protected override void OnDestroy()
-        {
-            base.OnDestroy();
-            BrokenLineRenderer.Refresh();
-        }
-        public override void UpdateIndex()
-        {
-            base.UpdateIndex();
-            BrokenLineRenderer.Refresh();
-        }
-        public override LineSegment AddBefore(LineSegment target)
-        {
-            if (Last == null)
+            var target = base.AddBefore().GetComponent<T>();
+            if (last == null)
             {
-                target.transform.position = 2 * From - to;
+                target.from = 2 * from - to;
             }
             else
             {
-                target.transform.position = (Last.From + Last.to) / 2;
-                Last.to = target.transform.position;
+                var temp = last.GetComponent<T>();
+                target.from = (temp.from + temp.to) / 2;
+                temp.to = target.from;
             }
-            target.to = transform.position;
-            base.AddBefore(target);
-            BrokenLineRenderer.Refresh();
-            return target;
+            target.to = from;
+            Parent.UpdateRenderer();
+            return target.gameObject;
         }
-        public override LineSegment AddAfter(LineSegment target)
+        internal override GameObject AddAfter()
         {
-            if (Next == null)
+            var target = base.AddAfter().GetComponent<T>();
+            if (next == null)
             {
-                target.to = 2 * to - transform.position;
+                target.to = 2 * to - from;
             }
             else
             {
-                target.to = (Next.From + Next.to) / 2;
-                Next.transform.position = target.to;
+                var temp = next.GetComponent<T>();
+                target.to = (temp.from + temp.to) / 2;
+                temp.from = target.to;
             }
-            target.transform.position = To;
-            base.AddAfter(target);
-            BrokenLineRenderer.Refresh();
-            return target;
+            target.from = to;
+            Parent.UpdateRenderer();
+            return target.gameObject;
+        }
+
+        internal void ApplyBezierPoints(Vector3[] points)
+        {
+            LineSegment<T> current = this;
+            foreach (var point in points)
+            {
+                if (Vector3.Distance(current.from, point) > 1)
+                {
+                    Vector3 dest = current.from + (point - current.from).normalized;
+                    current.to = dest;
+                    var temp = current.AddAfter().GetComponent<LineSegment<T>>();
+                    temp.DataCopy(current);
+                    current = temp;
+                    current.from = dest;
+                }
+            }
+            current.To = points.Last();
+        }
+
+        protected virtual void DataCopy(LineSegment<T> current) => name = current.name;
+
+        internal void Merge(T[] targets)
+        {
+            if (targets.Length > 1)
+            {
+                var temp = targets.OrderBy(_ => _.Index).ToArray();
+                var first = temp.First();
+                var last = temp.Last();
+                first.To = last.To;
+                if (last.next)
+                {
+                    last.next.GetComponent<LineSegment<T>>().From = first.To;
+                }
+                for (int i = 1; i < temp.Length; i++)
+                {
+                    DestroyImmediate(temp[i].gameObject);
+                }
+            }
         }
     }
 }
