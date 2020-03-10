@@ -75,14 +75,26 @@ namespace AutoCore.MapToolbox.Autoware
                 child.First().UpdateRef();
                 child.Last().UpdateRef();
                 var target = child[0];
-                if (target.bLane != null)
+                if (target.bLane != null && target.bLane.Count > 0)
                 {
-                    bLane = target.bLane.Select(_ => _.GetComponentInParent<ADASGoSlicesLane>()).ToList();
+                    foreach (var item in target.bLane)
+                    {
+                        if (item?.Slices)
+                        {
+                            bLane.Add(item.Slices);
+                        }
+                    }
                 }
                 target = child[child.Length - 1];
-                if (target.fLane != null)
+                if (target.fLane != null && target.fLane.Count > 0)
                 {
-                    fLane = target.fLane.Select(_ => _.GetComponentInParent<ADASGoSlicesLane>()).ToList();
+                    foreach (var item in target.fLane)
+                    {
+                        if (item?.Slices)
+                        {
+                            fLane.Add(item.Slices);
+                        }
+                    }
                 }
             }
             else

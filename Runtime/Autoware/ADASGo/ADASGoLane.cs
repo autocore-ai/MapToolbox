@@ -26,6 +26,18 @@ namespace AutoCore.MapToolbox.Autoware
     {
         public GameObject GameObject => gameObject;
         public MonoBehaviour MonoBehaviour => this;
+        ADASGoSlicesLane slices;
+        public ADASGoSlicesLane Slices
+        {
+            get
+            {
+                if (slices)
+                {
+                    slices = GetComponentInParent<ADASGoSlicesLane>();
+                }
+                return slices;
+            }
+        }
         public CollectionADASLane CollectionLane { get; set; }
         [HideInInspector] public ADASMapLane.Jct jct;
         [HideInInspector] public List<ADASGoLane> bLane;
