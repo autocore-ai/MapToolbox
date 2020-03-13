@@ -54,17 +54,20 @@ namespace AutoCore.MapToolbox.Autoware
             set
             {
                 data = value;
-                CollectionLane?.Add(data.ID, this);
-                name = data.ID.ToString();
-                from = data.BNode.Point.Position;
-                to = data.FNode.Point.Position;
-                jct = data.JCT;
-                lCnt = data.LCnt;
-                lno = data.Lno;
-                laneType = data.LaneType;
-                limitVel = data.LimitVel;
-                refVel = data.RefVel;
-                transform.position = (from + to) / 2;
+                if (data != null)
+                {
+                    CollectionLane?.Add(data.ID, this);
+                    name = data.ID.ToString();
+                    from = data.BNode.Point.Position;
+                    to = data.FNode.Point.Position;
+                    jct = data.JCT;
+                    lCnt = data.LCnt;
+                    lno = data.Lno;
+                    laneType = data.LaneType;
+                    limitVel = data.LimitVel;
+                    refVel = data.RefVel;
+                    transform.position = (from + to) / 2;
+                }
             }
             get
             {

@@ -37,18 +37,21 @@ namespace AutoCore.MapToolbox.Autoware
             set
             {
                 data = value;
-                CollectionSignal?.Add(data.ID, this);
-                name = data.ID.ToString();
-                signalType = data.SignalType;
-                transform.position = data.Vector.Point.Position;
-                transform.rotation = data.Vector.Rotation;
-                if (CollectionPole != null && data.Pole != null)
+                if (data != null)
                 {
-                    pole = CollectionPole[data.Pole.ID];
-                }
-                if (CollectionLane != null && data.LinkLane != null)
-                {
-                    linkLane = CollectionLane[data.LinkLane.ID];
+                    CollectionSignal?.Add(data.ID, this);
+                    name = data.ID.ToString();
+                    signalType = data.SignalType;
+                    transform.position = data.Vector.Point.Position;
+                    transform.rotation = data.Vector.Rotation;
+                    if (CollectionPole != null && data.Pole != null)
+                    {
+                        pole = CollectionPole[data.Pole.ID];
+                    }
+                    if (CollectionLane != null && data.LinkLane != null)
+                    {
+                        linkLane = CollectionLane[data.LinkLane.ID];
+                    }
                 }
             }
             get
@@ -77,7 +80,7 @@ namespace AutoCore.MapToolbox.Autoware
         }
         internal void BuildData()
         {
-            data = null;
+            Signal = null;
             data = Signal;
         }
         private void OnDrawGizmos()

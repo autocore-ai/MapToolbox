@@ -38,19 +38,22 @@ namespace AutoCore.MapToolbox.Autoware
             set
             {
                 data = value;
-                CollectionRoadSign?.Add(data.ID, this);
-                name = data.ID.ToString();
-                roadSignType = data.RoadSignType;
-                transform.position = data.Vector.Point.Position;
-                transform.rotation = data.Vector.Rotation;
-                Mesh = Resources.GetBuiltinResource<Mesh>("Quad.fbx");
-                if (CollectionPole != null && data.Pole != null)
+                if (data != null)
                 {
-                    pole = CollectionPole[data.Pole.ID];
-                }
-                if (CollectionLane != null && data.LinkLane != null)
-                {
-                    linkLane = CollectionLane[data.LinkLane.ID];
+                    CollectionRoadSign?.Add(data.ID, this);
+                    name = data.ID.ToString();
+                    roadSignType = data.RoadSignType;
+                    transform.position = data.Vector.Point.Position;
+                    transform.rotation = data.Vector.Rotation;
+                    Mesh = Resources.GetBuiltinResource<Mesh>("Quad.fbx");
+                    if (CollectionPole != null && data.Pole != null)
+                    {
+                        pole = CollectionPole[data.Pole.ID];
+                    }
+                    if (CollectionLane != null && data.LinkLane != null)
+                    {
+                        linkLane = CollectionLane[data.LinkLane.ID];
+                    }
                 }
             }
             get

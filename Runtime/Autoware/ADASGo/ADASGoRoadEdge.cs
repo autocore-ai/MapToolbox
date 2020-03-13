@@ -27,8 +27,11 @@ namespace AutoCore.MapToolbox.Autoware
             set
             {
                 data = value;
-                Line = data.Line;
-                name = data.ID.ToString();
+                if (data != null)
+                {
+                    Line = data.Line;
+                    name = data.ID.ToString();
+                }
             }
             get
             {
@@ -41,7 +44,8 @@ namespace AutoCore.MapToolbox.Autoware
         }
         internal override void BuildData()
         {
-            data = null;
+            Line = null;
+            RoadEdge = null;
             data = RoadEdge;
         }
     }

@@ -31,9 +31,12 @@ namespace AutoCore.MapToolbox.Autoware
             set
             {
                 data = value;
-                Line = data.Line;
-                name = data.ID.ToString();
-                width = data.Width;
+                if (data != null)
+                {
+                    Line = data.Line;
+                    name = data.ID.ToString();
+                    width = data.Width;
+                }
             }
             get
             {
@@ -51,7 +54,8 @@ namespace AutoCore.MapToolbox.Autoware
         }
         internal override void BuildData()
         {
-            data = null;
+            Line = null;
+            WhiteLine = null;
             data = WhiteLine;
         }
     }

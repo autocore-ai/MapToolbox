@@ -33,9 +33,12 @@ namespace AutoCore.MapToolbox.Autoware
             set
             {
                 data = value;
-                from = data.BPoint.Position;
-                to = data.FPoint.Position;
-                transform.position = (from + to) / 2;
+                if (data != null)
+                {
+                    from = data.BPoint.Position;
+                    to = data.FPoint.Position;
+                    transform.position = (from + to) / 2;
+                }
             }
             get
             {

@@ -33,19 +33,22 @@ namespace AutoCore.MapToolbox.Autoware
             set
             {
                 data = value;
-                Line = data.Line;
-                name = data.ID.ToString();
-                if (CollectionSignal != null && value.Signal != null)
+                if (data != null)
                 {
-                    signal = CollectionSignal[value.Signal.ID];
-                }
-                if (CollectionRoadSign != null && value.RoadSign != null)
-                {
-                    roadSign = CollectionRoadSign[value.RoadSign.ID];
-                }
-                if (CollectionLane != null && value.LinkLane != null)
-                {
-                    linkLane = CollectionLane[value.LinkLane.ID];
+                    Line = data.Line;
+                    name = data.ID.ToString();
+                    if (CollectionSignal != null && value.Signal != null)
+                    {
+                        signal = CollectionSignal[value.Signal.ID];
+                    }
+                    if (CollectionRoadSign != null && value.RoadSign != null)
+                    {
+                        roadSign = CollectionRoadSign[value.RoadSign.ID];
+                    }
+                    if (CollectionLane != null && value.LinkLane != null)
+                    {
+                        linkLane = CollectionLane[value.LinkLane.ID];
+                    }
                 }
             }
             get
@@ -70,7 +73,8 @@ namespace AutoCore.MapToolbox.Autoware
         }
         internal override void BuildData()
         {
-            data = null;
+            Line = null;
+            StopLine = null;
             data = StopLine;
         }
     }
