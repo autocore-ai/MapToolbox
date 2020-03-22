@@ -1,6 +1,6 @@
 ﻿#region License
 /******************************************************************************
-* Copyright 2019 The AutoCore Authors. All Rights Reserved.
+* Copyright 2018-2020 The AutoCore Authors. All Rights Reserved.
 * 
 * Licensed under the GNU Lesser General Public License, Version 3.0 (the "License"); 
 * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 #endregion
 
 
-using System;
 using System.Linq;
 using UnityEngine;
 
@@ -39,29 +38,40 @@ namespace AutoCore.MapToolbox
                 return lineRenderer;
             }
         }
-
         T[] children;
-        T[] Children
+        public T[] Children
         {
             get
             {
-                if (children == null)
+                if (children == null || children.Length == 0)
                 {
                     children = GetComponentsInChildren<T>();
                 }
                 return children;
             }
         }
-        public Vector3 From
+        public virtual Vector3 LocalFrom
         {
-            set => Children.First().From = value;
-            get => Children.First().From;
+            set => Children.First().LocalFrom = value;
+            get => Children.First().LocalFrom;
         }
 
-        public Vector3 To
+        public virtual Vector3 LocalTo
         {
-            set => Children.Last().To = value;
-            get => Children.Last().To;
+            set => Children.Last().LocalTo = value;
+            get => Children.Last().LocalTo;
+        }
+
+        public virtual Vector3 From
+        {
+            set => LocalFrom = transform.InverseTransformPoint(value);
+            get => transform.TransformPoint(LocalFrom);
+        }
+
+        public virtual Vector3 To
+        {
+            set => LocalTo = transform.InverseTransformPoint(value);
+            get => transform.TransformPoint(LocalTo);
         }
 
         public virtual void UpdateRenderer()
@@ -70,8 +80,8 @@ namespace AutoCore.MapToolbox
             if (children.Length > 0)
             {
                 LineRenderer.positionCount = children.Length + 1;
-                LineRenderer.SetPositions(children.Select(_ => _.From).ToArray());
-                LineRenderer.SetPosition(children.Length, children.Last().To);
+                LineRenderer.SetPositions(children.Select(_ => _.LocalFrom).ToArray());
+                LineRenderer.SetPosition(children.Length, children.Last().LocalTo);
             }
             else
             {
@@ -83,9 +93,9 @@ namespace AutoCore.MapToolbox
         {
             foreach (var item in Children)
             {
-                var to = item.to;
-                item.to = item.from;
-                item.from = to;
+                var localTo = item.localTo;
+                item.localTo = item.localFrom;
+                item.localFrom = localTo;
                 item.transform.SetAsFirstSibling();
             }
             UpdateRenderer();

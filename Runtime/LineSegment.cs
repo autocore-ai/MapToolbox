@@ -1,6 +1,6 @@
 ﻿#region License
 /******************************************************************************
-* Copyright 2019 The AutoCore Authors. All Rights Reserved.
+* Copyright 2018-2020 The AutoCore Authors. All Rights Reserved.
 * 
 * Licensed under the GNU Lesser General Public License, Version 3.0 (the "License"); 
 * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #endregion
 
 
+using System;
 using System.Linq;
 using UnityEngine;
 
@@ -37,26 +38,26 @@ namespace AutoCore.MapToolbox
                 return parent;
             }
         }
-        [HideInInspector] public Vector3 from;
-        [HideInInspector] public Vector3 to;
-        public Vector3 From
+        [HideInInspector] public Vector3 localFrom;
+        [HideInInspector] public Vector3 localTo;
+        public Vector3 LocalFrom
         {
-            get => from;
+            get => localFrom;
             set
             {
-                if (from != value)
+                if (localFrom != value)
                 {
-                    from = value;
+                    localFrom = value;
                     UpdateRef();
                     if (last)
                     {
-                        last.GetComponent<T>().to = from;
+                        last.GetComponent<T>().localTo = localFrom;
                     }
                     else
                     {
-                        if (Parent.From != from)
+                        if (Parent.LocalFrom != localFrom)
                         {
-                            Parent.From = from;
+                            Parent.LocalFrom = localFrom;
                         }
                     }
                     Parent.UpdateRenderer();
@@ -64,35 +65,47 @@ namespace AutoCore.MapToolbox
             }
         }
 
-        public Vector3 To
+        public Vector3 LocalTo
         {
-            get => to;
+            get => localTo;
             set
             {
-                if (to != value)
+                if (localTo != value)
                 {
-                    to = value;
+                    localTo = value;
                     UpdateRef();
                     if (next)
                     {
-                        next.GetComponent<T>().from = to;
+                        next.GetComponent<T>().localFrom = localTo;
                     }
                     else
                     {
-                        if (Parent.To != to)
+                        if (Parent.LocalTo != localTo)
                         {
-                            Parent.To = to;
+                            Parent.LocalTo = localTo;
                         }
                     }
                     Parent.UpdateRenderer();
                 }
             }
+        }
+
+        public virtual Vector3 From
+        {
+            set => LocalFrom = transform.parent.InverseTransformPoint(value);
+            get => transform.parent.TransformPoint(LocalFrom);
+        }
+
+        public virtual Vector3 To
+        {
+            set => LocalTo = transform.parent.InverseTransformPoint(value);
+            get => transform.parent.TransformPoint(LocalTo);
         }
 
         public override void UpdateRef()
         {
             base.UpdateRef();
-            transform.position = (from + to) / 2;
+            transform.localPosition = (localFrom + localTo) / 2;
         }
 
         private void OnDestroy()
@@ -107,15 +120,16 @@ namespace AutoCore.MapToolbox
             var target = base.AddBefore().GetComponent<T>();
             if (last == null)
             {
-                target.from = 2 * from - to;
+                target.localFrom = 2 * localFrom - localTo;
             }
             else
             {
                 var temp = last.GetComponent<T>();
-                target.from = (temp.from + temp.to) / 2;
-                temp.to = target.from;
+                target.localFrom = (temp.localFrom + temp.localTo) / 2;
+                temp.localTo = target.localFrom;
             }
-            target.to = from;
+            target.localTo = localFrom;
+            target.DataCopy(this);
             Parent.UpdateRenderer();
             return target.gameObject;
         }
@@ -124,38 +138,68 @@ namespace AutoCore.MapToolbox
             var target = base.AddAfter().GetComponent<T>();
             if (next == null)
             {
-                target.to = 2 * to - from;
+                target.localTo = 2 * localTo - localFrom;
             }
             else
             {
                 var temp = next.GetComponent<T>();
-                target.to = (temp.from + temp.to) / 2;
-                temp.from = target.to;
+                target.localTo = (temp.localFrom + temp.localTo) / 2;
+                temp.localFrom = target.localTo;
             }
-            target.from = to;
+            target.localFrom = localTo;
+            target.DataCopy(this);
             Parent.UpdateRenderer();
             return target.gameObject;
         }
 
-        internal void ApplyBezierPoints(Vector3[] points)
+        internal virtual void AutoSubdivision()
+        {
+            UpdateRef();
+            if (last != null && next != null)
+            {
+                var refLast = last.GetComponent<LineSegment<T>>();
+                var refNext = next.GetComponent<LineSegment<T>>();
+                if (refLast && refNext)
+                {
+                    Vector3 lastDir = refLast.To - refLast.From;
+                    Vector3 nextDir = refNext.To - refNext.From;
+                    if (Utils.ClosestPointsOnTwoLines(out Vector3 p1, out Vector3 p2,
+                        refLast.From, lastDir, refNext.From, nextDir))
+                    {
+                        Subdivision((refLast.To + p1) / 2, (refNext.From + p2) / 2);
+                    }
+                    else
+                    {
+                        Subdivision((refLast.To + refNext.From) / 2, (refLast.To + refNext.From) / 2);
+                    }
+                }
+            }
+        }
+
+        internal virtual void Subdivision(Vector3 startTangent, Vector3 endTangent, float distance = 1)
+        {
+            ApplySubdivisionPoints(UnityEditor.Handles.MakeBezierPoints(From, To, startTangent, endTangent, (int)(From - To).magnitude * 10), distance);
+        }
+
+        internal void ApplySubdivisionPoints(Vector3[] points, float distance = 1)
         {
             LineSegment<T> current = this;
             foreach (var point in points)
             {
-                if (Vector3.Distance(current.from, point) > 1)
+                if (Vector3.Distance(current.From, point) > distance)
                 {
-                    Vector3 dest = current.from + (point - current.from).normalized;
-                    current.to = dest;
+                    Vector3 dest = current.From + (point - current.From).normalized * distance;
+                    current.To = dest;
                     var temp = current.AddAfter().GetComponent<LineSegment<T>>();
                     temp.DataCopy(current);
                     current = temp;
-                    current.from = dest;
+                    current.From = dest;
                 }
             }
             current.To = points.Last();
         }
 
-        protected virtual void DataCopy(LineSegment<T> current) => name = current.name;
+        protected virtual void DataCopy(LineSegment<T> target) => name = target.name;
 
         internal void Merge(T[] targets)
         {
@@ -164,10 +208,11 @@ namespace AutoCore.MapToolbox
                 var temp = targets.OrderBy(_ => _.Index).ToArray();
                 var first = temp.First();
                 var last = temp.Last();
-                first.To = last.To;
+                first.LocalTo = last.LocalTo;
+                first.next = last.next;
                 if (last.next)
                 {
-                    last.next.GetComponent<LineSegment<T>>().From = first.To;
+                    last.next.GetComponent<LineSegment<T>>().LocalFrom = first.LocalTo;
                 }
                 for (int i = 1; i < temp.Length; i++)
                 {

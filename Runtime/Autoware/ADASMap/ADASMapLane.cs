@@ -1,6 +1,6 @@
 ﻿#region License
 /******************************************************************************
-* Copyright 2019 The AutoCore Authors. All Rights Reserved.
+* Copyright 2018-2020 The AutoCore Authors. All Rights Reserved.
 * 
 * Licensed under the GNU Lesser General Public License, Version 3.0 (the "License"); 
 * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 #endregion
 
 
-using System;
 using System.Linq;
 
 namespace AutoCore.MapToolbox.Autoware
@@ -39,7 +38,7 @@ namespace AutoCore.MapToolbox.Autoware
             RIGHT_MERGING = 4,
             COMPOSITION = 5
         }
-        public Jct JCT { get; private set; }
+        public Jct JCT { get; set; }
         public int BLID2 { get; set; }
         public int BLID3 { get; set; }
         public int BLID4 { get; set; }
@@ -211,23 +210,20 @@ namespace AutoCore.MapToolbox.Autoware
                 return fnode;
             }
         }
-        public ADASMapLane StartLane { get; set; }
-        public ADASMapLane EndLane { get; set; }
         public ADASMapLane FirstLane { get; set; }
-        public ADASMapLane FinalLane { get; set; }
-        bool IsStartLane()
+        bool EdgeOrCross()
         {
             if (JCT > Jct.NORMAL || BLID == 0)
             {
                 return true;
             }
-            if (BLID2 != 0 || BLID3 != 0 || BLID4 != 0)
+            if (BLID2 > 0 || BLID3 > 0 || BLID4 > 0)
             {
                 return true;
             }
             if (Dic.TryGetValue(BLID, out ADASMapLane value))
             {
-                return value.FLID2 > 0 || value.FLID3 > 0 || value.FLID4 > 0 || value.JCT > 0;
+                return value.FLID2 > 0 || value.FLID3 > 0 || value.FLID4 > 0 || value.JCT > Jct.NORMAL;
             }
             else
             {
@@ -236,13 +232,12 @@ namespace AutoCore.MapToolbox.Autoware
         }
         bool IsFirstLane()
         {
-            if (IsStartLane())
+            if (EdgeOrCross())
             {
                 return true;
             }
             return BLane.ID != ID - 1;
         }
-        ADASMapLane GetStartLane() => IsStartLane() ? this : BLane.GetStartLane();
         ADASMapLane GetFirstLane() => IsFirstLane() ? this : BLane.GetFirstLane();
         #endregion
         public override string ToString() => $"{ID},{DTLane.ID},{(BLane != null ? BLane.ID : 0)},{(FLane != null ? FLane.ID : 0)},{BNode.ID},{FNode.ID},{(int)JCT},{(BLane2 != null ? BLane2.ID : 0)},{(BLane3 != null ? BLane3.ID : 0)},{(BLane4 != null ? BLane4.ID : 0)},{(FLane2 != null ? FLane2.ID : 0)},{(FLane3 != null ? FLane3.ID : 0)},{(FLane4 != null ? FLane4.ID : 0)},{ClossID},{Span},{LCnt},{Lno},{(int)LaneType},{LimitVel},{RefVel},{RoadSecID},{(int)LaneChgFG}";
@@ -284,24 +279,7 @@ namespace AutoCore.MapToolbox.Autoware
                 }
                 foreach (var item in List)
                 {
-                    item.StartLane = item.GetStartLane();
                     item.FirstLane = item.GetFirstLane();
-                }
-                foreach (var item in List.GroupBy(_ => _.StartLane))
-                {
-                    var endLane = Dic[item.Max(_ => _.ID)];
-                    foreach (var lane in item)
-                    {
-                        lane.EndLane = endLane;
-                    }
-                }
-                foreach (var item in List.GroupBy(_ => _.FirstLane))
-                {
-                    var finalLane = Dic[item.Max(_ => _.ID)];
-                    foreach (var lane in item)
-                    {
-                        lane.FinalLane = finalLane;
-                    }
                 }
             }
         }
@@ -310,6 +288,7 @@ namespace AutoCore.MapToolbox.Autoware
             ReIndex();
             Utils.CleanOrCreateNew(path, file, header);
             Utils.AppendData(path, file, List.Select(_ => _.ToString()));
+            Utils.RemoveEmpty(path, file);
         }
     }
 }

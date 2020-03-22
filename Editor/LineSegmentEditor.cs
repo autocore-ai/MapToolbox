@@ -1,6 +1,6 @@
 ﻿#region License
 /******************************************************************************
-* Copyright 2019 The AutoCore Authors. All Rights Reserved.
+* Copyright 2018-2020 The AutoCore Authors. All Rights Reserved.
 * 
 * Licensed under the GNU Lesser General Public License, Version 3.0 (the "License"); 
 * you may not use this file except in compliance with the License.
@@ -26,7 +26,8 @@ namespace AutoCore.MapToolbox.Editor
     [CanEditMultipleObjects]
     class LineSegmentEditor<T> : SiblingChildEditor<T> where T : LineSegment<T>
     {
-        bool BezierEditing { get; set; } = false;
+        static bool ArrowDisplay { get; set; }
+        bool Subdivision { get; set; } = false;
         Vector3 StartTangent { get; set; }
         Vector3 EndTangent { get; set; }
         protected override void AfterDefaultInspectorDraw()
@@ -34,9 +35,9 @@ namespace AutoCore.MapToolbox.Editor
             base.AfterDefaultInspectorDraw();
             if (Targets != null && Targets.Length == 1)
             {
-                Target.From = EditorGUILayout.Vector3Field(GetMemberName((T t) => t.From), Target.From);
-                Target.To = EditorGUILayout.Vector3Field(GetMemberName((T t) => t.To), Target.To);
-                if (BezierEditing)
+                Target.LocalFrom = EditorGUILayout.Vector3Field(GetMemberName((T t) => t.LocalFrom), Target.LocalFrom);
+                Target.LocalTo = EditorGUILayout.Vector3Field(GetMemberName((T t) => t.LocalTo), Target.LocalTo);
+                if (Subdivision)
                 {
                     StartTangent = EditorGUILayout.Vector3Field(GetMemberName((LineSegmentEditor<T> t) => t.StartTangent), StartTangent);
                     EndTangent = EditorGUILayout.Vector3Field(GetMemberName((LineSegmentEditor<T> t) => t.EndTangent), EndTangent);
@@ -51,7 +52,7 @@ namespace AutoCore.MapToolbox.Editor
                 if (Targets.Length == 1)
                 {
                     InspectorGUIAddButton();
-                    BezierEditorGUI();
+                    SubdivisionEditorGUI();
                 }
                 else
                 {
@@ -66,33 +67,43 @@ namespace AutoCore.MapToolbox.Editor
                 }
             }
             InspectorGUIRemoveButton();
+            ArrowDisplay = GUILayout.Toggle(ArrowDisplay, "Direction Arrow");
         }
 
-        private void BezierEditorGUI()
+        private void SubdivisionEditorGUI()
         {
-            if (BezierEditing)
+            if (Subdivision)
             {
                 GUILayout.BeginHorizontal();
                 GUI.color = Color.yellow;
-                if (GUILayout.Button("Apply"))
+                if (GUILayout.Button("Normal way"))
                 {
-                    BezierEditing = false;
-                    Target.ApplyBezierPoints(Handles.MakeBezierPoints(Target.from, Target.to, StartTangent, EndTangent, (int)(Target.from - Target.to).magnitude * 10));
+                    Subdivision = false;
+                    Target.Subdivision(StartTangent, EndTangent, 1);
+                }
+                else if (GUILayout.Button("High Way"))
+                {
+                    Subdivision = false;
+                    Target.Subdivision(StartTangent, EndTangent, 5);
                 }
                 GUI.color = Color.white;
                 if (GUILayout.Button("Cancel"))
                 {
-                    BezierEditing = false;
+                    Subdivision = false;
                 }
                 GUILayout.EndHorizontal();
             }
             else
             {
-                if (GUILayout.Button("Bezier Edit"))
+                if (GUILayout.Button("Subdivision"))
                 {
-                    BezierEditing = true;
-                    StartTangent = Target.from + (Target.to - Target.from) / 4;
-                    EndTangent = Target.from + 3 * (Target.to - Target.from) / 4;
+                    Subdivision = true;
+                    StartTangent = Target.From + (Target.To - Target.From) / 4;
+                    EndTangent = Target.From + 3 * (Target.To - Target.From) / 4;
+                }
+                else if (GUILayout.Button("Auto Subdivision"))
+                {
+                    Target.AutoSubdivision();
                 }
             }
         }
@@ -100,18 +111,45 @@ namespace AutoCore.MapToolbox.Editor
         protected virtual void OnSceneGUI()
         {
             Tools.current = Tool.None;
-            if (BezierEditing)
+            if (Subdivision)
             {
-                StartTangent = Handles.PositionHandle(StartTangent, Quaternion.identity);
-                EndTangent = Handles.PositionHandle(EndTangent, Quaternion.identity);
-                Handles.DrawBezier(Target.from, Target.to, StartTangent, EndTangent, Color.green, null, (Target.from - Target.to).magnitude / 10);
+                var oldStartTangent = StartTangent;
+                var oldEndTangent = EndTangent;
+                var newStartTangent = Handles.PositionHandle(StartTangent, Quaternion.identity);
+                var newEndTangent = Handles.PositionHandle(EndTangent, Quaternion.identity);
+                if (oldStartTangent != newStartTangent)
+                {
+                    StartTangent = newStartTangent;
+                    Repaint();
+                }
+                else if (oldEndTangent != newEndTangent)
+                {
+                    EndTangent = newEndTangent;
+                    Repaint();
+                }
+                Handles.DrawBezier(Target.From, Target.To, StartTangent, EndTangent, Color.green, null, (Target.From - Target.To).magnitude / 10);
             }
             else
             {
-                Handles.color = Color.cyan;
-                Handles.ArrowHandleCap(0, Target.From, Quaternion.FromToRotation(Vector3.forward, Target.To - Target.From), (Target.To - Target.From).magnitude, EventType.Repaint);
-                Target.From = Handles.PositionHandle(Target.From, Quaternion.identity);
-                Target.To = Handles.PositionHandle(Target.To, Quaternion.identity);
+                if (ArrowDisplay)
+                {
+                    Handles.color = Color.cyan;
+                    Handles.ArrowHandleCap(0, Target.From, Quaternion.FromToRotation(Vector3.forward, Target.To - Target.From), (Target.To - Target.From).magnitude, EventType.Repaint);
+                }
+                var oldFrom = Target.From;
+                var oldTo = Target.To;
+                var newFrom = Handles.PositionHandle(oldFrom, Quaternion.identity);
+                var newTo = Handles.PositionHandle(oldTo, Quaternion.identity);
+                if (newFrom != oldFrom)
+                {
+                    Target.From = newFrom;
+                    Repaint();
+                }
+                else if (newTo != oldTo)
+                {
+                    Target.To = newTo;
+                    Repaint();
+                }
             }
         }
     }

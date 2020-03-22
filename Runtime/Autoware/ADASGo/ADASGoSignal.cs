@@ -1,6 +1,6 @@
 ﻿#region License
 /******************************************************************************
-* Copyright 2019 The AutoCore Authors. All Rights Reserved.
+* Copyright 2018-2020 The AutoCore Authors. All Rights Reserved.
 * 
 * Licensed under the GNU Lesser General Public License, Version 3.0 (the "License"); 
 * you may not use this file except in compliance with the License.
@@ -72,7 +72,7 @@ namespace AutoCore.MapToolbox.Autoware
                     };
                     if (linkLane != null)
                     {
-                        data.LinkLane = linkLane.Lane;
+                        data.LinkLane = linkLane.lane;
                     }
                 }
                 return data;
@@ -85,60 +85,31 @@ namespace AutoCore.MapToolbox.Autoware
         }
         private void OnDrawGizmos()
         {
-            switch (signalType)
+            Gizmos.color = Color;
+            Gizmos.matrix = transform.localToWorldMatrix;
+            Gizmos.DrawFrustum(Vector3.zero, 30, 1, 0.1f, 1);
+        }
+        public Color Color
+        {
+            get
             {
-                case ADASMapSignal.Type.RED:
-                case ADASMapSignal.Type.RED_LEFT:
-                    Gizmos.color = Color.red;
-                    if (linkLane != null)
-                    {
-                        Gizmos.DrawLine(transform.position, linkLane.transform.position);
-                    }
-                    Gizmos.matrix = transform.localToWorldMatrix;
-                    Gizmos.DrawFrustum(Vector3.zero, 30, 1, 0.1f, 1);
-                    break;
-                case ADASMapSignal.Type.BLUE:
-                case ADASMapSignal.Type.BLUE_LEFT:
-                    Gizmos.color = Color.green;
-                    if (linkLane != null)
-                    {
-                        Gizmos.DrawLine(transform.position, linkLane.transform.position);
-                    }
-                    Gizmos.matrix = transform.localToWorldMatrix;
-                    Gizmos.DrawFrustum(Vector3.zero, 30, 1, 0.1f, 1);
-                    break;
-                case ADASMapSignal.Type.YELLOW:
-                case ADASMapSignal.Type.YELLOW_LEFT:
-                    Gizmos.color = Color.yellow;
-                    if (linkLane != null)
-                    {
-                        Gizmos.DrawLine(transform.position, linkLane.transform.position);
-                    }
-                    Gizmos.matrix = transform.localToWorldMatrix;
-                    Gizmos.DrawFrustum(Vector3.zero, 30, 1, 0.1f, 1);
-                    break;
-                case ADASMapSignal.Type.PEDESTRIAN_RED:
-                    Gizmos.color = Color.cyan;
-                    if (linkLane != null)
-                    {
-                        Gizmos.DrawLine(transform.position, linkLane.transform.position);
-                    }
-                    Gizmos.matrix = transform.localToWorldMatrix;
-                    Gizmos.DrawFrustum(Vector3.zero, 30, 1, 0.1f, 1);
-                    break;
-                case ADASMapSignal.Type.PEDESTRIAN_BLUE:
-                    Gizmos.color = Color.blue;
-                    if (linkLane != null)
-                    {
-                        Gizmos.DrawLine(transform.position, linkLane.transform.position);
-                    }
-                    Gizmos.matrix = transform.localToWorldMatrix;
-                    Gizmos.DrawFrustum(Vector3.zero, 30, 1, 0.1f, 1);
-                    break;
-                case ADASMapSignal.Type.OTHER:
-                    break;
-                default:
-                    break;
+                switch (signalType)
+                {
+                    case ADASMapSignal.Type.RED:
+                    case ADASMapSignal.Type.RED_LEFT:
+                    case ADASMapSignal.Type.PEDESTRIAN_RED:
+                        return Color.red;
+                    case ADASMapSignal.Type.BLUE:
+                    case ADASMapSignal.Type.BLUE_LEFT:
+                    case ADASMapSignal.Type.PEDESTRIAN_BLUE:
+                        return Color.green;
+                    case ADASMapSignal.Type.YELLOW:
+                    case ADASMapSignal.Type.YELLOW_LEFT:
+                        return Color.yellow;
+                    case ADASMapSignal.Type.OTHER:
+                    default:
+                        return Color.white;
+                }
             }
         }
     }

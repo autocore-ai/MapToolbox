@@ -1,6 +1,6 @@
 ﻿#region License
 /******************************************************************************
-* Copyright 2019 The AutoCore Authors. All Rights Reserved.
+* Copyright 2018-2020 The AutoCore Authors. All Rights Reserved.
 * 
 * Licensed under the GNU Lesser General Public License, Version 3.0 (the "License"); 
 * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ namespace AutoCore.MapToolbox.Autoware
                 return point;
             }
         }
-        public override string ToString() => $"{ID},{Dist},{Point.ID},{Dir},{Apara},{R},{Slope},{Cant},{LW},{RW}";
+        public override string ToString() => $"{ID},{Dist:0.##},{Point.ID},{Dir},{Apara},{R},{Slope},{Cant},{LW},{RW}";
         const string file = "dtlane.csv";
         const string header = "DID,Dist,PID,Dir,Apara,r,slope,cant,LW,RW";
         public static void ReadCsv(string path)
@@ -79,6 +79,7 @@ namespace AutoCore.MapToolbox.Autoware
             ReIndex();
             Utils.CleanOrCreateNew(path, file, header);
             Utils.AppendData(path, file, List.Select(_ => _.ToString()));
+            Utils.RemoveEmpty(path, file);
         }
     }
 }

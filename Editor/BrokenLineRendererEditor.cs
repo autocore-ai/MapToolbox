@@ -1,6 +1,6 @@
 ﻿#region License
 /******************************************************************************
-* Copyright 2019 The AutoCore Authors. All Rights Reserved.
+* Copyright 2018-2020 The AutoCore Authors. All Rights Reserved.
 * 
 * Licensed under the GNU Lesser General Public License, Version 3.0 (the "License"); 
 * you may not use this file except in compliance with the License.
@@ -34,8 +34,8 @@ namespace AutoCore.MapToolbox.Editor
         protected override void BeforeDefaultInspectorDraw()
         {
             base.BeforeDefaultInspectorDraw();
-            Target.From = EditorGUILayout.Vector3Field(GetMemberName((BrokenLineRenderer<T> t) => t.From), Target.From);
-            Target.To = EditorGUILayout.Vector3Field(GetMemberName((BrokenLineRenderer<T> t) => t.To), Target.To);
+            Target.LocalFrom = EditorGUILayout.Vector3Field(GetMemberName((BrokenLineRenderer<T> t) => t.LocalFrom), Target.LocalFrom);
+            Target.LocalTo = EditorGUILayout.Vector3Field(GetMemberName((BrokenLineRenderer<T> t) => t.LocalTo), Target.LocalTo);
         }
         protected override void AfterDefaultInspectorDraw()
         {
@@ -50,8 +50,20 @@ namespace AutoCore.MapToolbox.Editor
         protected virtual void OnSceneGUI()
         {
             Tools.current = Tool.None;
-            Target.From = Handles.PositionHandle(Target.From, Quaternion.identity);
-            Target.To = Handles.PositionHandle(Target.To, Quaternion.identity);
+            var oldFrom = Target.From;
+            var oldTo = Target.To;
+            var newFrom = Handles.PositionHandle(oldFrom, Quaternion.identity);
+            var newTo = Handles.PositionHandle(oldTo, Quaternion.identity);
+            if (newFrom != oldFrom)
+            {
+                Target.From = newFrom;
+                Repaint();
+            }
+            else if (newTo != oldTo)
+            {
+                Target.To = newTo;
+                Repaint();
+            }
         }
     }
 }

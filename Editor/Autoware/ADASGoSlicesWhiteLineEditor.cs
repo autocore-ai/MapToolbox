@@ -1,6 +1,6 @@
 ﻿#region License
 /******************************************************************************
-* Copyright 2019 The AutoCore Authors. All Rights Reserved.
+* Copyright 2018-2020 The AutoCore Authors. All Rights Reserved.
 * 
 * Licensed under the GNU Lesser General Public License, Version 3.0 (the "License"); 
 * you may not use this file except in compliance with the License.
@@ -25,6 +25,11 @@ namespace AutoCore.MapToolbox.Editor.Autoware
     [CustomEditor(typeof(ADASGoSlicesWhiteLine))]
     class ADASGoSlicesWhiteLineEditor : BrokenLineRendererEditor<ADASGoLine>
     {
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            (Target as ADASGoSlicesWhiteLine).OnEnableEditor();
+        }
         public override void OnInspectorGUI()
         {
             (target as ADASGoSlicesWhiteLine).UpdateRenderer();

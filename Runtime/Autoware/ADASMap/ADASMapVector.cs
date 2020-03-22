@@ -1,6 +1,6 @@
 ﻿#region License
 /******************************************************************************
-* Copyright 2019 The AutoCore Authors. All Rights Reserved.
+* Copyright 2018-2020 The AutoCore Authors. All Rights Reserved.
 * 
 * Licensed under the GNU Lesser General Public License, Version 3.0 (the "License"); 
 * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ namespace AutoCore.MapToolbox.Autoware
                 Hang = value.eulerAngles.y;
             }
         }
-        public override string ToString() => $"{ID},{Point.ID},{Hang},{Vang}";
+        public override string ToString() => $"{ID},{Point.ID},{Hang:0.##},{Vang:0.##}";
         const string file = "vector.csv";
         const string header = "VID,PID,Hang,Vang";
         public static void ReadCsv(string path)
@@ -75,6 +75,7 @@ namespace AutoCore.MapToolbox.Autoware
             ReIndex();
             Utils.CleanOrCreateNew(path, file, header);
             Utils.AppendData(path, file, List.Select(_ => _.ToString()));
+            Utils.RemoveEmpty(path, file);
         }
     }
 }

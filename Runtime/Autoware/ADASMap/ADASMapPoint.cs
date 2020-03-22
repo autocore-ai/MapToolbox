@@ -1,6 +1,6 @@
 ﻿#region License
 /******************************************************************************
-* Copyright 2019 The AutoCore Authors. All Rights Reserved.
+* Copyright 2018-2020 The AutoCore Authors. All Rights Reserved.
 * 
 * Licensed under the GNU Lesser General Public License, Version 3.0 (the "License"); 
 * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ namespace AutoCore.MapToolbox.Autoware
             }
         }
         #endregion
-        public override string ToString() => $"{ID},{B},{L},{H},{Bx},{Ly},{ReF},{MCODE1},{MCODE2},{MCODE3}";
+        public override string ToString() => $"{ID},{B},{L},{H:0.##},{Bx:0.##},{Ly:0.##},{ReF},{MCODE1},{MCODE2},{MCODE3}";
         const string file = "point.csv";
         const string header = "PID,B,L,H,Bx,Ly,ReF,MCODE1,MCODE2,MCODE3";
         public static void ReadCsv(string path)
@@ -77,6 +77,7 @@ namespace AutoCore.MapToolbox.Autoware
             ReIndex();
             Utils.CleanOrCreateNew(path, file, header);
             Utils.AppendData(path, file, List.Select(_ => _.ToString()));
+            Utils.RemoveEmpty(path, file);
         }
     }
 }

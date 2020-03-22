@@ -1,6 +1,6 @@
 ﻿#region License
 /******************************************************************************
-* Copyright 2019 The AutoCore Authors. All Rights Reserved.
+* Copyright 2018-2020 The AutoCore Authors. All Rights Reserved.
 * 
 * Licensed under the GNU Lesser General Public License, Version 3.0 (the "License"); 
 * you may not use this file except in compliance with the License.
@@ -17,7 +17,9 @@
 #endregion
 
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace AutoCore.MapToolbox.Autoware
@@ -31,50 +33,63 @@ namespace AutoCore.MapToolbox.Autoware
         {
             get
             {
-                if (slices)
+                if (slices == null)
                 {
                     slices = GetComponentInParent<ADASGoSlicesLane>();
                 }
                 return slices;
             }
         }
-        public CollectionADASLane CollectionLane { get; set; }
-        [HideInInspector] public ADASMapLane.Jct jct;
-        [HideInInspector] public List<ADASGoLane> bLane;
-        [HideInInspector] public List<ADASGoLane> fLane;
-        public int lCnt;
-        public int lno;
-        public ADASMapLane.Type laneType;
-        public int limitVel;
-        public int refVel;
-        ADASMapLane data;
+        CollectionADASLane collectionLane;
+        public CollectionADASLane CollectionLane
+        {
+            set => collectionLane = value;
+            get
+            {
+                if (collectionLane == null)
+                {
+                    collectionLane = GetComponentInParent<AutowareADASMap>().GetComponentInChildren<CollectionADASLane>();
+                }
+                return collectionLane;
+            }
+        }
+        public ADASMapLane.Jct jct = ADASMapLane.Jct.NORMAL;
+        [HideInInspector] public List<ADASGoLane> bLane = new List<ADASGoLane>();
+        [HideInInspector] public List<ADASGoLane> fLane = new List<ADASGoLane>();
+        public int lCnt = 1;
+        public int lno = 1;
+        public ADASMapLane.Type laneType = ADASMapLane.Type.STRAIGHT;
+        public int limitVel = 20;
+        public int refVel = 20;
         public static float tempDist;
+        public const float minDistance = 0.2f;
+        public ADASMapLane lane;
         public ADASMapLane Lane
         {
             set
             {
-                data = value;
-                if (data != null)
+                lane = value;
+                if (lane != null)
                 {
-                    CollectionLane?.Add(data.ID, this);
-                    name = data.ID.ToString();
-                    from = data.BNode.Point.Position;
-                    to = data.FNode.Point.Position;
-                    jct = data.JCT;
-                    lCnt = data.LCnt;
-                    lno = data.Lno;
-                    laneType = data.LaneType;
-                    limitVel = data.LimitVel;
-                    refVel = data.RefVel;
-                    transform.position = (from + to) / 2;
+                    CollectionLane?.Add(lane.ID, this);
+                    name = lane.ID.ToString();
+                    From = lane.BNode.Point.Position;
+                    To = lane.FNode.Point.Position;
+                    jct = lane.JCT;
+                    lCnt = lane.LCnt;
+                    lno = lane.Lno;
+                    laneType = lane.LaneType;
+                    limitVel = lane.LimitVel;
+                    refVel = lane.RefVel;
+                    transform.position = (From + To) / 2;
                 }
             }
             get
             {
-                if (data == null)
+                if (lane == null)
                 {
-                    var point = new ADASMapPoint { Position = from };
-                    data = new ADASMapLane
+                    var point = new ADASMapPoint { Position = From };
+                    lane = new ADASMapLane
                     {
                         DTLane = new ADASMapDTLane
                         {
@@ -85,33 +100,101 @@ namespace AutoCore.MapToolbox.Autoware
                         {
                             Point = point
                         },
+                        JCT = jct,
                         LCnt = lCnt,
                         Lno = lno,
                         LaneType = laneType,
                         LimitVel = limitVel,
                         RefVel = refVel
                     };
-                    tempDist += (to - from).magnitude;
+                    tempDist += (To - From).magnitude;
                     if (last != null)
                     {
-                        last.GetComponent<ADASGoLane>().data.FNode = data.BNode;
+                        last.GetComponent<ADASGoLane>().lane.FNode = lane.BNode;
                     }
                     if (next == null)
                     {
-                        data.FNode = new ADASMapNode
+                        lane.FNode = new ADASMapNode
                         {
-                            Point = new ADASMapPoint { Position = to }
+                            Point = new ADASMapPoint { Position = To }
                         };
                     }
                 }
-                return data;
+                return lane;
             }
         }
+        internal void OnEditorEnable()
+        {
 
+        }
+        internal override void AutoSubdivision()
+        {
+            base.AutoSubdivision();
+            ADASGoLane refLast = last?.GetComponent<ADASGoLane>();
+            if (refLast == null && Slices.bLane.Count > 0)
+            {
+                var lastSlices = Slices.bLane.First();
+                if (lastSlices != null)
+                {
+                    var lastLanes = lastSlices.GetComponentsInChildren<ADASGoLane>();
+                    if (lastLanes.Length > 0)
+                    {
+                        refLast = lastLanes.Last();
+                    }
+                }
+            }
+            ADASGoLane refNext = next?.GetComponent<ADASGoLane>();
+            if (refNext == null && Slices.fLane.Count > 0)
+            {
+                var nextSlices = Slices.fLane.First();
+                if (nextSlices != null)
+                {
+                    var nextLanes = nextSlices.GetComponentsInChildren<ADASGoLane>();
+                    if (nextLanes.Length > 0)
+                    {
+                        refNext = nextLanes.First();
+                    }
+                }
+            }
+            if (refLast && refNext)
+            {
+                Vector3 lastDir = refLast.To - refLast.From;
+                Vector3 nextDir = refNext.To - refNext.From;
+                if (MapToolbox.Utils.ClosestPointsOnTwoLines(out Vector3 p1, out Vector3 p2,
+                    refLast.From, lastDir, refNext.From, nextDir))
+                {
+                    Subdivision((refLast.To + p1) / 2, (refNext.From + p2) / 2);
+                }
+                else
+                {
+                    Subdivision((refLast.To + refNext.From) / 2, (refLast.To + refNext.From) / 2);
+                }
+            }
+        }
+        internal void CheckFLanes(IEnumerable<ADASGoLane> flanes)
+        {
+            UpdateRef();
+            UpdateOutterRef();
+            fLane = flanes.Where(_ => _ != null && Vector3.Distance(_.From, To) < minDistance).ToList();
+            foreach (var item in fLane)
+            {
+                item.From = To;
+            }
+        }
+        internal void CheckBLanes(IEnumerable<ADASGoLane> blanes)
+        {
+            UpdateRef();
+            UpdateOutterRef();
+            bLane = blanes.Where(_ => _ != null && Vector3.Distance(_.To, From) < minDistance).ToList();
+            foreach (var item in bLane)
+            {
+                item.To = From;
+            }
+        }
         internal void BuildData()
         {
-            data = null;
-            data = Lane;
+            lane = null;
+            lane = Lane;
         }
         internal void BuildDataRef()
         {
@@ -119,38 +202,38 @@ namespace AutoCore.MapToolbox.Autoware
             {
                 if (bLane.Count > 0 && bLane[0] != null)
                 {
-                    Lane.BLane = bLane[0].Lane;
+                    lane.BLane = bLane[0].lane;
                 }
                 if (bLane.Count > 1 && bLane[1] != null)
                 {
-                    Lane.BLane2 = bLane[1].Lane;
+                    lane.BLane2 = bLane[1].lane;
                 }
                 if (bLane.Count > 2 && bLane[2] != null)
                 {
-                    Lane.BLane3 = bLane[2].Lane;
+                    lane.BLane3 = bLane[2].lane;
                 }
                 if (bLane.Count > 3 && bLane[3] != null)
                 {
-                    Lane.BLane4 = bLane[3].Lane;
+                    lane.BLane4 = bLane[3].lane;
                 }
             }
             if (fLane != null)
             {
                 if (fLane.Count > 0 && fLane[0] != null)
                 {
-                    Lane.FLane = fLane[0].Lane;
+                    lane.FLane = fLane[0].lane;
                 }
                 if (fLane.Count > 1 && fLane[1] != null)
                 {
-                    Lane.FLane2 = fLane[1].Lane;
+                    lane.FLane2 = fLane[1].lane;
                 }
                 if (fLane.Count > 2 && fLane[2] != null)
                 {
-                    Lane.FLane3 = fLane[2].Lane;
+                    lane.FLane3 = fLane[2].lane;
                 }
                 if (fLane.Count > 3 && fLane[3] != null)
                 {
-                    Lane.FLane4 = fLane[3].Lane;
+                    lane.FLane4 = fLane[3].lane;
                 }
             }
         }
@@ -195,47 +278,47 @@ namespace AutoCore.MapToolbox.Autoware
         }
         private void OutterLastRef()
         {
-            if (last == null && data != null)
+            if (last == null && lane != null)
             {
                 bLane = new List<ADASGoLane>();
-                if (data.BLane != null)
+                if (lane.BLane != null)
                 {
-                    bLane.Add(CollectionLane[data.BLane.ID]);
+                    bLane.Add(CollectionLane[lane.BLane.ID]);
                 }
-                if (data.BLane2 != null)
+                if (lane.BLane2 != null)
                 {
-                    bLane.Add(CollectionLane[data.BLane2.ID]);
+                    bLane.Add(CollectionLane[lane.BLane2.ID]);
                 }
-                if (data.BLane3 != null)
+                if (lane.BLane3 != null)
                 {
-                    bLane.Add(CollectionLane[data.BLane3.ID]);
+                    bLane.Add(CollectionLane[lane.BLane3.ID]);
                 }
-                if (data.BLane4 != null)
+                if (lane.BLane4 != null)
                 {
-                    bLane.Add(CollectionLane[data.BLane4.ID]);
+                    bLane.Add(CollectionLane[lane.BLane4.ID]);
                 }
             }
         }
         private void OutterNextRef()
         {
-            if (next == null && data != null)
+            if (next == null && lane != null)
             {
                 fLane = new List<ADASGoLane>();
-                if (data.FLane != null)
+                if (lane.FLane != null)
                 {
-                    fLane.Add(CollectionLane[data.FLane.ID]);
+                    fLane.Add(CollectionLane[lane.FLane.ID]);
                 }
-                if (data.FLane2 != null)
+                if (lane.FLane2 != null)
                 {
-                    fLane.Add(CollectionLane[data.FLane2.ID]);
+                    fLane.Add(CollectionLane[lane.FLane2.ID]);
                 }
-                if (data.FLane3 != null)
+                if (lane.FLane3 != null)
                 {
-                    fLane.Add(CollectionLane[data.FLane3.ID]);
+                    fLane.Add(CollectionLane[lane.FLane3.ID]);
                 }
-                if (data.FLane4 != null)
+                if (lane.FLane4 != null)
                 {
-                    fLane.Add(CollectionLane[data.FLane4.ID]);
+                    fLane.Add(CollectionLane[lane.FLane4.ID]);
                 }
             }
         }

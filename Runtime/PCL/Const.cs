@@ -1,6 +1,6 @@
 ﻿#region License
 /******************************************************************************
-* Copyright 2019 The AutoCore Authors. All Rights Reserved.
+* Copyright 2018-2020 The AutoCore Authors. All Rights Reserved.
 * 
 * Licensed under the GNU Lesser General Public License, Version 3.0 (the "License"); 
 * you may not use this file except in compliance with the License.
@@ -21,7 +21,8 @@ namespace AutoCore.MapToolbox.PCL
 {
     public class Const
     {
-        public const string nativePlugin = "PCL4Unity";
+        public const string unity_debug_plugin = "unity_debug";
+        public const string unity_pcl_plugin = "unity_pcl";
         public const string IntensityPrecentMin = "IntensityPrecentMin";
         public const string IntensityPrecentMax = "IntensityPrecentMax";
     }

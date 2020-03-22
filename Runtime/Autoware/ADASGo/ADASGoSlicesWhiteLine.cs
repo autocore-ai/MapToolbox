@@ -1,6 +1,6 @@
 ﻿#region License
 /******************************************************************************
-* Copyright 2019 The AutoCore Authors. All Rights Reserved.
+* Copyright 2018-2020 The AutoCore Authors. All Rights Reserved.
 * 
 * Licensed under the GNU Lesser General Public License, Version 3.0 (the "License"); 
 * you may not use this file except in compliance with the License.
@@ -60,12 +60,24 @@ namespace AutoCore.MapToolbox.Autoware
                 item.BuildData();
             }
         }
+        internal void OnEnableEditor()
+        {
+            var children = GetComponentsInChildren<ADASGoWhiteLine>();
+            if (children.Length > 0)
+            {
+                LineRenderer.startWidth = children.First().width;
+                LineRenderer.endWidth = children.Last().width;
+                LineRenderer.startColor = children.First().color == ADASMapWhiteLine.Color.White ? Color.white : Color.yellow;
+                LineRenderer.endColor = children.Last().color == ADASMapWhiteLine.Color.White ? Color.white : Color.yellow;
+            }
+        }
         public void SetupRenderer()
         {
             LineRenderer.startWidth = startWidth;
             LineRenderer.endWidth = endWidth;
             LineRenderer.startColor = startColor;
             LineRenderer.endColor = endColor;
+            LineRenderer.useWorldSpace = false;
 #if UNITY_EDITOR
             LineRenderer.sharedMaterial = UnityEditor.AssetDatabase.GetBuiltinExtraResource<Material>("Sprites-Default.mat");
 #endif

@@ -1,6 +1,6 @@
 ﻿#region License
 /******************************************************************************
-* Copyright 2019 The AutoCore Authors. All Rights Reserved.
+* Copyright 2018-2020 The AutoCore Authors. All Rights Reserved.
 * 
 * Licensed under the GNU Lesser General Public License, Version 3.0 (the "License"); 
 * you may not use this file except in compliance with the License.
@@ -82,9 +82,7 @@ namespace AutoCore.MapToolbox.Autoware
             }
         }
         public ADASMapLine FirstLine { get; set; }
-        public ADASMapLine FinalLine { get; set; }
-        private ADASMapLine GetFirstLine() => BLID == 0 ? this : BLine.GetFirstLine();
-        private ADASMapLine GetFinalLine() => FLID == 0 ? this : FLine.GetFinalLine();
+        private ADASMapLine GetFirstLine() => BLID == 0 ? this : BLine?.GetFirstLine();
         public override string ToString() => $"{ID},{BPoint.ID},{FPoint.ID},{(BLine != null ? BLine.ID : 0)},{(FLine != null ? FLine.ID : 0)}";
         const string file = "line.csv";
         const string header = "LID,BPID,FPID,BLID,FLID";
@@ -122,7 +120,6 @@ namespace AutoCore.MapToolbox.Autoware
                 foreach (var item in List)
                 {
                     item.FirstLine = item.GetFirstLine();
-                    item.FinalLine = item.GetFinalLine();
                 }
             }
         }
@@ -131,6 +128,7 @@ namespace AutoCore.MapToolbox.Autoware
             ReIndex();
             Utils.CleanOrCreateNew(path, file, header);
             Utils.AppendData(path, file, List.Select(_ => _.ToString()));
+            Utils.RemoveEmpty(path, file);
         }
     }
 }

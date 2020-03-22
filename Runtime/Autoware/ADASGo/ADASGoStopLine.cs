@@ -1,6 +1,6 @@
 ﻿#region License
 /******************************************************************************
-* Copyright 2019 The AutoCore Authors. All Rights Reserved.
+* Copyright 2018-2020 The AutoCore Authors. All Rights Reserved.
 * 
 * Licensed under the GNU Lesser General Public License, Version 3.0 (the "License"); 
 * you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@
 #endregion
 
 
+using System.Linq;
+using UnityEngine;
+
 namespace AutoCore.MapToolbox.Autoware
 {
     class ADASGoStopLine : ADASGoLine
@@ -26,8 +29,21 @@ namespace AutoCore.MapToolbox.Autoware
         public ADASGoLane linkLane;
         public CollectionADASSignal CollectionSignal { get; set; }
         public CollectionADASRoadSign CollectionRoadSign { get; set; }
-        public CollectionADASLane CollectionLane { get; set; }
+        CollectionADASLane collectionLane;
+        public CollectionADASLane CollectionLane
+        {
+            set => collectionLane = value;
+            get
+            {
+                if (collectionLane == null)
+                {
+                    collectionLane = GetComponentInParent<AutowareADASMap>().GetComponentInChildren<CollectionADASLane>();
+                }
+                return collectionLane;
+            }
+        }
         ADASMapStopLine data;
+        public static bool ShowLinkedSignal { get; set; }
         public ADASMapStopLine StopLine
         {
             set
@@ -67,6 +83,10 @@ namespace AutoCore.MapToolbox.Autoware
                     {
                         data.RoadSign = roadSign.RoadSign;
                     }
+                    if (linkLane)
+                    {
+                        data.LinkLane = linkLane.lane;
+                    }
                 }
                 return data;
             }
@@ -76,6 +96,28 @@ namespace AutoCore.MapToolbox.Autoware
             Line = null;
             StopLine = null;
             data = StopLine;
+            if (linkLane == null)
+            {
+                linkLane = CollectionLane.First().Value;
+                float distance = float.MaxValue;
+                foreach (var item in CollectionLane)
+                {
+                    var dis = Vector3.Distance(item.Value.transform.position, transform.position);
+                    if (dis < distance)
+                    {
+                        distance = dis;
+                        linkLane = item.Value;
+                    }
+                }
+            }
+        }
+        private void OnDrawGizmos()
+        {
+            if (ShowLinkedSignal && signal)
+            {
+                Gizmos.color = signal.Color;
+                Gizmos.DrawLine(transform.position, signal.transform.position);
+            }
         }
     }
 }

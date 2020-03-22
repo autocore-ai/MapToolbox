@@ -1,6 +1,6 @@
 ﻿#region License
 /******************************************************************************
-* Copyright 2019 The AutoCore Authors. All Rights Reserved.
+* Copyright 2018-2020 The AutoCore Authors. All Rights Reserved.
 * 
 * Licensed under the GNU Lesser General Public License, Version 3.0 (the "License"); 
 * you may not use this file except in compliance with the License.
@@ -19,10 +19,18 @@
 
 using AutoCore.MapToolbox.Autoware;
 using UnityEditor;
+using UnityEngine;
 
 namespace AutoCore.MapToolbox.Editor.Autoware
 {
     [CanEditMultipleObjects]
     [CustomEditor(typeof(ADASGoStopLine))]
-    class ADASGoStopLineEditor : ADASGoLineEditor { }
+    class ADASGoStopLineEditor : ADASGoLineEditor 
+    {
+        public override void OnInspectorGUI()
+        {
+            base.OnInspectorGUI();
+            ADASGoStopLine.ShowLinkedSignal = GUILayout.Toggle(ADASGoStopLine.ShowLinkedSignal, "Linked Signal");
+        }
+    }
 }

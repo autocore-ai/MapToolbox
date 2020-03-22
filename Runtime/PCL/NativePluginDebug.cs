@@ -1,6 +1,6 @@
 ﻿#region License
 /******************************************************************************
-* Copyright 2019 The AutoCore Authors. All Rights Reserved.
+* Copyright 2018-2020 The AutoCore Authors. All Rights Reserved.
 * 
 * Licensed under the GNU Lesser General Public License, Version 3.0 (the "License"); 
 * you may not use this file except in compliance with the License.
@@ -27,15 +27,15 @@ namespace AutoCore.MapToolbox.PCL
     {
         [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
         delegate void UnmanagedFunctionDelegate(IntPtr strPtr);
-        [DllImport(Const.nativePlugin)]
+        [DllImport(Const.unity_debug_plugin)]
         static extern void SetFunctionDebugLog(IntPtr fp);
-        [DllImport(Const.nativePlugin)]
+        [DllImport(Const.unity_debug_plugin)]
         static extern void SetFunctionDebugLogWarning(IntPtr fp);
-        [DllImport(Const.nativePlugin)]
+        [DllImport(Const.unity_debug_plugin)]
         static extern void SetFunctionDebugLogError(IntPtr fp);
-        static void Log(IntPtr strPtr) => Debug.Log($"{Const.nativePlugin}:{Marshal.PtrToStringAnsi(strPtr)}");
-        static void LogWarning(IntPtr strPtr) => Debug.LogWarning($"{Const.nativePlugin}:{Marshal.PtrToStringAnsi(strPtr)}");
-        static void LogError(IntPtr strPtr) => Debug.LogError($"{Const.nativePlugin}:{Marshal.PtrToStringAnsi(strPtr)}");
+        static void Log(IntPtr strPtr) => Debug.Log($"{Const.unity_debug_plugin}:{Marshal.PtrToStringAnsi(strPtr)}");
+        static void LogWarning(IntPtr strPtr) => Debug.LogWarning($"{Const.unity_debug_plugin}:{Marshal.PtrToStringAnsi(strPtr)}");
+        static void LogError(IntPtr strPtr) => Debug.LogError($"{Const.unity_debug_plugin}:{Marshal.PtrToStringAnsi(strPtr)}");
         [RuntimeInitializeOnLoadMethod]
         public static void RegisterDebugFunctions()
         {

@@ -1,6 +1,6 @@
 ﻿#region License
 /******************************************************************************
-* Copyright 2019 The AutoCore Authors. All Rights Reserved.
+* Copyright 2018-2020 The AutoCore Authors. All Rights Reserved.
 * 
 * Licensed under the GNU Lesser General Public License, Version 3.0 (the "License"); 
 * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #endregion
 
 
+using System;
 using System.Linq;
 using UnityEngine;
 
@@ -26,24 +27,32 @@ namespace AutoCore.MapToolbox.Autoware
     {
         public override void Csv2Go()
         {
-            foreach (var group in ADASMapLane.List.GroupBy(_ => _.StartLane))
+            foreach (var item in ADASMapLane.List.GroupBy(_ => _.FirstLane))
             {
-                foreach (var item in group.GroupBy(_ => _.FirstLane))
-                {
-                    var slices = new GameObject().AddComponent<ADASGoSlicesLane>();
-                    slices.transform.SetParent(transform);
-                    slices.CollectionLane = this;
-                    slices.Lanes = item;
-                }
+                var slices = new GameObject().AddComponent<ADASGoSlicesLane>();
+                slices.transform.SetParent(transform);
+                slices.CollectionLane = this;
+                slices.Lanes = item;
             }
             foreach (var item in GetComponentsInChildren<ADASGoSlicesLane>())
             {
-                item.UpdateRef();
+                item.SetRef();
                 item.UpdateRenderer();
+            }
+        }
+        internal void FindRef()
+        {
+            foreach (var item in GetComponentsInChildren<ADASGoSlicesLane>())
+            {
+                item.From = item.From;
+                item.To = item.To;
+                item.OnEnableEditor();
             }
         }
         public override void Go2Csv()
         {
+            int id = 1;
+            Dic = GetComponentsInChildren<ADASGoLane>().ToDictionary(_ => id++);
             foreach (var item in GetComponentsInChildren<ADASGoSlicesLane>())
             {
                 item.BuildData();
@@ -62,8 +71,11 @@ namespace AutoCore.MapToolbox.Autoware
             var go = new GameObject(typeof(ADASGoLane).Name);
             go.transform.SetParent(slices.transform);
             var lane = go.AddComponent<ADASGoLane>();
-            lane.From = position;
-            lane.To = position;
+            lane.LocalFrom = position;
+            lane.LocalTo = position;
+#if UNITY_EDITOR
+            UnityEditor.Selection.activeGameObject = slices;
+#endif
             return lane;
         }
     }

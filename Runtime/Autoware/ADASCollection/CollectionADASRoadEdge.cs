@@ -1,6 +1,6 @@
 ﻿#region License
 /******************************************************************************
-* Copyright 2019 The AutoCore Authors. All Rights Reserved.
+* Copyright 2018-2020 The AutoCore Authors. All Rights Reserved.
 * 
 * Licensed under the GNU Lesser General Public License, Version 3.0 (the "License"); 
 * you may not use this file except in compliance with the License.
@@ -54,7 +54,11 @@ namespace AutoCore.MapToolbox.Autoware
             go.transform.SetParent(slices.transform);
             go.transform.position = position;
             var roadEdge = go.AddComponent<ADASGoRoadEdge>();
-            roadEdge.To = position;
+            roadEdge.LocalFrom = position;
+            roadEdge.LocalTo = position;
+#if UNITY_EDITOR
+            UnityEditor.Selection.activeGameObject = slices;
+#endif
             return roadEdge;
         }
     }

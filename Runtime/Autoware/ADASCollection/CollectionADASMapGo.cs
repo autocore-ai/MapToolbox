@@ -1,6 +1,6 @@
 ﻿#region License
 /******************************************************************************
-* Copyright 2019 The AutoCore Authors. All Rights Reserved.
+* Copyright 2018-2020 The AutoCore Authors. All Rights Reserved.
 * 
 * Licensed under the GNU Lesser General Public License, Version 3.0 (the "License"); 
 * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ namespace AutoCore.MapToolbox.Autoware
     }
     class CollectionADASMapGo<T> : CollectionADASMapGo, IEnumerable<KeyValuePair<int, T>> where T : IADASMapGameObject
     {
-        Dictionary<int, T> Dic { get; set; } = new Dictionary<int, T>();
+        protected Dictionary<int, T> Dic { get; set; } = new Dictionary<int, T>();
         public T this[int index]
         {
             get
