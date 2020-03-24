@@ -68,7 +68,9 @@ namespace AutoCore.MapToolbox
             go.AddComponent(GetType());
             go.transform.parent = transform.parent;
             go.transform.SetSiblingIndex(Index);
+#if UNITY_EDITOR
             UnityEditor.Undo.RegisterCreatedObjectUndo(go, "AddBefore");
+#endif
             return go;
         }
 
@@ -78,17 +80,21 @@ namespace AutoCore.MapToolbox
             go.AddComponent(GetType());
             go.transform.parent = transform.parent;
             go.transform.SetSiblingIndex(Index + 1);
+#if UNITY_EDITOR
             UnityEditor.Undo.RegisterCreatedObjectUndo(go, "AddAfter");
+#endif
             return go;
         }
 
         internal void MoveForward()
         {
             Index--;
+#if UNITY_EDITOR
             UnityEditor.Undo.SetTransformParent(transform, transform.parent, "MoveForward");
+#endif
         }
 
-        internal void MoveBack()
+            internal void MoveBack()
         {
             if (Index == transform.parent.childCount - 1)
             {
@@ -98,12 +104,16 @@ namespace AutoCore.MapToolbox
             {
                 Index++;
             }
+#if UNITY_EDITOR
             UnityEditor.Undo.SetTransformParent(transform, transform.parent, "MoveBack");
+#endif
         }
 
         internal virtual void Remove()
         {
+#if UNITY_EDITOR
             UnityEditor.Undo.DestroyObjectImmediate(gameObject);
+#endif
         }
     }
 }

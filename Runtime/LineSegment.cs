@@ -178,7 +178,9 @@ namespace AutoCore.MapToolbox
 
         internal virtual void Subdivision(Vector3 startTangent, Vector3 endTangent, float distance = 1)
         {
+#if UNITY_EDITOR
             ApplySubdivisionPoints(UnityEditor.Handles.MakeBezierPoints(From, To, startTangent, endTangent, (int)(From - To).magnitude * 10), distance);
+#endif
         }
 
         internal void ApplySubdivisionPoints(Vector3[] points, float distance = 1)
