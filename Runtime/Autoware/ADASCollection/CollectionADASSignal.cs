@@ -50,6 +50,7 @@ namespace AutoCore.MapToolbox.Autoware
             signal.CollectionPole = AutowareADASMap.CollectionPole;
             signal.CollectionLane = AutowareADASMap.CollectionLane;
             signal.CollectionSignal = this;
+            signal.transform.position = position;
             return signal;
         }
     }
