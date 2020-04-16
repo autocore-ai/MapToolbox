@@ -59,7 +59,7 @@ namespace AutoCore.MapToolbox.Autoware
                 return linkLane;
             }
         }
-        public override string ToString() => $"{ID},{Area.ID},{(int)RoadMarkType},{LinkLane.ID}";
+        public override string ToString() => $"{ID},{(Area != null ? Area.ID : 0)},{(int)RoadMarkType},{(LinkLane != null ? LinkLane.ID : 0)}";
         const string file = "road_surface_mark.csv";
         const string header = "ID,AID,Type,LinkID";
         public static void ReadCsv(string path)
@@ -80,15 +80,12 @@ namespace AutoCore.MapToolbox.Autoware
                 }
             }
         }
-        public static void PreWrite(string path)
-        {
-            Reset();
-            Utils.CleanOrCreateNew(path, file, header);
-        }
         public static void WriteCsv(string path)
         {
             ReIndex();
+            Utils.CleanOrCreateNew(path, file, header);
             Utils.AppendData(path, file, List.Select(_ => _.ToString()));
+            Utils.RemoveEmpty(path, file);
         }
     }
 }

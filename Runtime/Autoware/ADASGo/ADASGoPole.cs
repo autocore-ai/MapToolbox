@@ -27,7 +27,7 @@ namespace AutoCore.MapToolbox.Autoware
         public GameObject GameObject => gameObject;
         public MonoBehaviour MonoBehaviour => this;
         public ADASMapPole Pole { get; set; }
-        public CollectionADASPole CollectionPole { get; set; }
+        public CollectionPole CollectionPole { get; set; }
         MeshFilter MeshFilter { get; set; }
         MeshRenderer MeshRenderer { get; set; }
         public void Csv2Go()

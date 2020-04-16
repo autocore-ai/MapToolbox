@@ -27,40 +27,64 @@ namespace AutoCore.MapToolbox.Autoware
         public MonoBehaviour MonoBehaviour => this;
         [HideInInspector] public ADASGoLine bLine;
         [HideInInspector] public ADASGoLine fLine;
-        ADASMapLine data;
+        public override Vector3 From
+        {
+            get => base.From;
+            set
+            {
+                base.From = value;
+                if (bLine)
+                {
+                    bLine.localTo = localFrom;
+                }
+            }
+        }
+        public override Vector3 To
+        {
+            get => base.To;
+            set
+            {
+                base.To = value;
+                if (fLine)
+                {
+                    fLine.localFrom = localTo;
+                }
+            }
+        }
+        ADASMapLine line;
         public ADASMapLine Line
         {
             set
             {
-                data = value;
-                if (data != null)
+                line = value;
+                if (line != null)
                 {
-                    From = data.BPoint.Position;
-                    To = data.FPoint.Position;
+                    From = line.BPoint.Position;
+                    To = line.FPoint.Position;
                     transform.position = (From + To) / 2;
                 }
             }
             get
             {
-                if (data == null)
+                if (line == null)
                 {
-                    data = new ADASMapLine
+                    line = new ADASMapLine
                     {
                         BPoint = new ADASMapPoint { Position = From }
                     };
                     if (last)
                     {
                         var lastLine = last.GetComponent<ADASGoLine>();
-                        lastLine.data.FPoint = data.BPoint;
-                        data.BLine = lastLine.data;
-                        lastLine.data.FLine = data;
+                        lastLine.line.FPoint = line.BPoint;
+                        line.BLine = lastLine.line;
+                        lastLine.line.FLine = line;
                     }
                     if (next == null)
                     {
-                        data.FPoint = new ADASMapPoint { Position = To };
+                        line.FPoint = new ADASMapPoint { Position = To };
                     }
                 }
-                return data;
+                return line;
             }
         }
         public override void UpdateRef()
@@ -75,11 +99,10 @@ namespace AutoCore.MapToolbox.Autoware
                 fLine = next.GetComponent<ADASGoLine>();
             }
         }
-
         internal virtual void BuildData()
         {
-            data = null;
-            data = Line;
+            line = null;
+            line = Line;
         }
     }
 }

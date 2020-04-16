@@ -17,11 +17,12 @@
 #endregion
 
 
+using System.Linq;
 using UnityEngine;
 
 namespace AutoCore.MapToolbox.Autoware
 {
-    class CollectionADASSignal : CollectionADASMapGo<ADASGoSignal>
+    class CollectionSignal : CollectionADASMapGo<ADASGoSignal>
     {
         public override void Csv2Go()
         {
@@ -37,6 +38,8 @@ namespace AutoCore.MapToolbox.Autoware
         }
         public override void Go2Csv()
         {
+            int id = 1;
+            Dic = GetComponentsInChildren<ADASGoSignal>().ToDictionary(_ => id++);
             foreach (var item in GetComponentsInChildren<ADASGoSignal>())
             {
                 item.BuildData();

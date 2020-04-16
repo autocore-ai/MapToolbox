@@ -79,9 +79,17 @@ namespace AutoCore.MapToolbox
             children = GetComponentsInChildren<T>();
             if (children.Length > 0)
             {
-                LineRenderer.positionCount = children.Length + 1;
-                LineRenderer.SetPositions(children.Select(_ => _.LocalFrom).ToArray());
-                LineRenderer.SetPosition(children.Length, children.Last().LocalTo);
+                if (LineRenderer.loop)
+                {
+                    LineRenderer.positionCount = children.Length;
+                    LineRenderer.SetPositions(children.Select(_ => _.LocalFrom).ToArray());
+                }
+                else
+                {
+                    LineRenderer.positionCount = children.Length + 1;
+                    LineRenderer.SetPositions(children.Select(_ => _.LocalFrom).ToArray());
+                    LineRenderer.SetPosition(children.Length, children.Last().LocalTo);
+                }
             }
             else
             {

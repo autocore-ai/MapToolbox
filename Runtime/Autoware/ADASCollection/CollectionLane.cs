@@ -22,44 +22,60 @@ using UnityEngine;
 
 namespace AutoCore.MapToolbox.Autoware
 {
-    class CollectionADASRoadEdge : CollectionADASMapGo<ADASGoRoadEdge>
+    class CollectionLane : CollectionADASMapGo<ADASGoLane>
     {
         public override void Csv2Go()
         {
-            foreach (var item in ADASMapRoadEdge.List.GroupBy(_ => _.Line.FirstLine))
+            foreach (var item in ADASMapLane.List.GroupBy(_ => _.FirstLane))
             {
-                var slices = new GameObject().AddComponent<ADASGoSlicesRoadEdge>();
+                var slices = new GameObject().AddComponent<ADASGoSlicesLane>();
                 slices.transform.SetParent(transform);
-                slices.RoadEdges = item;
+                slices.CollectionLane = this;
+                slices.Lanes = item;
             }
-            foreach (var item in GetComponentsInChildren<ADASGoSlicesRoadEdge>())
+            foreach (var item in GetComponentsInChildren<ADASGoSlicesLane>())
             {
+                item.SetRef();
                 item.UpdateRenderer();
+            }
+        }
+        internal void FindRef()
+        {
+            foreach (var item in GetComponentsInChildren<ADASGoSlicesLane>())
+            {
+                item.From = item.From;
+                item.To = item.To;
+                item.OnEnableEditor();
             }
         }
         public override void Go2Csv()
         {
-            foreach (var item in GetComponentsInChildren<ADASGoSlicesRoadEdge>())
+            int id = 1;
+            Dic = GetComponentsInChildren<ADASGoLane>().ToDictionary(_ => id++);
+            foreach (var item in GetComponentsInChildren<ADASGoSlicesLane>())
             {
                 item.BuildData();
             }
+            foreach (var item in GetComponentsInChildren<ADASGoLane>())
+            {
+                item.BuildDataRef();
+            }
         }
-        public ADASGoRoadEdge AddRoadEdge(Vector3 position)
+        public ADASGoLane AddLane(Vector3 position)
         {
             position.y = 0;
-            var slices = new GameObject(typeof(ADASGoSlicesRoadEdge).Name);
+            var slices = new GameObject(typeof(ADASGoSlicesLane).Name);
             slices.transform.SetParent(transform);
-            slices.AddComponent<ADASGoSlicesRoadEdge>().SetupRenderer();
-            var go = new GameObject(typeof(ADASGoRoadEdge).Name);
+            slices.AddComponent<ADASGoSlicesLane>().SetupRenderer();
+            var go = new GameObject(typeof(ADASGoLane).Name);
             go.transform.SetParent(slices.transform);
-            go.transform.position = position;
-            var roadEdge = go.AddComponent<ADASGoRoadEdge>();
-            roadEdge.LocalFrom = position;
-            roadEdge.LocalTo = position;
+            var lane = go.AddComponent<ADASGoLane>();
+            lane.LocalFrom = position;
+            lane.LocalTo = position;
 #if UNITY_EDITOR
             UnityEditor.Selection.activeGameObject = slices;
 #endif
-            return roadEdge;
+            return lane;
         }
     }
 }

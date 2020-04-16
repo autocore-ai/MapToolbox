@@ -17,18 +17,45 @@
 #endregion
 
 
+using System.Linq;
 using UnityEngine;
 
 namespace AutoCore.MapToolbox.Autoware
 {
     class ADASGoArea : ADASGoSlicesLine
     {
-        public ADASMapArea VectorMapArea 
+        public ADASMapArea Area
         {
             set
             {
-                Lines = value.SLine.GetRangeToEnd(value.ELine);
-                LineRenderer.loop = true;
+                if (value != null)
+                {
+                    Lines = value.SLine.GetRangeToEnd(value.ELine);
+                    foreach (var item in Lines)
+                    {
+                        var go = new GameObject(typeof(ADASGoLine).Name);
+                        go.transform.SetParent(transform);
+                        var line = go.AddComponent<ADASGoLine>();
+                        line.Line = item;
+                    }
+                    var lines = GetComponentsInChildren<ADASGoLine>();
+                    lines.Last().fLine = lines.First();
+                    lines.First().bLine = lines.Last();
+                    LineRenderer.loop = true;
+                }
+            }
+            get
+            {
+                Lines = GetComponentsInChildren<ADASGoLine>().Select(_ => _.Line);
+                if (Lines.Count() > 0)
+                {
+                    return new ADASMapArea
+                    {
+                        SLine = Lines.First(),
+                        ELine = Lines.Last()
+                    };
+                }
+                return null;
             }
         }
     }

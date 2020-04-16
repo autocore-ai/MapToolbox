@@ -17,21 +17,22 @@
 #endregion
 
 
+using AutoCore.MapToolbox.Autoware;
+using UnityEditor;
 using UnityEngine;
 
-namespace AutoCore.MapToolbox.Autoware
+namespace AutoCore.MapToolbox.Editor.Autoware
 {
-    class CollectionADASPole : CollectionADASMapGo<ADASGoPole>
+    [CustomEditor(typeof(CollectionStopLine))]
+    class CollectionStopLineEditor : UnityEditor.Editor
     {
-        public override void Csv2Go()
+        public override void OnInspectorGUI()
         {
-            foreach (var item in ADASMapPole.List)
+            base.OnInspectorGUI();
+            GUI.color = Color.yellow;
+            if (GUILayout.Button(Const.AddStopLine))
             {
-                var pole = new GameObject().AddComponent<ADASGoPole>();
-                pole.transform.SetParent(transform);
-                pole.Pole = item;
-                pole.CollectionPole = this;
-                pole.Csv2Go();
+                (target as CollectionStopLine).AddStopLine(SceneView.lastActiveSceneView.pivot);
             }
         }
     }

@@ -55,6 +55,7 @@ namespace AutoCore.MapToolbox.Autoware
                 return default;
             }
         }
+        public bool TryGetValue(int key, out T value) => Dic.TryGetValue(key, out value);
         public void Add(int id, T value)
         {
             if (Dic.ContainsKey(id))

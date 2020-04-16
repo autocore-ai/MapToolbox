@@ -22,44 +22,44 @@ using UnityEngine;
 
 namespace AutoCore.MapToolbox.Autoware
 {
-    class CollectionADASWhiteLine : CollectionADASMapGo<ADASGoWhiteLine>
+    class CollectionCrossWalk : CollectionADASMapGo<ADASGoCrossWalk>
     {
         public override void Csv2Go()
         {
-            foreach (var item in ADASMapWhiteLine.List.GroupBy(_ => _.Line.FirstLine))
+            foreach (var item in ADASMapCrossWalk.List)
             {
-                var slices = new GameObject().AddComponent<ADASGoSlicesWhiteLine>();
+                var slices = new GameObject().AddComponent<ADASGoCrossWalk>();
                 slices.transform.SetParent(transform);
-                slices.WhiteLines = item;
+                slices.CrossWalk = item;
             }
-            foreach (var item in GetComponentsInChildren<ADASGoSlicesWhiteLine>())
+            foreach (var item in GetComponentsInChildren<ADASGoCrossWalk>())
             {
+                item.UpdateBorder();
                 item.UpdateRenderer();
             }
         }
         public override void Go2Csv()
         {
-            foreach (var item in GetComponentsInChildren<ADASGoSlicesWhiteLine>())
+            int id = 1;
+            Dic = GetComponentsInChildren<ADASGoCrossWalk>().ToDictionary(_ => id++);
+            foreach (var item in GetComponentsInChildren<ADASGoCrossWalk>())
             {
                 item.BuildData();
             }
+            foreach (var item in GetComponentsInChildren<ADASGoCrossWalk>())
+            {
+                item.BuildDataRef();
+            }
         }
-        public ADASGoWhiteLine AddWhiteLine(Vector3 position)
+        public void AddCrossWalk(Vector3 position)
         {
             position.y = 0;
-            var slices = new GameObject(typeof(ADASGoSlicesWhiteLine).Name);
-            slices.transform.SetParent(transform);
-            slices.AddComponent<ADASGoSlicesWhiteLine>().SetupRenderer();
-            var go = new GameObject(typeof(ADASGoWhiteLine).Name);
-            go.transform.SetParent(slices.transform);
-            go.transform.position = position;
-            var whiteLine = go.AddComponent<ADASGoWhiteLine>();
-            whiteLine.LocalFrom = position;
-            whiteLine.LocalTo = position;
+            var crosswalk = new GameObject(typeof(ADASGoCrossWalk).Name).AddComponent<ADASGoCrossWalk>();
+            crosswalk.transform.SetParent(transform);
+            crosswalk.transform.position = position;
 #if UNITY_EDITOR
-            UnityEditor.Selection.activeGameObject = slices;
+            UnityEditor.Selection.activeGameObject = crosswalk.gameObject;
 #endif
-            return whiteLine;
         }
     }
 }

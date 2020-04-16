@@ -23,16 +23,16 @@ using UnityEngine;
 
 namespace AutoCore.MapToolbox.Editor.Autoware
 {
-    [CustomEditor(typeof(CollectionADASRoadEdge))]
-    class CollectionADASGoRoadEdgeEditor : UnityEditor.Editor
+    [CustomEditor(typeof(CollectionWhiteLine))]
+    class CollectionWhiteLineEditor : UnityEditor.Editor
     {
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
             GUI.color = Color.yellow;
-            if (GUILayout.Button(Const.AddRoadEdge))
+            if (GUILayout.Button(Const.AddWhiteLine))
             {
-                (target as CollectionADASRoadEdge).AddRoadEdge(SceneView.lastActiveSceneView.pivot);
+                (target as CollectionWhiteLine).AddWhiteLine(SceneView.lastActiveSceneView.pivot);
             }
         }
     }

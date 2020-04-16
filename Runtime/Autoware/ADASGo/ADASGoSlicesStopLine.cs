@@ -25,10 +25,10 @@ namespace AutoCore.MapToolbox.Autoware
 {
     class ADASGoSlicesStopLine : ADASGoSlicesLine
     {
-        public CollectionADASSignal CollectionSignal { get; set; }
-        public CollectionADASRoadSign CollectionRoadSign { get; set; }
-        public CollectionADASLane CollectionLane { get; set; }
-        public IEnumerable<ADASMapStopLine> VectorMapStopLines 
+        public CollectionSignal CollectionSignal { get; set; }
+        public CollectionRoadSign CollectionRoadSign { get; set; }
+        public CollectionLane CollectionLane { get; set; }
+        public IEnumerable<ADASMapStopLine> VectorMapStopLines
         {
             set
             {

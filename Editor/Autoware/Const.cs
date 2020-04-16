@@ -26,5 +26,7 @@ namespace AutoCore.MapToolbox.Editor.Autoware
         public const string AddStopLine = "Add Stop Line";
         public const string AddWhiteLine = "Add White Line";
         public const string AddRoadEdge = "Add Road Edge";
+        public const string AddCrossWalk = "Add Cross Walk";
+        public const string AddRoadMark = "Add Road Mark";
     }
 }

@@ -46,6 +46,19 @@ namespace AutoCore.MapToolbox.Autoware
                 return area;
             }
         }
+        ADASMapCrossWalk border;
+        public ADASMapCrossWalk Border
+        {
+            set => border = value;
+            get
+            {
+                if (border == null && Dic.TryGetValue(BdID,out ADASMapCrossWalk value))
+                {
+                    border = value;
+                }
+                return border;
+            }
+        }
         ADASMapLane linkLane;
         public ADASMapLane LinkLane
         {
@@ -59,7 +72,7 @@ namespace AutoCore.MapToolbox.Autoware
                 return linkLane;
             }
         }
-        public override string ToString() => $"{ID},{Area.ID},{(int)CrossWalkType},{BdID},{LinkLane.ID}";
+        public override string ToString() => $"{ID},{(Area != null ? Area.ID : 0)},{(int)CrossWalkType},{(Border != null ? Border.ID : 0)},{(LinkLane != null ? LinkLane.ID : 0)}";
         const string file = "crosswalk.csv";
         const string header = "ID,AID,Type,BdID,LinkID";
         public static void ReadCsv(string path)
@@ -81,15 +94,12 @@ namespace AutoCore.MapToolbox.Autoware
                 }
             }
         }
-        public static void PreWrite(string path)
-        {
-            Reset();
-            Utils.CleanOrCreateNew(path, file, header);
-        }
         public static void WriteCsv(string path)
         {
             ReIndex();
+            Utils.CleanOrCreateNew(path, file, header);
             Utils.AppendData(path, file, List.Select(_ => _.ToString()));
+            Utils.RemoveEmpty(path, file);
         }
     }
 }

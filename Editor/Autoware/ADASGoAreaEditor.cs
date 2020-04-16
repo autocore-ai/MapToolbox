@@ -19,21 +19,11 @@
 
 using AutoCore.MapToolbox.Autoware;
 using UnityEditor;
-using UnityEngine;
 
 namespace AutoCore.MapToolbox.Editor.Autoware
 {
-    [CustomEditor(typeof(CollectionADASStopLine))]
-    class CollectionADASGoStopLineEditor : UnityEditor.Editor
+    [CustomEditor(typeof(ADASGoArea))]
+    class ADASGoAreaEditor : BrokenLineRendererEditor<ADASGoLine>
     {
-        public override void OnInspectorGUI()
-        {
-            base.OnInspectorGUI();
-            GUI.color = Color.yellow;
-            if (GUILayout.Button(Const.AddStopLine))
-            {
-                (target as CollectionADASStopLine).AddStopLine(SceneView.lastActiveSceneView.pivot);
-            }
-        }
     }
 }

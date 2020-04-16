@@ -27,32 +27,32 @@ namespace AutoCore.MapToolbox.Autoware
         public ADASGoSignal signal;
         public ADASGoRoadSign roadSign;
         public ADASGoLane linkLane;
-        public CollectionADASSignal CollectionSignal { get; set; }
-        public CollectionADASRoadSign CollectionRoadSign { get; set; }
-        CollectionADASLane collectionLane;
-        public CollectionADASLane CollectionLane
+        public CollectionSignal CollectionSignal { get; set; }
+        public CollectionRoadSign CollectionRoadSign { get; set; }
+        CollectionLane collectionLane;
+        public CollectionLane CollectionLane
         {
             set => collectionLane = value;
             get
             {
                 if (collectionLane == null)
                 {
-                    collectionLane = GetComponentInParent<AutowareADASMap>().GetComponentInChildren<CollectionADASLane>();
+                    collectionLane = GetComponentInParent<AutowareADASMap>().GetComponentInChildren<CollectionLane>();
                 }
                 return collectionLane;
             }
         }
-        ADASMapStopLine data;
+        ADASMapStopLine stopline;
         public static bool ShowLinkedSignal { get; set; }
         public ADASMapStopLine StopLine
         {
             set
             {
-                data = value;
-                if (data != null)
+                stopline = value;
+                if (stopline != null)
                 {
-                    Line = data.Line;
-                    name = data.ID.ToString();
+                    Line = stopline.Line;
+                    name = stopline.ID.ToString();
                     if (CollectionSignal != null && value.Signal != null)
                     {
                         signal = CollectionSignal[value.Signal.ID];
@@ -69,33 +69,33 @@ namespace AutoCore.MapToolbox.Autoware
             }
             get
             {
-                if (data == null)
+                if (stopline == null)
                 {
-                    data = new ADASMapStopLine
+                    stopline = new ADASMapStopLine
                     {
                         Line = Line
                     };
                     if (signal)
                     {
-                        data.Signal = signal.Signal;
+                        stopline.Signal = signal.Signal;
                     }
                     if (roadSign)
                     {
-                        data.RoadSign = roadSign.RoadSign;
+                        stopline.RoadSign = roadSign.RoadSign;
                     }
                     if (linkLane)
                     {
-                        data.LinkLane = linkLane.lane;
+                        stopline.LinkLane = linkLane.lane;
                     }
                 }
-                return data;
+                return stopline;
             }
         }
         internal override void BuildData()
         {
             Line = null;
             StopLine = null;
-            data = StopLine;
+            stopline = StopLine;
             if (linkLane == null)
             {
                 linkLane = CollectionLane.First().Value;

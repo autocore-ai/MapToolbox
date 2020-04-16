@@ -18,137 +18,172 @@
 
 
 using UnityEngine;
-
 namespace AutoCore.MapToolbox.Autoware
 {
     [ExecuteInEditMode]
     class AutowareADASMap : MonoBehaviour
     {
         #region Collection
-        CollectionADASLane laneCollection;
-        public CollectionADASLane CollectionLane
+        CollectionLane collectionLane;
+        public CollectionLane CollectionLane
         {
-            set => laneCollection = value;
+            set => collectionLane = value;
             get
             {
-                if (laneCollection == null)
+                if (collectionLane == null)
                 {
-                    laneCollection = GetComponentInChildren<CollectionADASLane>();
-                    if (laneCollection == null)
+                    collectionLane = GetComponentInChildren<CollectionLane>();
+                    if (collectionLane == null)
                     {
-                        laneCollection = new GameObject(typeof(ADASMapLane).Name).AddComponent<CollectionADASLane>();
-                        laneCollection.transform.SetParent(transform);
+                        collectionLane = new GameObject(typeof(CollectionLane).Name).AddComponent<CollectionLane>();
+                        collectionLane.transform.SetParent(transform);
                     }
                 }
-                return laneCollection;
+                return collectionLane;
             }
         }
-        CollectionADASPole poleCollection;
-        public CollectionADASPole CollectionPole
+        CollectionPole collectionPole;
+        public CollectionPole CollectionPole
         {
-            set => poleCollection = value;
+            set => collectionPole = value;
             get
             {
-                if (poleCollection == null)
+                if (collectionPole == null)
                 {
-                    poleCollection = GetComponentInChildren<CollectionADASPole>();
-                    if (poleCollection == null)
+                    collectionPole = GetComponentInChildren<CollectionPole>();
+                    if (collectionPole == null)
                     {
-                        poleCollection = new GameObject(typeof(ADASMapPole).Name).AddComponent<CollectionADASPole>();
-                        poleCollection.transform.SetParent(transform);
+                        collectionPole = new GameObject(typeof(CollectionPole).Name).AddComponent<CollectionPole>();
+                        collectionPole.transform.SetParent(transform);
                     }
                 }
-                return poleCollection;
+                return collectionPole;
             }
         }
-        CollectionADASSignal signalCollection;
-        public CollectionADASSignal CollectionSignal
+        CollectionSignal collectionSignal;
+        public CollectionSignal CollectionSignal
         {
-            set => signalCollection = value;
+            set => collectionSignal = value;
             get
             {
-                if (signalCollection == null)
+                if (collectionSignal == null)
                 {
-                    signalCollection = GetComponentInChildren<CollectionADASSignal>();
-                    if (signalCollection == null)
+                    collectionSignal = GetComponentInChildren<CollectionSignal>();
+                    if (collectionSignal == null)
                     {
-                        signalCollection = new GameObject(typeof(ADASMapSignal).Name).AddComponent<CollectionADASSignal>();
-                        signalCollection.transform.SetParent(transform);
+                        collectionSignal = new GameObject(typeof(CollectionSignal).Name).AddComponent<CollectionSignal>();
+                        collectionSignal.transform.SetParent(transform);
                     }
                 }
-                return signalCollection;
+                return collectionSignal;
             }
         }
-        CollectionADASRoadSign roadSignCollection;
-        public CollectionADASRoadSign CollectionRoadSign
+        CollectionRoadSign collectionRoadSign;
+        public CollectionRoadSign CollectionRoadSign
         {
-            set => roadSignCollection = value;
+            set => collectionRoadSign = value;
             get
             {
-                if (roadSignCollection == null)
+                if (collectionRoadSign == null)
                 {
-                    roadSignCollection = GetComponentInChildren<CollectionADASRoadSign>();
-                    if (roadSignCollection == null)
+                    collectionRoadSign = GetComponentInChildren<CollectionRoadSign>();
+                    if (collectionRoadSign == null)
                     {
-                        roadSignCollection = new GameObject(typeof(ADASMapRoadSign).Name).AddComponent<CollectionADASRoadSign>();
-                        roadSignCollection.transform.SetParent(transform);
+                        collectionRoadSign = new GameObject(typeof(CollectionRoadSign).Name).AddComponent<CollectionRoadSign>();
+                        collectionRoadSign.transform.SetParent(transform);
                     }
                 }
-                return roadSignCollection;
+                return collectionRoadSign;
             }
         }
-        CollectionADASStopLine stopLineCollection;
-        public CollectionADASStopLine CollectionStopLine
+        CollectionStopLine stopLineCollection;
+        public CollectionStopLine CollectionStopLine
         {
             set => stopLineCollection = value;
             get
             {
                 if (stopLineCollection == null)
                 {
-                    stopLineCollection = GetComponentInChildren<CollectionADASStopLine>();
+                    stopLineCollection = GetComponentInChildren<CollectionStopLine>();
                     if (stopLineCollection == null)
                     {
-                        stopLineCollection = new GameObject(typeof(ADASMapStopLine).Name).AddComponent<CollectionADASStopLine>();
+                        stopLineCollection = new GameObject(typeof(CollectionStopLine).Name).AddComponent<CollectionStopLine>();
                         stopLineCollection.transform.SetParent(transform);
                     }
                 }
                 return stopLineCollection;
             }
         }
-        CollectionADASWhiteLine whiteLineCollection;
-        public CollectionADASWhiteLine CollectionWhiteLine
+        CollectionWhiteLine whiteLineCollection;
+        public CollectionWhiteLine CollectionWhiteLine
         {
             set => whiteLineCollection = value;
             get
             {
                 if (whiteLineCollection == null)
                 {
-                    whiteLineCollection = GetComponentInChildren<CollectionADASWhiteLine>();
+                    whiteLineCollection = GetComponentInChildren<CollectionWhiteLine>();
                     if (whiteLineCollection == null)
                     {
-                        whiteLineCollection = new GameObject(typeof(ADASMapWhiteLine).Name).AddComponent<CollectionADASWhiteLine>();
+                        whiteLineCollection = new GameObject(typeof(CollectionWhiteLine).Name).AddComponent<CollectionWhiteLine>();
                         whiteLineCollection.transform.SetParent(transform);
                     }
                 }
                 return whiteLineCollection;
             }
         }
-        CollectionADASRoadEdge roadEdgeCollection;
-        public CollectionADASRoadEdge CollectionRoadEdge
+        CollectionRoadEdge roadEdgeCollection;
+        public CollectionRoadEdge CollectionRoadEdge
         {
             set => roadEdgeCollection = value;
             get
             {
                 if (roadEdgeCollection == null)
                 {
-                    roadEdgeCollection = GetComponentInChildren<CollectionADASRoadEdge>();
+                    roadEdgeCollection = GetComponentInChildren<CollectionRoadEdge>();
                     if (roadEdgeCollection == null)
                     {
-                        roadEdgeCollection = new GameObject(typeof(ADASMapRoadEdge).Name).AddComponent<CollectionADASRoadEdge>();
+                        roadEdgeCollection = new GameObject(typeof(CollectionRoadEdge).Name).AddComponent<CollectionRoadEdge>();
                         roadEdgeCollection.transform.SetParent(transform);
                     }
                 }
                 return roadEdgeCollection;
+            }
+        }
+        CollectionCrossWalk collectionCrossWalk;
+        public CollectionCrossWalk CollectionCrossWalk
+        {
+            set => collectionCrossWalk = value;
+            get
+            {
+                if (collectionCrossWalk == null)
+                {
+                    collectionCrossWalk = GetComponentInChildren<CollectionCrossWalk>();
+                    if (collectionCrossWalk == null)
+                    {
+                        collectionCrossWalk = new GameObject(typeof(CollectionCrossWalk).Name).AddComponent<CollectionCrossWalk>();
+                        collectionCrossWalk.transform.SetParent(transform);
+                    }
+                }
+                return collectionCrossWalk;
+            }
+        }
+        CollectionRoadMark collectionRoadMark;
+        public CollectionRoadMark CollectionRoadMark
+        {
+            set => collectionRoadMark = value;
+            get
+            {
+                if (collectionRoadMark == null)
+                {
+                    collectionRoadMark = GetComponentInChildren<CollectionRoadMark>();
+                    if (collectionRoadMark == null)
+                    {
+                        collectionRoadMark = new GameObject(typeof(CollectionRoadMark).Name).AddComponent<CollectionRoadMark>();
+                        collectionRoadMark.transform.SetParent(transform);
+                    }
+                }
+                return collectionRoadMark;
             }
         }
         #endregion
@@ -165,6 +200,8 @@ namespace AutoCore.MapToolbox.Autoware
         public void AddStopLine(Vector3 position) => CollectionStopLine.AddStopLine(position);
         public void AddWhiteLine(Vector3 position) => CollectionWhiteLine.AddWhiteLine(position);
         public void AddRoadEdge(Vector3 position) => CollectionRoadEdge.AddRoadEdge(position);
+        public void AddCrossWalk(Vector3 position) => CollectionCrossWalk.AddCrossWalk(position);
+        public void AddRoadMark(Vector3 position) => CollectionRoadMark.AddRoadMark(position);
         public void Save(string folder) => WriteCsv(folder);
         private void ReadCsv(string path)
         {
@@ -180,6 +217,9 @@ namespace AutoCore.MapToolbox.Autoware
             ADASMapStopLine.ReadCsv(path);
             ADASMapWhiteLine.ReadCsv(path);
             ADASMapRoadEdge.ReadCsv(path);
+            ADASMapArea.ReadCsv(path);
+            ADASMapCrossWalk.ReadCsv(path);
+            ADASMapRoadMark.ReadCsv(path);
             CollectionLane.Csv2Go();
             CollectionPole.Csv2Go();
             CollectionSignal.Csv2Go();
@@ -187,6 +227,8 @@ namespace AutoCore.MapToolbox.Autoware
             CollectionStopLine.Csv2Go();
             CollectionWhiteLine.Csv2Go();
             CollectionRoadEdge.Csv2Go();
+            CollectionCrossWalk.Csv2Go();
+            CollectionRoadMark.Csv2Go();
         }
         private void WriteCsv(string path)
         {
@@ -200,6 +242,9 @@ namespace AutoCore.MapToolbox.Autoware
             ADASMapStopLine.Reset();
             ADASMapWhiteLine.Reset();
             ADASMapRoadEdge.Reset();
+            ADASMapArea.Reset();
+            ADASMapCrossWalk.Reset();
+            ADASMapRoadMark.Reset();
             CollectionLane.Go2Csv();
             CollectionPole.Go2Csv();
             CollectionSignal.Go2Csv();
@@ -207,6 +252,8 @@ namespace AutoCore.MapToolbox.Autoware
             CollectionStopLine.Go2Csv();
             CollectionWhiteLine.Go2Csv();
             CollectionRoadEdge.Go2Csv();
+            CollectionCrossWalk.Go2Csv();
+            CollectionRoadMark.Go2Csv();
             ADASMapPoint.WriteCsv(path);
             ADASMapNode.WriteCsv(path);
             ADASMapDTLane.WriteCsv(path);
@@ -217,6 +264,9 @@ namespace AutoCore.MapToolbox.Autoware
             ADASMapStopLine.WriteCsv(path);
             ADASMapWhiteLine.WriteCsv(path);
             ADASMapRoadEdge.WriteCsv(path);
+            ADASMapArea.WriteCsv(path);
+            ADASMapCrossWalk.WriteCsv(path);
+            ADASMapRoadMark.WriteCsv(path);
         }
     }
 }

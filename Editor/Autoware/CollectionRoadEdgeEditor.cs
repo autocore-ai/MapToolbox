@@ -23,16 +23,16 @@ using UnityEngine;
 
 namespace AutoCore.MapToolbox.Editor.Autoware
 {
-    [CustomEditor(typeof(CollectionADASSignal))]
-    class CollectionADASGoSignalEditor : UnityEditor.Editor
+    [CustomEditor(typeof(CollectionRoadEdge))]
+    class CollectionRoadEdgeEditor : UnityEditor.Editor
     {
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
             GUI.color = Color.yellow;
-            if (GUILayout.Button(Const.AddSignal))
+            if (GUILayout.Button(Const.AddRoadEdge))
             {
-                (target as CollectionADASSignal).AddSignal(SceneView.lastActiveSceneView.pivot);
+                (target as CollectionRoadEdge).AddRoadEdge(SceneView.lastActiveSceneView.pivot);
             }
         }
     }

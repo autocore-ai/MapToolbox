@@ -21,16 +21,18 @@ using UnityEngine;
 
 namespace AutoCore.MapToolbox.Autoware
 {
-    class ADASGoZebraZone : ADASGoArea
+    class CollectionPole : CollectionADASMapGo<ADASGoPole>
     {
-        public ADASMapZebraZone VectorMapZebraZone { get; set; }
-        public void Csv2Go()
+        public override void Csv2Go()
         {
-            Area = VectorMapZebraZone.Area;
-            name = VectorMapZebraZone.ID.ToString();
-            LineRenderer.startWidth = LineRenderer.endWidth = 0.1f;
-            LineRenderer.startColor = LineRenderer.endColor = Color.white;
-            LineRenderer.sharedMaterial = new Material(Shader.Find("Sprites/Default"));
+            foreach (var item in ADASMapPole.List)
+            {
+                var pole = new GameObject().AddComponent<ADASGoPole>();
+                pole.transform.SetParent(transform);
+                pole.Pole = item;
+                pole.CollectionPole = this;
+                pole.Csv2Go();
+            }
         }
     }
 }

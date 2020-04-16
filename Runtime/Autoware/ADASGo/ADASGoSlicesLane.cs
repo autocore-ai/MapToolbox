@@ -29,7 +29,7 @@ namespace AutoCore.MapToolbox.Autoware
         public MonoBehaviour MonoBehaviour => this;
         [HideInInspector] public List<ADASGoSlicesLane> bLane = new List<ADASGoSlicesLane>();
         [HideInInspector] public List<ADASGoSlicesLane> fLane = new List<ADASGoSlicesLane>();
-        public CollectionADASLane CollectionLane { get; set; }
+        public CollectionLane CollectionLane { get; set; }
         static HashSet<ADASGoSlicesLane> HashSet { get; set; } = new HashSet<ADASGoSlicesLane>();
         private void OnEnable() => HashSet.Add(this);
         private void OnDisable() => HashSet.Remove(this);

@@ -23,39 +23,39 @@ namespace AutoCore.MapToolbox.Autoware
     {
         public ADASMapWhiteLine.Color color;
         public float width = 0.2f;
-        ADASMapWhiteLine data;
+        ADASMapWhiteLine whiteLine;
         public ADASMapWhiteLine WhiteLine
         {
             set
             {
-                data = value;
-                if (data != null)
+                whiteLine = value;
+                if (whiteLine != null)
                 {
-                    Line = data.Line;
-                    name = data.ID.ToString();
-                    width = data.Width;
-                    color = data.COLOR;
+                    Line = whiteLine.Line;
+                    name = whiteLine.ID.ToString();
+                    width = whiteLine.Width;
+                    color = whiteLine.COLOR;
                 }
             }
             get
             {
-                if (data == null)
+                if (whiteLine == null)
                 {
-                    data = new ADASMapWhiteLine
+                    whiteLine = new ADASMapWhiteLine
                     {
                         Line = Line,
                         Width = width,
                         COLOR = color
                     };
                 }
-                return data;
+                return whiteLine;
             }
         }
         internal override void BuildData()
         {
             Line = null;
             WhiteLine = null;
-            data = WhiteLine;
+            whiteLine = WhiteLine;
         }
         protected override void DataCopy(LineSegment<ADASGoLine> target)
         {

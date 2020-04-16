@@ -21,7 +21,7 @@ namespace AutoCore.MapToolbox.Autoware
 {
     class ADASGoCurb : ADASGoLine
     {
-        public ADASMapCurb VectorMapCurb 
+        public ADASMapCurb VectorMapCurb
         {
             set
             {

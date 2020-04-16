@@ -28,11 +28,11 @@ namespace AutoCore.MapToolbox.Autoware
         public ADASMapSignal.Type signalType = ADASMapSignal.Type.BLUE;
         public ADASGoPole pole;
         public ADASGoLane linkLane;
-        public CollectionADASLane CollectionLane { get; set; }
-        public CollectionADASPole CollectionPole { get; set; }
-        public CollectionADASSignal CollectionSignal { get; set; }
+        public CollectionLane CollectionLane { get; set; }
+        public CollectionPole CollectionPole { get; set; }
+        public CollectionSignal CollectionSignal { get; set; }
         ADASMapSignal data;
-        public ADASMapSignal Signal 
+        public ADASMapSignal Signal
         {
             set
             {

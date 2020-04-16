@@ -23,16 +23,21 @@ using UnityEngine;
 
 namespace AutoCore.MapToolbox.Editor.Autoware
 {
-    [CustomEditor(typeof(CollectionADASWhiteLine))]
-    class CollectionADASGoWhiteLineEditor : UnityEditor.Editor
+    [CustomEditor(typeof(CollectionLane))]
+    class CollectionLaneEditor : UnityEditor.Editor
     {
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
             GUI.color = Color.yellow;
-            if (GUILayout.Button(Const.AddWhiteLine))
+            if (GUILayout.Button(Const.AddLane))
             {
-                (target as CollectionADASWhiteLine).AddWhiteLine(SceneView.lastActiveSceneView.pivot);
+                (target as CollectionLane).AddLane(SceneView.lastActiveSceneView.pivot);
+            }
+            GUI.color = Color.white;
+            if (GUILayout.Button("Find Ref"))
+            {
+                (target as CollectionLane).FindRef();
             }
         }
     }

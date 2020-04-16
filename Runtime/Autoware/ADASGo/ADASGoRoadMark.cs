@@ -23,16 +23,43 @@ namespace AutoCore.MapToolbox.Autoware
 {
     class ADASGoRoadMark : ADASGoArea
     {
-        public ADASMapRoadMark VectorMapRoadMark
+        public ADASMapRoadMark.Type type;
+        ADASMapRoadMark roadMark;
+        public ADASMapRoadMark RoadMark
         {
             set
             {
-                VectorMapArea = value.Area;
-                name = value.ID.ToString();
-                LineRenderer.startWidth = LineRenderer.endWidth = 0.1f;
-                LineRenderer.startColor = LineRenderer.endColor = Color.white;
-                LineRenderer.sharedMaterial = new Material(Shader.Find("Sprites/Default"));
+                roadMark = value;
+                if (roadMark != null)
+                {
+                    Area = roadMark.Area;
+                    name = roadMark.ID.ToString();
+                    type = roadMark.RoadMarkType;
+                    LineRenderer.startWidth = LineRenderer.endWidth = 0.1f;
+                    LineRenderer.startColor = LineRenderer.endColor = Color.white;
+#if UNITY_EDITOR
+                    LineRenderer.sharedMaterial = UnityEditor.AssetDatabase.GetBuiltinExtraResource<Material>("Sprites-Default.mat");
+#endif
+                }
             }
+            get
+            {
+                if (roadMark == null)
+                {
+                    roadMark = new ADASMapRoadMark
+                    {
+                        Area = Area,
+                        RoadMarkType = type
+                    };
+                }
+                return roadMark;
+            }
+        }
+        public override void BuildData()
+        {
+            Area = null;
+            RoadMark = null;
+            roadMark = RoadMark;
         }
     }
 }

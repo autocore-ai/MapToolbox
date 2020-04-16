@@ -63,6 +63,14 @@ namespace AutoCore.MapToolbox.Editor.Autoware
             {
                 (target as AutowareADASMap).AddRoadEdge(SceneView.lastActiveSceneView.pivot);
             }
+            else if (GUILayout.Button(Const.AddCrossWalk))
+            {
+                (target as AutowareADASMap).AddCrossWalk(SceneView.lastActiveSceneView.pivot);
+            }
+            else if (GUILayout.Button(Const.AddRoadMark))
+            {
+                (target as AutowareADASMap).AddRoadMark(SceneView.lastActiveSceneView.pivot);
+            }
             GUI.color = Color.green;
             if (GUILayout.Button(LoadFromFolder))
             {

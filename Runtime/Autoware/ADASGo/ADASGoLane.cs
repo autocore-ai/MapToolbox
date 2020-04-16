@@ -40,15 +40,15 @@ namespace AutoCore.MapToolbox.Autoware
                 return slices;
             }
         }
-        CollectionADASLane collectionLane;
-        public CollectionADASLane CollectionLane
+        CollectionLane collectionLane;
+        public CollectionLane CollectionLane
         {
             set => collectionLane = value;
             get
             {
                 if (collectionLane == null)
                 {
-                    collectionLane = GetComponentInParent<AutowareADASMap>().GetComponentInChildren<CollectionADASLane>();
+                    collectionLane = GetComponentInParent<AutowareADASMap>().GetComponentInChildren<CollectionLane>();
                 }
                 return collectionLane;
             }

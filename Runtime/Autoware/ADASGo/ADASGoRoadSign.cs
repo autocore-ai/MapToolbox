@@ -28,9 +28,9 @@ namespace AutoCore.MapToolbox.Autoware
         public ADASGoPole pole;
         public ADASGoLane linkLane;
         public ADASMapRoadSign.Type roadSignType;
-        public CollectionADASLane CollectionLane { get; set; }
-        public CollectionADASPole CollectionPole { get; set; }
-        public CollectionADASRoadSign CollectionRoadSign { get; set; }
+        public CollectionLane CollectionLane { get; set; }
+        public CollectionPole CollectionPole { get; set; }
+        public CollectionRoadSign CollectionRoadSign { get; set; }
         Mesh Mesh { get; set; }
         ADASMapRoadSign data;
         public ADASMapRoadSign RoadSign

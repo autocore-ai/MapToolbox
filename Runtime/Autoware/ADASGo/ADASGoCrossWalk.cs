@@ -23,15 +23,71 @@ namespace AutoCore.MapToolbox.Autoware
 {
     class ADASGoCrossWalk : ADASGoArea
     {
-        public ADASMapCrossWalk VectorMapCrossWalk
+        CollectionCrossWalk collectionCrossWalk;
+        public CollectionCrossWalk CollectionCrossWalk
+        {
+            set => collectionCrossWalk = value;
+            get
+            {
+                if (collectionCrossWalk == null)
+                {
+                    collectionCrossWalk = GetComponentInParent<AutowareADASMap>().GetComponentInChildren<CollectionCrossWalk>();
+                }
+                return collectionCrossWalk;
+            }
+        }
+        public ADASGoCrossWalk border;
+        public ADASMapCrossWalk.Type type;
+        ADASMapCrossWalk crossWalk;
+        public ADASMapCrossWalk CrossWalk
         {
             set
             {
-                VectorMapArea = value.Area;
-                name = value.ID.ToString();
-                LineRenderer.startWidth = LineRenderer.endWidth = 0.1f;
-                LineRenderer.startColor = LineRenderer.endColor = Color.white;
-                LineRenderer.sharedMaterial = new Material(Shader.Find("Sprites/Default"));
+                crossWalk = value;
+                if (crossWalk != null)
+                {
+                    Area = crossWalk.Area;
+                    name = crossWalk.ID.ToString();
+                    type = crossWalk.CrossWalkType;
+                    LineRenderer.startWidth = LineRenderer.endWidth = 0.1f;
+                    LineRenderer.startColor = LineRenderer.endColor = Color.white;
+                    CollectionCrossWalk.Add(crossWalk.ID, this);
+#if UNITY_EDITOR
+                    LineRenderer.sharedMaterial = UnityEditor.AssetDatabase.GetBuiltinExtraResource<Material>("Sprites-Default.mat");
+#endif
+                }
+            }
+            get
+            {
+                if (crossWalk == null)
+                {
+                    crossWalk = new ADASMapCrossWalk
+                    {
+                        Area = Area,
+                        CrossWalkType = type
+                    };
+                }
+                return crossWalk;
+            }
+        }
+        public override void BuildData()
+        {
+            Area = null;
+            CrossWalk = null;
+            crossWalk = CrossWalk;
+        }
+        internal void BuildDataRef()
+        {
+            if (border)
+            {
+                crossWalk.Border = border.crossWalk;
+            }
+        }
+        internal void UpdateBorder()
+        {
+            if (crossWalk != null)
+            {
+                CollectionCrossWalk.TryGetValue(crossWalk.BdID, out border);
             }
         }
     }

@@ -17,20 +17,23 @@
 #endregion
 
 
+using AutoCore.MapToolbox.Autoware;
+using UnityEditor;
 using UnityEngine;
 
-namespace AutoCore.MapToolbox.Autoware
+namespace AutoCore.MapToolbox.Editor.Autoware
 {
-    class ADASGoZebraZone : ADASGoArea
+    [CustomEditor(typeof(CollectionSignal))]
+    class CollectionSignalEditor : UnityEditor.Editor
     {
-        public ADASMapZebraZone VectorMapZebraZone { get; set; }
-        public void Csv2Go()
+        public override void OnInspectorGUI()
         {
-            Area = VectorMapZebraZone.Area;
-            name = VectorMapZebraZone.ID.ToString();
-            LineRenderer.startWidth = LineRenderer.endWidth = 0.1f;
-            LineRenderer.startColor = LineRenderer.endColor = Color.white;
-            LineRenderer.sharedMaterial = new Material(Shader.Find("Sprites/Default"));
+            base.OnInspectorGUI();
+            GUI.color = Color.yellow;
+            if (GUILayout.Button(Const.AddSignal))
+            {
+                (target as CollectionSignal).AddSignal(SceneView.lastActiveSceneView.pivot);
+            }
         }
     }
 }

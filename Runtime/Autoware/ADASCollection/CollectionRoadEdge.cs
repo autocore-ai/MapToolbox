@@ -22,47 +22,46 @@ using UnityEngine;
 
 namespace AutoCore.MapToolbox.Autoware
 {
-    class CollectionADASStopLine : CollectionADASMapGo<ADASGoStopLine>
+    class CollectionRoadEdge : CollectionADASMapGo<ADASGoRoadEdge>
     {
         public override void Csv2Go()
         {
-            foreach (var item in ADASMapStopLine.List.GroupBy(_ => _.Line.FirstLine))
+            foreach (var item in ADASMapRoadEdge.List.GroupBy(_ => _.Line.FirstLine))
             {
-                var slices = new GameObject().AddComponent<ADASGoSlicesStopLine>();
+                var slices = new GameObject().AddComponent<ADASGoSlicesRoadEdge>();
                 slices.transform.SetParent(transform);
-                slices.CollectionSignal = AutowareADASMap.CollectionSignal;
-                slices.CollectionRoadSign = AutowareADASMap.CollectionRoadSign;
-                slices.CollectionLane = AutowareADASMap.CollectionLane;
-                slices.VectorMapStopLines = item;
+                slices.RoadEdges = item;
             }
-            foreach (var item in GetComponentsInChildren<ADASGoSlicesStopLine>())
+            foreach (var item in GetComponentsInChildren<ADASGoSlicesRoadEdge>())
             {
                 item.UpdateRenderer();
             }
         }
         public override void Go2Csv()
         {
-            foreach (var item in GetComponentsInChildren<ADASGoSlicesStopLine>())
+            int id = 1;
+            Dic = GetComponentsInChildren<ADASGoRoadEdge>().ToDictionary(_ => id++);
+            foreach (var item in GetComponentsInChildren<ADASGoSlicesRoadEdge>())
             {
                 item.BuildData();
             }
         }
-        public ADASGoStopLine AddStopLine(Vector3 position)
+        public ADASGoRoadEdge AddRoadEdge(Vector3 position)
         {
             position.y = 0;
-            var slices = new GameObject(typeof(ADASGoSlicesStopLine).Name);
+            var slices = new GameObject(typeof(ADASGoSlicesRoadEdge).Name);
             slices.transform.SetParent(transform);
-            slices.AddComponent<ADASGoSlicesStopLine>().SetupRenderer();
-            var go = new GameObject(typeof(ADASGoStopLine).Name);
+            slices.AddComponent<ADASGoSlicesRoadEdge>().SetupRenderer();
+            var go = new GameObject(typeof(ADASGoRoadEdge).Name);
             go.transform.SetParent(slices.transform);
             go.transform.position = position;
-            var stopLine = go.AddComponent<ADASGoStopLine>();
-            stopLine.LocalFrom = position;
-            stopLine.LocalTo = position;
+            var roadEdge = go.AddComponent<ADASGoRoadEdge>();
+            roadEdge.LocalFrom = position;
+            roadEdge.LocalTo = position;
 #if UNITY_EDITOR
             UnityEditor.Selection.activeGameObject = slices;
 #endif
-            return stopLine;
+            return roadEdge;
         }
     }
 }

@@ -17,27 +17,22 @@
 #endregion
 
 
-using AutoCore.MapToolbox.Autoware;
-using UnityEditor;
 using UnityEngine;
 
-namespace AutoCore.MapToolbox.Editor.Autoware
+namespace AutoCore.MapToolbox.Autoware
 {
-    [CustomEditor(typeof(CollectionADASLane))]
-    class CollectionADASGoLaneEditor : UnityEditor.Editor
+    class CollectionRoadSign : CollectionADASMapGo<ADASGoRoadSign>
     {
-        public override void OnInspectorGUI()
+        public override void Csv2Go()
         {
-            base.OnInspectorGUI();
-            GUI.color = Color.yellow;
-            if (GUILayout.Button(Const.AddLane))
+            foreach (var item in ADASMapRoadSign.List)
             {
-                (target as CollectionADASLane).AddLane(SceneView.lastActiveSceneView.pivot);
-            }
-            GUI.color = Color.white;
-            if (GUILayout.Button("Find Ref"))
-            {
-                (target as CollectionADASLane).FindRef();
+                var roadSign = new GameObject().AddComponent<ADASGoRoadSign>();
+                roadSign.transform.SetParent(transform);
+                roadSign.CollectionPole = AutowareADASMap.CollectionPole;
+                roadSign.CollectionLane = AutowareADASMap.CollectionLane;
+                roadSign.CollectionRoadSign = this;
+                roadSign.RoadSign = item;
             }
         }
     }

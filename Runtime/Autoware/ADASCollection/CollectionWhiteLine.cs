@@ -17,66 +17,51 @@
 #endregion
 
 
-using System;
 using System.Linq;
 using UnityEngine;
 
 namespace AutoCore.MapToolbox.Autoware
 {
-    class CollectionADASLane : CollectionADASMapGo<ADASGoLane>
+    class CollectionWhiteLine : CollectionADASMapGo<ADASGoWhiteLine>
     {
         public override void Csv2Go()
         {
-            foreach (var item in ADASMapLane.List.GroupBy(_ => _.FirstLane))
+            foreach (var item in ADASMapWhiteLine.List.GroupBy(_ => _.Line.FirstLine))
             {
-                var slices = new GameObject().AddComponent<ADASGoSlicesLane>();
+                var slices = new GameObject().AddComponent<ADASGoSlicesWhiteLine>();
                 slices.transform.SetParent(transform);
-                slices.CollectionLane = this;
-                slices.Lanes = item;
+                slices.WhiteLines = item;
             }
-            foreach (var item in GetComponentsInChildren<ADASGoSlicesLane>())
+            foreach (var item in GetComponentsInChildren<ADASGoSlicesWhiteLine>())
             {
-                item.SetRef();
                 item.UpdateRenderer();
-            }
-        }
-        internal void FindRef()
-        {
-            foreach (var item in GetComponentsInChildren<ADASGoSlicesLane>())
-            {
-                item.From = item.From;
-                item.To = item.To;
-                item.OnEnableEditor();
             }
         }
         public override void Go2Csv()
         {
             int id = 1;
-            Dic = GetComponentsInChildren<ADASGoLane>().ToDictionary(_ => id++);
-            foreach (var item in GetComponentsInChildren<ADASGoSlicesLane>())
+            Dic = GetComponentsInChildren<ADASGoWhiteLine>().ToDictionary(_ => id++);
+            foreach (var item in GetComponentsInChildren<ADASGoSlicesWhiteLine>())
             {
                 item.BuildData();
             }
-            foreach (var item in GetComponentsInChildren<ADASGoLane>())
-            {
-                item.BuildDataRef();
-            }
         }
-        public ADASGoLane AddLane(Vector3 position)
+        public ADASGoWhiteLine AddWhiteLine(Vector3 position)
         {
             position.y = 0;
-            var slices = new GameObject(typeof(ADASGoSlicesLane).Name);
+            var slices = new GameObject(typeof(ADASGoSlicesWhiteLine).Name);
             slices.transform.SetParent(transform);
-            slices.AddComponent<ADASGoSlicesLane>().SetupRenderer();
-            var go = new GameObject(typeof(ADASGoLane).Name);
+            slices.AddComponent<ADASGoSlicesWhiteLine>().SetupRenderer();
+            var go = new GameObject(typeof(ADASGoWhiteLine).Name);
             go.transform.SetParent(slices.transform);
-            var lane = go.AddComponent<ADASGoLane>();
-            lane.LocalFrom = position;
-            lane.LocalTo = position;
+            go.transform.position = position;
+            var whiteLine = go.AddComponent<ADASGoWhiteLine>();
+            whiteLine.LocalFrom = position;
+            whiteLine.LocalTo = position;
 #if UNITY_EDITOR
             UnityEditor.Selection.activeGameObject = slices;
 #endif
-            return lane;
+            return whiteLine;
         }
     }
 }
