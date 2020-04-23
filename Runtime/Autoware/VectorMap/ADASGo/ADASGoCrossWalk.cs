@@ -49,12 +49,8 @@ namespace AutoCore.MapToolbox.Autoware
                     Area = crossWalk.Area;
                     name = crossWalk.ID.ToString();
                     type = crossWalk.CrossWalkType;
-                    LineRenderer.startWidth = LineRenderer.endWidth = 0.1f;
-                    LineRenderer.startColor = LineRenderer.endColor = Color.white;
+                    SetupRenderer();
                     CollectionCrossWalk.Add(crossWalk.ID, this);
-#if UNITY_EDITOR
-                    LineRenderer.sharedMaterial = UnityEditor.AssetDatabase.GetBuiltinExtraResource<Material>("Sprites-Default.mat");
-#endif
                 }
             }
             get
@@ -70,6 +66,7 @@ namespace AutoCore.MapToolbox.Autoware
                 return crossWalk;
             }
         }
+
         public override void BuildData()
         {
             Area = null;
@@ -89,6 +86,15 @@ namespace AutoCore.MapToolbox.Autoware
             {
                 CollectionCrossWalk.TryGetValue(crossWalk.BdID, out border);
             }
+        }
+        public override void SetupRenderer()
+        {
+            base.SetupRenderer();
+            LineRenderer.startWidth = LineRenderer.endWidth = 0.1f;
+            LineRenderer.startColor = LineRenderer.endColor = Color.white;
+#if UNITY_EDITOR
+            LineRenderer.sharedMaterial = UnityEditor.AssetDatabase.GetBuiltinExtraResource<Material>("Sprites-Default.mat");
+#endif
         }
     }
 }

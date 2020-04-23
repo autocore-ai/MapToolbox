@@ -17,21 +17,21 @@
 #endregion
 
 
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace AutoCore.MapToolbox.Autoware
 {
-    class ADASGoSlicesLine : BrokenLineRenderer<ADASGoLine>, IADASMapGameObject
+    class CollectionPole : Collection<ADASGoPole>
     {
-        public GameObject GameObject => gameObject;
-        public MonoBehaviour MonoBehaviour => this;
-        public IEnumerable<ADASMapLine> Lines { get; set; }
-        public virtual void BuildData()
+        public void Csv2Go()
         {
-            foreach (var line in GetComponentsInChildren<ADASGoLine>())
+            foreach (var item in ADASMapPole.List)
             {
-                line.BuildData();
+                var pole = new GameObject().AddComponent<ADASGoPole>();
+                pole.transform.SetParent(transform);
+                pole.Pole = item;
+                pole.CollectionPole = this;
+                pole.Csv2Go();
             }
         }
     }

@@ -22,9 +22,21 @@ using UnityEngine;
 
 namespace AutoCore.MapToolbox.Autoware
 {
-    class CollectionStopLine : CollectionADASMapGo<ADASGoStopLine>
+    class CollectionStopLine : Collection<ADASGoStopLine>
     {
-        public override void Csv2Go()
+        AutowareADASMap autowareADASMap;
+        public AutowareADASMap AutowareADASMap
+        {
+            get
+            {
+                if (autowareADASMap == null)
+                {
+                    autowareADASMap = GetComponentInParent<AutowareADASMap>();
+                }
+                return autowareADASMap;
+            }
+        }
+        public void Csv2Go()
         {
             foreach (var item in ADASMapStopLine.List.GroupBy(_ => _.Line.FirstLine))
             {
@@ -40,7 +52,7 @@ namespace AutoCore.MapToolbox.Autoware
                 item.UpdateRenderer();
             }
         }
-        public override void Go2Csv()
+        public void Go2Csv()
         {
             int id = 1;
             Dic = GetComponentsInChildren<ADASGoStopLine>().ToDictionary(_ => id++);

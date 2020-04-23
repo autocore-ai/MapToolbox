@@ -17,14 +17,12 @@
 #endregion
 
 
-using System.Collections;
-using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace AutoCore.MapToolbox.Autoware
 {
-    [ExecuteInEditMode]
-    abstract class CollectionADASMapGo : MonoBehaviour
+    class CollectionSignal : Collection<ADASGoSignal>
     {
         AutowareADASMap autowareADASMap;
         public AutowareADASMap AutowareADASMap
@@ -38,36 +36,37 @@ namespace AutoCore.MapToolbox.Autoware
                 return autowareADASMap;
             }
         }
-        public virtual void Csv2Go() { }
-        public virtual void Go2Csv() { }
-    }
-    class CollectionADASMapGo<T> : CollectionADASMapGo, IEnumerable<KeyValuePair<int, T>> where T : IADASMapGameObject
-    {
-        protected Dictionary<int, T> Dic { get; set; } = new Dictionary<int, T>();
-        public T this[int index]
+        public void Csv2Go()
         {
-            get
+            foreach (var item in ADASMapSignal.List)
             {
-                if (Dic.TryGetValue(index, out T value))
-                {
-                    return value;
-                }
-                return default;
+                var signal = new GameObject().AddComponent<ADASGoSignal>();
+                signal.transform.SetParent(transform);
+                signal.CollectionPole = AutowareADASMap.CollectionPole;
+                signal.CollectionLane = AutowareADASMap.CollectionLane;
+                signal.CollectionSignal = this;
+                signal.Signal = item;
             }
         }
-        public bool TryGetValue(int key, out T value) => Dic.TryGetValue(key, out value);
-        public void Add(int id, T value)
+        public void Go2Csv()
         {
-            if (Dic.ContainsKey(id))
+            int id = 1;
+            Dic = GetComponentsInChildren<ADASGoSignal>().ToDictionary(_ => id++);
+            foreach (var item in GetComponentsInChildren<ADASGoSignal>())
             {
-                Dic[id] = value;
-            }
-            else
-            {
-                Dic.Add(id, value);
+                item.BuildData();
             }
         }
-        public IEnumerator<KeyValuePair<int, T>> GetEnumerator() => Dic.GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => Dic.GetEnumerator();
+        public ADASGoSignal AddSignal(Vector3 position)
+        {
+            position.y = 6;
+            var signal = new GameObject().AddComponent<ADASGoSignal>();
+            signal.transform.SetParent(transform);
+            signal.CollectionPole = AutowareADASMap.CollectionPole;
+            signal.CollectionLane = AutowareADASMap.CollectionLane;
+            signal.CollectionSignal = this;
+            signal.transform.position = position;
+            return signal;
+        }
     }
 }

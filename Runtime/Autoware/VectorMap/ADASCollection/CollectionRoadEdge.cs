@@ -22,44 +22,46 @@ using UnityEngine;
 
 namespace AutoCore.MapToolbox.Autoware
 {
-    class CollectionCrossWalk : CollectionADASMapGo<ADASGoCrossWalk>
+    class CollectionRoadEdge : Collection<ADASGoRoadEdge>
     {
-        public override void Csv2Go()
+        public void Csv2Go()
         {
-            foreach (var item in ADASMapCrossWalk.List)
+            foreach (var item in ADASMapRoadEdge.List.GroupBy(_ => _.Line.FirstLine))
             {
-                var slices = new GameObject().AddComponent<ADASGoCrossWalk>();
+                var slices = new GameObject().AddComponent<ADASGoSlicesRoadEdge>();
                 slices.transform.SetParent(transform);
-                slices.CrossWalk = item;
+                slices.RoadEdges = item;
             }
-            foreach (var item in GetComponentsInChildren<ADASGoCrossWalk>())
+            foreach (var item in GetComponentsInChildren<ADASGoSlicesRoadEdge>())
             {
-                item.UpdateBorder();
                 item.UpdateRenderer();
             }
         }
-        public override void Go2Csv()
+        public void Go2Csv()
         {
             int id = 1;
-            Dic = GetComponentsInChildren<ADASGoCrossWalk>().ToDictionary(_ => id++);
-            foreach (var item in GetComponentsInChildren<ADASGoCrossWalk>())
+            Dic = GetComponentsInChildren<ADASGoRoadEdge>().ToDictionary(_ => id++);
+            foreach (var item in GetComponentsInChildren<ADASGoSlicesRoadEdge>())
             {
                 item.BuildData();
             }
-            foreach (var item in GetComponentsInChildren<ADASGoCrossWalk>())
-            {
-                item.BuildDataRef();
-            }
         }
-        public void AddCrossWalk(Vector3 position)
+        public ADASGoRoadEdge AddRoadEdge(Vector3 position)
         {
             position.y = 0;
-            var crosswalk = new GameObject(typeof(ADASGoCrossWalk).Name).AddComponent<ADASGoCrossWalk>();
-            crosswalk.transform.SetParent(transform);
-            crosswalk.transform.position = position;
+            var slices = new GameObject(typeof(ADASGoSlicesRoadEdge).Name);
+            slices.transform.SetParent(transform);
+            slices.AddComponent<ADASGoSlicesRoadEdge>().SetupRenderer();
+            var go = new GameObject(typeof(ADASGoRoadEdge).Name);
+            go.transform.SetParent(slices.transform);
+            go.transform.position = position;
+            var roadEdge = go.AddComponent<ADASGoRoadEdge>();
+            roadEdge.LocalFrom = position;
+            roadEdge.LocalTo = position;
 #if UNITY_EDITOR
-            UnityEditor.Selection.activeGameObject = crosswalk.gameObject;
+            UnityEditor.Selection.activeGameObject = slices;
 #endif
+            return roadEdge;
         }
     }
 }

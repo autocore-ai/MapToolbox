@@ -22,38 +22,45 @@ using UnityEngine;
 
 namespace AutoCore.MapToolbox.Autoware
 {
-    class CollectionRoadMark : CollectionADASMapGo<ADASGoRoadMark>
+    class CollectionCrossWalk : Collection<ADASGoCrossWalk>
     {
-        public override void Csv2Go()
+        public void Csv2Go()
         {
-            foreach (var item in ADASMapRoadMark.List)
+            foreach (var item in ADASMapCrossWalk.List)
             {
-                var slices = new GameObject().AddComponent<ADASGoRoadMark>();
+                var slices = new GameObject().AddComponent<ADASGoCrossWalk>();
                 slices.transform.SetParent(transform);
-                slices.RoadMark = item;
+                slices.CrossWalk = item;
             }
-            foreach (var item in GetComponentsInChildren<ADASGoRoadMark>())
+            foreach (var item in GetComponentsInChildren<ADASGoCrossWalk>())
             {
+                item.UpdateBorder();
                 item.UpdateRenderer();
             }
         }
-        public override void Go2Csv()
+        public void Go2Csv()
         {
             int id = 1;
-            Dic = GetComponentsInChildren<ADASGoRoadMark>().ToDictionary(_ => id++);
-            foreach (var item in GetComponentsInChildren<ADASGoRoadMark>())
+            Dic = GetComponentsInChildren<ADASGoCrossWalk>().ToDictionary(_ => id++);
+            foreach (var item in GetComponentsInChildren<ADASGoCrossWalk>())
             {
                 item.BuildData();
             }
+            foreach (var item in GetComponentsInChildren<ADASGoCrossWalk>())
+            {
+                item.BuildDataRef();
+            }
         }
-        public void AddRoadMark(Vector3 position)
+        public void AddCrossWalk(Vector3 position)
         {
             position.y = 0;
-            var roadMark = new GameObject(typeof(ADASGoRoadMark).Name).AddComponent<ADASGoRoadMark>();
-            roadMark.transform.SetParent(transform);
-            roadMark.transform.position = position;
+            var crosswalk = new GameObject(typeof(ADASGoCrossWalk).Name).AddComponent<ADASGoCrossWalk>();
+            crosswalk.transform.SetParent(transform);
+            crosswalk.transform.position = position;
+            crosswalk.Init4Lines();
+            crosswalk.SetupRenderer();
 #if UNITY_EDITOR
-            UnityEditor.Selection.activeGameObject = roadMark.gameObject;
+            UnityEditor.Selection.activeGameObject = crosswalk.gameObject;
 #endif
         }
     }

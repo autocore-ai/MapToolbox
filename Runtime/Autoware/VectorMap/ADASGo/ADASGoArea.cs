@@ -38,10 +38,7 @@ namespace AutoCore.MapToolbox.Autoware
                         var line = go.AddComponent<ADASGoLine>();
                         line.Line = item;
                     }
-                    var lines = GetComponentsInChildren<ADASGoLine>();
-                    lines.Last().fLine = lines.First();
-                    lines.First().bLine = lines.Last();
-                    LineRenderer.loop = true;
+                    ConnectLoopLineRef();
                 }
             }
             get
@@ -57,6 +54,38 @@ namespace AutoCore.MapToolbox.Autoware
                 }
                 return null;
             }
+        }
+
+        public void ConnectLoopLineRef()
+        {
+            var lines = GetComponentsInChildren<ADASGoLine>();
+            lines.Last().fLine = lines.First();
+            lines.First().bLine = lines.Last();
+        }
+        public void Init4Lines()
+        {
+            var p1 = new GameObject(typeof(ADASGoLine).Name);
+            var p2 = new GameObject(typeof(ADASGoLine).Name);
+            var p3 = new GameObject(typeof(ADASGoLine).Name);
+            var p4 = new GameObject(typeof(ADASGoLine).Name);
+            p1.transform.SetParent(transform);
+            p2.transform.SetParent(transform);
+            p3.transform.SetParent(transform);
+            p4.transform.SetParent(transform);
+            var l1 = p1.AddComponent<ADASGoLine>();
+            var l2 = p2.AddComponent<ADASGoLine>();
+            var l3 = p3.AddComponent<ADASGoLine>();
+            var l4 = p4.AddComponent<ADASGoLine>();
+            l1.LocalTo = l2.LocalFrom = new Vector3(1, 0, 1);
+            l2.LocalTo = l3.LocalFrom = new Vector3(-1, 0, 1);
+            l3.LocalTo = l4.LocalFrom = new Vector3(-1, 0, -1);
+            l4.LocalTo = l1.LocalFrom = new Vector3(1, 0, -1);
+            ConnectLoopLineRef();
+        }
+        public override void SetupRenderer()
+        {
+            base.SetupRenderer();
+            LineRenderer.loop = true;
         }
     }
 }

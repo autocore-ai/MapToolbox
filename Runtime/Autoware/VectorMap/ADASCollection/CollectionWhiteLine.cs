@@ -22,46 +22,46 @@ using UnityEngine;
 
 namespace AutoCore.MapToolbox.Autoware
 {
-    class CollectionRoadEdge : CollectionADASMapGo<ADASGoRoadEdge>
+    class CollectionWhiteLine : Collection<ADASGoWhiteLine>
     {
-        public override void Csv2Go()
+        public void Csv2Go()
         {
-            foreach (var item in ADASMapRoadEdge.List.GroupBy(_ => _.Line.FirstLine))
+            foreach (var item in ADASMapWhiteLine.List.GroupBy(_ => _.Line.FirstLine))
             {
-                var slices = new GameObject().AddComponent<ADASGoSlicesRoadEdge>();
+                var slices = new GameObject().AddComponent<ADASGoSlicesWhiteLine>();
                 slices.transform.SetParent(transform);
-                slices.RoadEdges = item;
+                slices.WhiteLines = item;
             }
-            foreach (var item in GetComponentsInChildren<ADASGoSlicesRoadEdge>())
+            foreach (var item in GetComponentsInChildren<ADASGoSlicesWhiteLine>())
             {
                 item.UpdateRenderer();
             }
         }
-        public override void Go2Csv()
+        public void Go2Csv()
         {
             int id = 1;
-            Dic = GetComponentsInChildren<ADASGoRoadEdge>().ToDictionary(_ => id++);
-            foreach (var item in GetComponentsInChildren<ADASGoSlicesRoadEdge>())
+            Dic = GetComponentsInChildren<ADASGoWhiteLine>().ToDictionary(_ => id++);
+            foreach (var item in GetComponentsInChildren<ADASGoSlicesWhiteLine>())
             {
                 item.BuildData();
             }
         }
-        public ADASGoRoadEdge AddRoadEdge(Vector3 position)
+        public ADASGoWhiteLine AddWhiteLine(Vector3 position)
         {
             position.y = 0;
-            var slices = new GameObject(typeof(ADASGoSlicesRoadEdge).Name);
+            var slices = new GameObject(typeof(ADASGoSlicesWhiteLine).Name);
             slices.transform.SetParent(transform);
-            slices.AddComponent<ADASGoSlicesRoadEdge>().SetupRenderer();
-            var go = new GameObject(typeof(ADASGoRoadEdge).Name);
+            slices.AddComponent<ADASGoSlicesWhiteLine>().SetupRenderer();
+            var go = new GameObject(typeof(ADASGoWhiteLine).Name);
             go.transform.SetParent(slices.transform);
             go.transform.position = position;
-            var roadEdge = go.AddComponent<ADASGoRoadEdge>();
-            roadEdge.LocalFrom = position;
-            roadEdge.LocalTo = position;
+            var whiteLine = go.AddComponent<ADASGoWhiteLine>();
+            whiteLine.LocalFrom = position;
+            whiteLine.LocalTo = position;
 #if UNITY_EDITOR
             UnityEditor.Selection.activeGameObject = slices;
 #endif
-            return roadEdge;
+            return whiteLine;
         }
     }
 }

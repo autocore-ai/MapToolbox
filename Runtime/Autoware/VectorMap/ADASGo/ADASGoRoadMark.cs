@@ -23,7 +23,7 @@ namespace AutoCore.MapToolbox.Autoware
 {
     class ADASGoRoadMark : ADASGoArea
     {
-        public ADASMapRoadMark.Type type;
+        public ADASMapRoadMark.Type type = ADASMapRoadMark.Type.MARK;
         ADASMapRoadMark roadMark;
         public ADASMapRoadMark RoadMark
         {
@@ -35,11 +35,7 @@ namespace AutoCore.MapToolbox.Autoware
                     Area = roadMark.Area;
                     name = roadMark.ID.ToString();
                     type = roadMark.RoadMarkType;
-                    LineRenderer.startWidth = LineRenderer.endWidth = 0.1f;
-                    LineRenderer.startColor = LineRenderer.endColor = Color.white;
-#if UNITY_EDITOR
-                    LineRenderer.sharedMaterial = UnityEditor.AssetDatabase.GetBuiltinExtraResource<Material>("Sprites-Default.mat");
-#endif
+                    SetupRenderer();
                 }
             }
             get
@@ -60,6 +56,15 @@ namespace AutoCore.MapToolbox.Autoware
             Area = null;
             RoadMark = null;
             roadMark = RoadMark;
+        }
+        public override void SetupRenderer()
+        {
+            base.SetupRenderer();
+            LineRenderer.startWidth = LineRenderer.endWidth = 0.1f;
+            LineRenderer.startColor = LineRenderer.endColor = Color.white;
+#if UNITY_EDITOR
+            LineRenderer.sharedMaterial = UnityEditor.AssetDatabase.GetBuiltinExtraResource<Material>("Sprites-Default.mat");
+#endif
         }
     }
 }

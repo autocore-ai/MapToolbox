@@ -82,7 +82,7 @@ namespace AutoCore.MapToolbox.Editor.Autoware
                     Undo.IncrementCurrentGroup();
                     Undo.SetCurrentGroupName(LoadFromFolder);
                     int undoGroupIndex = Undo.GetCurrentGroup();
-                    foreach (var go in (target as AutowareADASMap).GetComponentsInChildren<CollectionADASMapGo>().Select(_ => _.gameObject))
+                    foreach (var go in (target as AutowareADASMap).GetComponentsInChildren<Collection>().Select(_ => _.gameObject))
                     {
                         Undo.RegisterCreatedObjectUndo(go, string.Empty);
                     }

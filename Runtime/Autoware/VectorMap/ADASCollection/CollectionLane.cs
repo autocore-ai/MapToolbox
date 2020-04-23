@@ -22,9 +22,9 @@ using UnityEngine;
 
 namespace AutoCore.MapToolbox.Autoware
 {
-    class CollectionLane : CollectionADASMapGo<ADASGoLane>
+    class CollectionLane : Collection<ADASGoLane>
     {
-        public override void Csv2Go()
+        public void Csv2Go()
         {
             foreach (var item in ADASMapLane.List.GroupBy(_ => _.FirstLane))
             {
@@ -48,7 +48,7 @@ namespace AutoCore.MapToolbox.Autoware
                 item.OnEnableEditor();
             }
         }
-        public override void Go2Csv()
+        public void Go2Csv()
         {
             int id = 1;
             Dic = GetComponentsInChildren<ADASGoLane>().ToDictionary(_ => id++);

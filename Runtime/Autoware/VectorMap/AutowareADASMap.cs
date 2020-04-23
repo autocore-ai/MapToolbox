@@ -189,7 +189,7 @@ namespace AutoCore.MapToolbox.Autoware
         #endregion
         public void Load(string folder)
         {
-            foreach (var item in GetComponentsInChildren<CollectionADASMapGo>())
+            foreach (var item in GetComponentsInChildren<Collection>())
             {
                 DestroyImmediate(item.gameObject);
             }
@@ -246,9 +246,9 @@ namespace AutoCore.MapToolbox.Autoware
             ADASMapCrossWalk.Reset();
             ADASMapRoadMark.Reset();
             CollectionLane.Go2Csv();
-            CollectionPole.Go2Csv();
+            //CollectionPole.Go2Csv();
             CollectionSignal.Go2Csv();
-            CollectionRoadSign.Go2Csv();
+            //CollectionRoadSign.Go2Csv();
             CollectionStopLine.Go2Csv();
             CollectionWhiteLine.Go2Csv();
             CollectionRoadEdge.Go2Csv();

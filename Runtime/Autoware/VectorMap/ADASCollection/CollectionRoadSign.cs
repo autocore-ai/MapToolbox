@@ -21,17 +21,30 @@ using UnityEngine;
 
 namespace AutoCore.MapToolbox.Autoware
 {
-    class CollectionPole : CollectionADASMapGo<ADASGoPole>
+    class CollectionRoadSign : Collection<ADASGoRoadSign>
     {
-        public override void Csv2Go()
+        AutowareADASMap autowareADASMap;
+        public AutowareADASMap AutowareADASMap
         {
-            foreach (var item in ADASMapPole.List)
+            get
             {
-                var pole = new GameObject().AddComponent<ADASGoPole>();
-                pole.transform.SetParent(transform);
-                pole.Pole = item;
-                pole.CollectionPole = this;
-                pole.Csv2Go();
+                if (autowareADASMap == null)
+                {
+                    autowareADASMap = GetComponentInParent<AutowareADASMap>();
+                }
+                return autowareADASMap;
+            }
+        }
+        public void Csv2Go()
+        {
+            foreach (var item in ADASMapRoadSign.List)
+            {
+                var roadSign = new GameObject().AddComponent<ADASGoRoadSign>();
+                roadSign.transform.SetParent(transform);
+                roadSign.CollectionPole = AutowareADASMap.CollectionPole;
+                roadSign.CollectionLane = AutowareADASMap.CollectionLane;
+                roadSign.CollectionRoadSign = this;
+                roadSign.RoadSign = item;
             }
         }
     }

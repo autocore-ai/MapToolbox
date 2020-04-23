@@ -17,23 +17,26 @@
 #endregion
 
 
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace AutoCore.MapToolbox.Autoware
 {
-    class CollectionRoadSign : CollectionADASMapGo<ADASGoRoadSign>
+    class ADASGoSlicesLine : BrokenLineRenderer<ADASGoLine>, IADASMapGameObject
     {
-        public override void Csv2Go()
+        public GameObject GameObject => gameObject;
+        public MonoBehaviour MonoBehaviour => this;
+        public IEnumerable<ADASMapLine> Lines { get; set; }
+        public virtual void BuildData()
         {
-            foreach (var item in ADASMapRoadSign.List)
+            foreach (var line in GetComponentsInChildren<ADASGoLine>())
             {
-                var roadSign = new GameObject().AddComponent<ADASGoRoadSign>();
-                roadSign.transform.SetParent(transform);
-                roadSign.CollectionPole = AutowareADASMap.CollectionPole;
-                roadSign.CollectionLane = AutowareADASMap.CollectionLane;
-                roadSign.CollectionRoadSign = this;
-                roadSign.RoadSign = item;
+                line.BuildData();
             }
+        }
+        public virtual void SetupRenderer()
+        {
+            LineRenderer.useWorldSpace = false;
         }
     }
 }
