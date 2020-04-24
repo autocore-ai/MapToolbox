@@ -51,6 +51,36 @@ namespace AutoCore.MapToolbox.Autoware
                 }
             }
         }
+        protected override void UpdateLast(int index)
+        {
+            base.UpdateLast(index);
+            if (last)
+            {
+                bLine = last.GetComponent<ADASGoLine>();
+            }
+            else
+            {
+                if (Parent.LineRenderer.loop)
+                {
+                    bLine = Parent.transform.GetChild(Parent.transform.childCount-1).GetComponent<ADASGoLine>();
+                }
+            }
+        }
+        protected override void UpdateNext(int index)
+        {
+            base.UpdateNext(index);
+            if (next)
+            {
+                fLine = next.GetComponent<ADASGoLine>();
+            }
+            else
+            {
+                if (Parent.LineRenderer.loop)
+                {
+                    fLine = Parent.transform.GetChild(0).GetComponent<ADASGoLine>();
+                }
+            }
+        }
         ADASMapLine line;
         public ADASMapLine Line
         {

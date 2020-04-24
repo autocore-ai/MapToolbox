@@ -46,6 +46,10 @@ namespace AutoCore.MapToolbox.Editor
                 Target.Reverse();
             }
             GUI.color = Color.white;
+            if (GUILayout.Button(GetMethodName(Target.IndexChildName)))
+            {
+                Target.IndexChildName();
+            }
         }
         protected virtual void OnSceneGUI()
         {

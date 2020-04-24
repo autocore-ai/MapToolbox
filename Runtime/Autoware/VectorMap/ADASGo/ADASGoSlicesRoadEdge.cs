@@ -50,11 +50,11 @@ namespace AutoCore.MapToolbox.Autoware
                 item.BuildData();
             }
         }
-        public void SetupRenderer()
+        public override void SetupRenderer()
         {
+            base.SetupRenderer();
             LineRenderer.startWidth = LineRenderer.endWidth = 0.2f;
             LineRenderer.startColor = LineRenderer.endColor = Color.blue;
-            LineRenderer.useWorldSpace = false;
 #if UNITY_EDITOR
             LineRenderer.sharedMaterial = UnityEditor.AssetDatabase.GetBuiltinExtraResource<Material>("Sprites-Default.mat");
 #endif

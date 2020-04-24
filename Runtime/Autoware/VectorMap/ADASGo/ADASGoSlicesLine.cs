@@ -38,5 +38,13 @@ namespace AutoCore.MapToolbox.Autoware
         {
             LineRenderer.useWorldSpace = false;
         }
+        protected virtual void Start() => CheckRef();
+        private void CheckRef()
+        {
+            foreach (var item in GetComponentsInChildren<ADASGoLine>())
+            {
+                item.UpdateRef();
+            }
+        }
     }
 }

@@ -71,13 +71,13 @@ namespace AutoCore.MapToolbox.Autoware
                 LineRenderer.endColor = children.Last().color == ADASMapWhiteLine.Color.White ? Color.white : Color.yellow;
             }
         }
-        public void SetupRenderer()
+        public override void SetupRenderer()
         {
+            base.SetupRenderer();
             LineRenderer.startWidth = startWidth;
             LineRenderer.endWidth = endWidth;
             LineRenderer.startColor = startColor;
             LineRenderer.endColor = endColor;
-            LineRenderer.useWorldSpace = false;
 #if UNITY_EDITOR
             LineRenderer.sharedMaterial = UnityEditor.AssetDatabase.GetBuiltinExtraResource<Material>("Sprites-Default.mat");
 #endif

@@ -17,20 +17,17 @@
 #endregion
 
 
-using UnityEngine;
+using AutoCore.MapToolbox.Autoware;
+using UnityEditor;
 
-namespace AutoCore.MapToolbox
+namespace AutoCore.MapToolbox.Editor.Autoware
 {
-    [ExecuteInEditMode]
-    public class SiblingParent : MonoBehaviour
+    [CustomEditor(typeof(ADASGoRoadMark))]
+    class ADASGoRoadMarkEditor : ADASGoAreaEditor
     {
-        internal void IndexChildName()
+        protected override void AfterDefaultInspectorDraw()
         {
-            for (int i = 0; i < transform.childCount; i++)
-            {
-                var target = transform.GetChild(i);
-                target.name = target.GetSiblingIndex().ToString();
-            }
+            base.AfterDefaultInspectorDraw();
         }
     }
 }

@@ -40,7 +40,7 @@ namespace AutoCore.MapToolbox
                 UpdateNext(index);
             }
         }
-        private void UpdateLast(int index)
+        protected virtual void UpdateLast(int index)
         {
             if (index == 0)
             {
@@ -51,7 +51,7 @@ namespace AutoCore.MapToolbox
                 last = transform.parent.GetChild(index - 1);
             }
         }
-        private void UpdateNext(int index)
+        protected virtual void UpdateNext(int index)
         {
             if (index == transform.parent.childCount - 1)
             {
@@ -94,7 +94,7 @@ namespace AutoCore.MapToolbox
 #endif
         }
 
-            internal void MoveBack()
+        internal void MoveBack()
         {
             if (Index == transform.parent.childCount - 1)
             {
