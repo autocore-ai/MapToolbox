@@ -186,6 +186,24 @@ namespace AutoCore.MapToolbox.Autoware
                 return collectionRoadMark;
             }
         }
+        CollectionWayArea collectionWayArea;
+        public CollectionWayArea CollectionWayArea
+        {
+            set => collectionWayArea = value;
+            get
+            {
+                if (collectionWayArea == null)
+                {
+                    collectionWayArea = GetComponentInChildren<CollectionWayArea>();
+                    if (collectionWayArea == null)
+                    {
+                        collectionWayArea = new GameObject(typeof(CollectionWayArea).Name).AddComponent<CollectionWayArea>();
+                        collectionWayArea.transform.SetParent(transform);
+                    }
+                }
+                return collectionWayArea;
+            }
+        }
         #endregion
         public void Load(string folder)
         {
@@ -202,6 +220,7 @@ namespace AutoCore.MapToolbox.Autoware
         public void AddRoadEdge(Vector3 position) => CollectionRoadEdge.AddRoadEdge(position);
         public void AddCrossWalk(Vector3 position) => CollectionCrossWalk.AddCrossWalk(position);
         public void AddRoadMark(Vector3 position) => CollectionRoadMark.AddRoadMark(position);
+        public void AddWayArea(Vector3 position) => CollectionWayArea.AddWayArea(position);
         public void Save(string folder) => WriteCsv(folder);
         private void ReadCsv(string path)
         {
@@ -220,6 +239,7 @@ namespace AutoCore.MapToolbox.Autoware
             ADASMapArea.ReadCsv(path);
             ADASMapCrossWalk.ReadCsv(path);
             ADASMapRoadMark.ReadCsv(path);
+            ADASMapWayArea.ReadCsv(path);
             CollectionLane.Csv2Go();
             CollectionPole.Csv2Go();
             CollectionSignal.Csv2Go();
@@ -229,6 +249,7 @@ namespace AutoCore.MapToolbox.Autoware
             CollectionRoadEdge.Csv2Go();
             CollectionCrossWalk.Csv2Go();
             CollectionRoadMark.Csv2Go();
+            CollectionWayArea.Csv2Go();
         }
         private void WriteCsv(string path)
         {
@@ -245,6 +266,7 @@ namespace AutoCore.MapToolbox.Autoware
             ADASMapArea.Reset();
             ADASMapCrossWalk.Reset();
             ADASMapRoadMark.Reset();
+            ADASMapWayArea.Reset();
             CollectionLane.Go2Csv();
             //CollectionPole.Go2Csv();
             CollectionSignal.Go2Csv();
@@ -254,6 +276,7 @@ namespace AutoCore.MapToolbox.Autoware
             CollectionRoadEdge.Go2Csv();
             CollectionCrossWalk.Go2Csv();
             CollectionRoadMark.Go2Csv();
+            CollectionWayArea.Go2Csv();
             ADASMapPoint.WriteCsv(path);
             ADASMapNode.WriteCsv(path);
             ADASMapDTLane.WriteCsv(path);
@@ -267,6 +290,7 @@ namespace AutoCore.MapToolbox.Autoware
             ADASMapArea.WriteCsv(path);
             ADASMapCrossWalk.WriteCsv(path);
             ADASMapRoadMark.WriteCsv(path);
+            ADASMapWayArea.WriteCsv(path);
         }
     }
 }

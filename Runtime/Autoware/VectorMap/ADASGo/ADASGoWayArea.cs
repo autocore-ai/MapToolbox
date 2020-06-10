@@ -16,45 +16,48 @@
 *****************************************************************************/
 #endregion
 
-
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace AutoCore.MapToolbox.Autoware
 {
-    class ADASGoSlicesRoadEdge : ADASGoSlicesLine
+    class ADASGoWayArea : ADASGoArea
     {
-        public IEnumerable<ADASMapRoadEdge> RoadEdges
+        ADASMapWayArea wayArea;
+        public ADASMapWayArea WayArea
         {
             set
             {
-                SetupRenderer();
-                Lines = value.Select(_ => _.Line);
-                name = $"{value.First().ID}-{value.Last().ID}";
-                foreach (var item in value)
+                wayArea = value;
+                if (wayArea != null)
                 {
-                    var go = new GameObject(typeof(ADASGoRoadEdge).Name);
-                    go.transform.SetParent(transform);
-                    go.transform.position = item.Line.FPoint.Position;
-                    var roadEdge = go.AddComponent<ADASGoRoadEdge>();
-                    roadEdge.RoadEdge = item;
+                    Area = wayArea.Area;
+                    name = wayArea.ID.ToString();
+                    SetupRenderer();
                 }
+            }
+            get
+            {
+                if (wayArea == null)
+                {
+                    wayArea = new ADASMapWayArea
+                    {
+                        Area = Area
+                    };
+                }
+                return wayArea;
             }
         }
         public override void BuildData()
         {
-            foreach (var item in GetComponentsInChildren<ADASGoRoadEdge>())
-            {
-                item.UpdateRef();
-                item.BuildData();
-            }
+            Area = null;
+            WayArea = null;
+            wayArea = WayArea;
         }
         public override void SetupRenderer()
         {
             base.SetupRenderer();
-            LineRenderer.startWidth = LineRenderer.endWidth = 0.2f;
-            LineRenderer.startColor = LineRenderer.endColor = Color.blue;
+            LineRenderer.startWidth = LineRenderer.endWidth = 0.1f;
+            LineRenderer.startColor = LineRenderer.endColor = Color.green;
 #if UNITY_EDITOR
             LineRenderer.sharedMaterial = UnityEditor.AssetDatabase.GetBuiltinExtraResource<Material>("Sprites-Default.mat");
 #endif

@@ -56,15 +56,12 @@ namespace AutoCore.MapToolbox.Autoware
                 }
             }
         }
-        public static void PreWrite(string path)
-        {
-            Reset();
-            Utils.CleanOrCreateNew(path, file, header);
-        }
         public static void WriteCsv(string path)
         {
             ReIndex();
+            Utils.CleanOrCreateNew(path, file, header);
             Utils.AppendData(path, file, List.Select(_ => _.ToString()));
+            Utils.RemoveEmpty(path, file);
         }
     }
 }

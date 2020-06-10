@@ -17,17 +17,23 @@
 #endregion
 
 
+using AutoCore.MapToolbox.Autoware;
+using UnityEditor;
+using UnityEngine;
+
 namespace AutoCore.MapToolbox.Editor.Autoware
 {
-    class Const
+    [CustomEditor(typeof(CollectionWayArea))]
+    class CollectionWayAreaEditor : UnityEditor.Editor
     {
-        public const string AddLane = "Add Lane";
-        public const string AddSignal = "Add Signal";
-        public const string AddStopLine = "Add Stop Line";
-        public const string AddWhiteLine = "Add White Line";
-        public const string AddRoadEdge = "Add Road Edge";
-        public const string AddCrossWalk = "Add Cross Walk";
-        public const string AddRoadMark = "Add Road Mark";
-        public const string AddWayArea = "Add Way Area";
+        public override void OnInspectorGUI()
+        {
+            base.OnInspectorGUI();
+            GUI.color = Color.yellow;
+            if (GUILayout.Button(Const.AddRoadMark))
+            {
+                (target as CollectionWayArea).AddWayArea(SceneView.lastActiveSceneView.pivot);
+            }
+        }
     }
 }

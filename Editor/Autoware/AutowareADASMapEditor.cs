@@ -71,6 +71,10 @@ namespace AutoCore.MapToolbox.Editor.Autoware
             {
                 (target as AutowareADASMap).AddRoadMark(SceneView.lastActiveSceneView.pivot);
             }
+            else if (GUILayout.Button(Const.AddWayArea))
+            {
+                (target as AutowareADASMap).AddWayArea(SceneView.lastActiveSceneView.pivot);
+            }
             GUI.color = Color.green;
             if (GUILayout.Button(LoadFromFolder))
             {
