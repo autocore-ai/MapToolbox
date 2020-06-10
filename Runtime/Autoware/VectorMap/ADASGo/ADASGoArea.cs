@@ -56,11 +56,33 @@ namespace AutoCore.MapToolbox.Autoware
             }
         }
 
+        protected virtual void OnEnable() => ConnectLoopLineRef();
+
+        public override void BuildData()
+        {
+            ConnectLoopLineRef();
+            base.BuildData();
+        }
+
         public void ConnectLoopLineRef()
         {
             var lines = GetComponentsInChildren<ADASGoLine>();
-            lines.Last().fLine = lines.First();
-            lines.First().bLine = lines.Last();
+            foreach (var item in lines)
+            {
+                item.UpdateRef();
+            }
+            if (lines.Length > 1)
+            {
+                lines.First().bLine = lines.Last();
+                lines.First().fLine = lines[1];
+                lines.Last().bLine = lines[lines.Length - 2];
+                lines.Last().fLine = lines.First();
+                for (int i = 1; i < lines.Length - 1; i++)
+                {
+                    lines[i].bLine = lines[i - 1];
+                    lines[i].fLine = lines[i + 1];
+                }
+            }
         }
         public void Init4Lines()
         {

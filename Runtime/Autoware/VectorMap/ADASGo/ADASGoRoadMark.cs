@@ -53,6 +53,7 @@ namespace AutoCore.MapToolbox.Autoware
         }
         public override void BuildData()
         {
+            base.BuildData();
             Area = null;
             RoadMark = null;
             roadMark = RoadMark;

@@ -49,6 +49,7 @@ namespace AutoCore.MapToolbox.Autoware
         }
         public override void BuildData()
         {
+            base.BuildData();
             Area = null;
             WayArea = null;
             wayArea = WayArea;
