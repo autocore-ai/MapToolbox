@@ -23,16 +23,16 @@ using UnityEngine;
 
 namespace AutoCore.MapToolbox.Editor.Autoware
 {
-    [CustomEditor(typeof(CollectionWayArea))]
-    class CollectionWayAreaEditor : UnityEditor.Editor
+    [CustomEditor(typeof(CollectionCustomArea))]
+    class CollectionCustomAreaEditor : UnityEditor.Editor
     {
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
             GUI.color = Color.yellow;
-            if (GUILayout.Button(Const.AddWayArea))
+            if (GUILayout.Button(Const.AddCustomArea))
             {
-                (target as CollectionWayArea).AddWayArea(SceneView.lastActiveSceneView.pivot);
+                (target as CollectionCustomArea).AddCustomArea(SceneView.lastActiveSceneView.pivot);
             }
         }
     }

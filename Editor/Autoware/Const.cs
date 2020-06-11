@@ -29,5 +29,6 @@ namespace AutoCore.MapToolbox.Editor.Autoware
         public const string AddCrossWalk = "Add Cross Walk";
         public const string AddRoadMark = "Add Road Mark";
         public const string AddWayArea = "Add Way Area";
+        public const string AddCustomArea = "Add Custom Area";
     }
 }
