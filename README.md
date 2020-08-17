@@ -8,6 +8,8 @@
 
 This a unity plugin helps user create vector maps for [Autoware](https://github.com/autowarefoundation/autoware) efficiently. 
 
+Vector map format and this branch will be obsoleted, please try [lanelet2](https://github.com/autocore-ai/MapToolbox/tree/lanelet2) branch.
+
 ## Requirements
 * Windows 10
 * [Unity 2019.3.0](https://store.unity.com/download?ref=personal) or above
