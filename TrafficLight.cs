@@ -38,7 +38,10 @@ namespace Packages.MapToolbox
         internal void OnEditorDisable()
         {
             SceneView.duringSceneGui -= DuringSceneGui;
-            SceneVisibilityManager.instance.EnableAllPicking();
+            if (gameObject != null)
+            {
+                SceneVisibilityManager.instance.EnablePicking(gameObject, true);
+            }
         }
         private void DuringSceneGui(SceneView obj)
         {
@@ -48,13 +51,13 @@ namespace Packages.MapToolbox
                 {
                     RemovePoints();
                     UpdateRenderer();
-                    SceneVisibilityManager.instance.DisableAllPicking();
+                    SceneVisibilityManager.instance.DisablePicking(gameObject, true);
                 }
                 else if (EditorUpdate.MouseLeftButtonDownWithCtrl)
                 {
                     AddPoints();
                     UpdateRenderer();
-                    SceneVisibilityManager.instance.DisableAllPicking();
+                    SceneVisibilityManager.instance.DisablePicking(gameObject, true);
                 }
             }
         }

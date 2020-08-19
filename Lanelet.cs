@@ -46,9 +46,7 @@ namespace Packages.MapToolbox
             right.Way.OnNodeMoved += OnNodeMoved;
             UpdateRenderer();
         }
-
-        private void OnNodeMoved(int arg0, Vector3 arg1) => UpdateRenderer();
-
+        private void OnNodeMoved(Node node) => UpdateRenderer();
         public MeshFilter MeshFilter => GetComponent<MeshFilter>() ?? gameObject.AddComponent<MeshFilter>();
         public MeshRenderer MeshRenderer => GetComponent<MeshRenderer>() ?? gameObject.AddComponent<MeshRenderer>();
         public Relation Relation => GetComponent<Relation>() ?? gameObject.AddComponent<Relation>();
@@ -56,6 +54,15 @@ namespace Packages.MapToolbox
         public LineThin left;
         public LineThin right;
         public float width = 3.75f;
+        public enum TurnDirection
+        {
+            Null,
+            Straight,
+            Left,
+            Right
+        }
+        public TurnDirection turnDirection = TurnDirection.Null;
+        internal Lanelet AddNew() => AddNew(Lanelet2Map);
         internal static Lanelet AddNew(Lanelet2Map map)
         {
             var ret = map.AddChildGameObject<Lanelet>(map.transform.childCount.ToString());
@@ -105,11 +112,36 @@ namespace Packages.MapToolbox
         {
             SceneView.duringSceneGui -= DuringSceneGui;
             SceneView.duringSceneGui += DuringSceneGui;
+            foreach (var item in Relation.Members)
+            {
+                if (item is Relation)
+                {
+                    var re = item.GetComponent<RegulatoryElement>();
+                    if (re)
+                    {
+                        re.drawGizmos = true;
+                    }
+                }
+            }
         }
         internal void OnEditorDisable()
         {
             SceneView.duringSceneGui -= DuringSceneGui;
-            SceneVisibilityManager.instance.EnableAllPicking();
+            if (gameObject != null)
+            {
+                SceneVisibilityManager.instance.EnablePicking(gameObject, true);
+            }
+            foreach (var item in Relation.Members)
+            {
+                if (item is Relation)
+                {
+                    var re = item.GetComponent<RegulatoryElement>();
+                    if (re)
+                    {
+                        re.drawGizmos = false;
+                    }
+                }
+            }
         }
         private void DuringSceneGui(SceneView obj)
         {
@@ -119,16 +151,24 @@ namespace Packages.MapToolbox
                 {
                     RemovePoints();
                     UpdateRenderer();
-                    SceneVisibilityManager.instance.DisableAllPicking();
+                    SceneVisibilityManager.instance.DisablePicking(gameObject, true);
                 }
                 else if (EditorUpdate.MouseLeftButtonDownWithCtrl)
                 {
                     AddPoints();
                     UpdateRenderer();
-                    SceneVisibilityManager.instance.DisableAllPicking();
+                    SceneVisibilityManager.instance.DisablePicking(gameObject, true);
                 }
             }
         }
+        enum ReversedMode
+        {
+            None,
+            Left,
+            Right,
+            All
+        }
+        ReversedMode CurrentReversedMode { get; set; } = ReversedMode.None;
         internal void UpdateRenderer()
         {
             MeshFilter.sharedMesh?.Clear();
@@ -137,9 +177,42 @@ namespace Packages.MapToolbox
                 List<Vector3> leftPoints = left.Way.Nodes.Select(_ => _.Position).ToList();
                 List<Vector3> rightPoints = right.Way.Nodes.Select(_ => _.Position).ToList();
                 Mesh mesh = LinkLeftRightPointsMesh(leftPoints, rightPoints);
+                mesh.RecalculateNormals();
+                SwitchOrders(leftPoints,rightPoints);
+                for (int i = 0; i < 4; i++)
+                {
+                    if (NeedReUpdateRenderer(mesh))
+                    {
+                        SwitchOrders(leftPoints, rightPoints);
+                        mesh = LinkLeftRightPointsMesh(leftPoints, rightPoints);
+                        mesh.RecalculateNormals();
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
                 MeshFilter.sharedMesh = mesh;
             }
         }
+
+        private void SwitchOrders(List<Vector3> left, List<Vector3> right)
+        {
+            if (CurrentReversedMode == ReversedMode.All)
+            {
+                left.Reverse();
+                right.Reverse();
+            }
+            else if (CurrentReversedMode == ReversedMode.Left)
+            {
+                left.Reverse();
+            }
+            else if (CurrentReversedMode == ReversedMode.Right)
+            {
+                right.Reverse();
+            }
+        }
+
         private Mesh LinkLeftRightPointsMesh(List<Vector3> left, List<Vector3> right)
         {
             Mesh ret = new Mesh
@@ -210,6 +283,36 @@ namespace Packages.MapToolbox
             ret.SetIndices(indices, MeshTopology.Triangles, 0);
             return ret;
         }
+        private bool NeedReUpdateRenderer(Mesh mesh)
+        {
+            List<Vector3> normals = new List<Vector3>();
+            mesh.RecalculateNormals();
+            mesh.GetNormals(normals);
+            if (normals.Count > 1)
+            {
+                for (int i = 0; i < normals.Count; i++)
+                {
+                    if (Vector3.Angle(Vector3.up, normals[i]) > 90)
+                    {
+                        switch (CurrentReversedMode)
+                        {
+                            case ReversedMode.None:
+                                CurrentReversedMode = ReversedMode.Left;
+                                return true;
+                            case ReversedMode.Left:
+                                CurrentReversedMode = ReversedMode.Right;
+                                return true;
+                            case ReversedMode.Right:
+                                CurrentReversedMode = ReversedMode.All;
+                                return true;
+                            default:
+                                return false;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
         public bool CanDuplicateLeft => left.Way.Nodes.Count > 1 && left.OnlyUsedBy(Relation);
         public bool CanDuplicateRight => right.Way.Nodes.Count > 1 && right.OnlyUsedBy(Relation);
         internal void DuplicateLeft()
@@ -252,6 +355,10 @@ namespace Packages.MapToolbox
         {
             base.OnInspectorGUI();
             Tools.current = Tool.None;
+            if (GUILayout.Button("Add Lanelet"))
+            {
+                Selection.activeObject = Target.AddNew();
+            }
             if (GUILayout.Button("Select Line Thin"))
             {
                 Target.SelectLineThin();

@@ -23,6 +23,6 @@ namespace Packages.MapToolbox
 {
     class Member : MonoBehaviour
     {
-        public List<Member> Ref = new List<Member>();
+        public List<Member> Ref { get; set; } = new List<Member>();
     }
 }

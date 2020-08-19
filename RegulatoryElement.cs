@@ -16,6 +16,7 @@
 *****************************************************************************/
 #endregion
 
+using UnityEditor;
 using UnityEngine;
 
 namespace Packages.MapToolbox
@@ -39,6 +40,46 @@ namespace Packages.MapToolbox
             var ret = map.AddChildGameObject<RegulatoryElement>(map.transform.childCount.ToString());
             ret.gameObject.RecordUndoCreateGo();
             return ret;
+        }
+        internal bool drawGizmos = false;
+        private void OnDrawGizmos()
+        {
+            if (drawGizmos && ref_line.Nodes.Count > 0 && refers.Nodes.Count > 0)
+            {
+                Gizmos.color = Color.green;
+                var start = Vector3.zero;
+                foreach (var item in ref_line.Nodes)
+                {
+                    start += item.Position;
+                }
+                start /= ref_line.Nodes.Count;
+                var end = Vector3.zero;
+                foreach (var item in refers.Nodes)
+                {
+                    end += item.Position;
+                }
+                end /= refers.Nodes.Count;
+                Gizmos.DrawLine(start, end);
+            }
+        }
+    }
+    [CanEditMultipleObjects]
+    [CustomEditor(typeof(RegulatoryElement))]
+    class RegulatoryElementEditor : Editor
+    {
+        private void OnEnable()
+        {
+            foreach (RegulatoryElement item in targets)
+            {
+                item.drawGizmos = true;
+            }
+        }
+        private void OnDisable()
+        {
+            foreach (RegulatoryElement item in targets)
+            {
+                item.drawGizmos = false;
+            }
         }
     }
 }

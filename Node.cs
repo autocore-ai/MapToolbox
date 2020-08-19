@@ -29,15 +29,16 @@ namespace Packages.MapToolbox
     [ExecuteInEditMode]
     class Node : Member
     {
-        public UnityAction<Node> OnNodeMoved { get; set; }
+        public UnityAction<Node> OnMoved { get; set; }
         public UnityAction<Node> OnDestroyed { get; set; }
+        public UnityAction<Node, Node> OnMerged { get; set; }
         internal Vector3 Position
         {
             get => transform.position;
             set
             {
                 transform.position = value;
-                OnNodeMoved?.Invoke(this);
+                OnMoved?.Invoke(this);
             }
         }
         internal static Node AddNew(Lanelet2Map map, Vector3 position)
@@ -45,26 +46,6 @@ namespace Packages.MapToolbox
             var ret = map.AddChildGameObject<Node>(map.transform.childCount.ToString());
             ret.Position = position;
             ret.gameObject.RecordUndoCreateGo();
-            return ret;
-        }
-        internal static Node GetNearestNode(Node target)
-        {
-            var nodes = target.GetComponentInParent<Lanelet2Map>().GetComponentsInChildren<Node>().ToList();
-            Node ret = null;
-            float distance = float.MaxValue;
-            for (int i = 0; i < nodes.Count; i++)
-            {
-                var nd = nodes[i];
-                if (nd != target)
-                {
-                    var dis = Vector3.Distance(target.Position, nd.Position);
-                    if (dis < distance)
-                    {
-                        distance = dis;
-                        ret = nd;
-                    }
-                }
-            }
             return ret;
         }
         private void Start() => gameObject.SetIcon(IconManager.ShapeIcon.CircleGray);
@@ -86,28 +67,20 @@ namespace Packages.MapToolbox
                         transform.SetLocalZ(float.Parse(tag.Attributes["v"].Value));
                         break;
                     default:
+                        Debug.LogWarning($"Unsupported Node tag {tag.Attributes["k"].Value} on {name}");
                         break;
                 }
             }
         }
-        internal XmlElement Save(XmlDocument xmlDocument)
+        internal XmlElement Save(XmlDocument doc)
         {
-            XmlElement node = xmlDocument.CreateElement("node");
+            XmlElement node = doc.CreateElement("node");
             node.SetAttribute("id", name);
             node.SetAttribute("lat", "0");
             node.SetAttribute("lon", "0");
-            XmlElement ele = xmlDocument.CreateElement("tag");
-            ele.SetAttribute("k", "ele");
-            ele.SetAttribute("v", transform.localPosition.y.ToString());
-            node.AppendChild(ele);
-            XmlElement local_x = xmlDocument.CreateElement("tag");
-            local_x.SetAttribute("k", "local_x");
-            local_x.SetAttribute("v", transform.localPosition.x.ToString());
-            node.AppendChild(local_x);
-            XmlElement local_y = xmlDocument.CreateElement("tag");
-            local_y.SetAttribute("k", "local_y");
-            local_y.SetAttribute("v", transform.localPosition.z.ToString());
-            node.AppendChild(local_y);
+            node.AppendChild(doc.AddTag("ele", transform.localPosition.y.ToString()));
+            node.AppendChild(doc.AddTag("local_x", transform.localPosition.x.ToString()));
+            node.AppendChild(doc.AddTag("local_y", transform.localPosition.z.ToString()));
             return node;
         }
         internal void RemoveRef(Member member)
@@ -121,6 +94,9 @@ namespace Packages.MapToolbox
         internal void Merge(Node node)
         {
             Position = node.Position;
+            OnMerged?.Invoke(this, node);
+            Selection.activeObject = node;
+            Undo.DestroyObjectImmediate(gameObject);
         }
     }
     [CanEditMultipleObjects]
@@ -133,6 +109,10 @@ namespace Packages.MapToolbox
         static List<Node> SelectList { get; set; } = new List<Node>();
         private void OnEnable()
         {
+            if (targets.Length > maxMultiEditorCount)
+            {
+                return;
+            }
             foreach (Node item in targets)
             {
                 Targets.Add(item);
@@ -143,13 +123,11 @@ namespace Packages.MapToolbox
             }
             else if (targets.Length == SelectList.Count + 1)
             {
-                var added = Targets.Where(_ => !SelectList.Contains(_)).First();
-                SelectList.Add(added);
+                SelectList.Add(Targets.Where(_ => !SelectList.Contains(_)).First());
             }
             else if (targets.Length == SelectList.Count - 1)
             {
-                var removed = SelectList.Where(_ => !Targets.Contains(_)).First();
-                SelectList.Remove(removed);
+                SelectList.Remove(SelectList.Where(_ => !Targets.Contains(_)).First());
             }
         }
         private void OnSceneGUI()
@@ -203,9 +181,11 @@ namespace Packages.MapToolbox
                     trafficSign.Way.Nodes.Add(Targets[1]);
                     Selection.activeObject = trafficSign;
                 }
-            }
-            else if (Targets.Count > 2)
-            {
+                if (GUILayout.Button("Debug Distance"))
+                {
+                    Debug.Log($"Distance:{Vector3.Distance(Targets[0].Position, Targets[1].Position)}");
+                    Debug.DrawLine(Targets[0].Position, Targets[1].Position, Color.white, 1);
+                }
             }
         }
     }

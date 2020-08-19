@@ -42,11 +42,38 @@ namespace Packages.MapToolbox
                             case "lanelet":
                                 gameObject.AddComponent<Lanelet>();
                                 break;
+                            case "regulatory_element":
+                                gameObject.AddComponent<RegulatoryElement>();
+                                break;
                             default:
+                                Debug.LogWarning($"Unsupported Relation type {tag.Attributes["v"].Value} on {name}");
                                 break;
                         }
                         break;
+                    case "subtype":
+                        break;
+                    case "turn_direction":
+                        var lanelet = gameObject.GetComponent<Lanelet>();
+                        if (lanelet)
+                        {
+                            switch (tag.Attributes["v"].Value)
+                            {
+                                case "straight":
+                                    lanelet.turnDirection = Lanelet.TurnDirection.Straight;
+                                    break;
+                                case "left":
+                                    lanelet.turnDirection = Lanelet.TurnDirection.Left;
+                                    break;
+                                case "right":
+                                    lanelet.turnDirection = Lanelet.TurnDirection.Right;
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                        break;
                     default:
+                        Debug.LogWarning($"Unsupported Relation tag {tag.Attributes["k"].Value} on {name}");
                         break;
                 }
             }
@@ -68,6 +95,12 @@ namespace Packages.MapToolbox
                             case "right":
                                 GetComponent<Lanelet>().right = way.GetComponent<LineThin>();
                                 break;
+                            case "ref_line":
+                                GetComponent<RegulatoryElement>().ref_line = way;
+                                break;
+                            case "refers":
+                                GetComponent<RegulatoryElement>().refers = way;
+                                break;
                             default:
                                 break;
                         }
@@ -80,76 +113,62 @@ namespace Packages.MapToolbox
                 }
             }
         }
-        internal XmlElement Save(XmlDocument xmlDocument)
+        internal XmlElement Save(XmlDocument doc)
         {
-            XmlElement relation = xmlDocument.CreateElement("relation");
+            XmlElement relation = doc.CreateElement("relation");
             relation.SetAttribute("id", name);
             members.RemoveNull();
-            foreach (var item in members)
-            {
-                XmlElement member = xmlDocument.CreateElement("member");
-                if (item is Way)
-                {
-                    member.SetAttribute("type", "way");
-                    if (item.GetComponent<StopLine>())
-                    {
-                        member.SetAttribute("role", "ref_line");
-                    }
-                    else if (item.GetComponent<TrafficSign>() || item.GetComponent<TrafficLight>())
-                    {
-                        member.SetAttribute("role", "refers");
-                    }
-                }
-                else if (item is Relation)
-                {
-                    member.SetAttribute("type", "relation");
-                    member.SetAttribute("role", "regulatory_element");
-                }
-                else if (item is Node)
-                {
-                    member.SetAttribute("type", "node");
-                }
-                member.SetAttribute("ref", item.name);
-                relation.AppendChild(member);
-            }
             var lanelet = GetComponent<Lanelet>();
             if (lanelet)
             {
-                XmlElement type = xmlDocument.CreateElement("tag");
-                type.SetAttribute("k", "type");
-                type.SetAttribute("v", "lanelet");
-                relation.AppendChild(type);
-                XmlElement subType = xmlDocument.CreateElement("tag");
-                subType.SetAttribute("k", "subtype");
-                subType.SetAttribute("v", "road");
-                relation.AppendChild(subType);
-                XmlElement left = xmlDocument.CreateElement("member");
-                left.SetAttribute("type", "way");
-                left.SetAttribute("ref", lanelet.left.name);
-                left.SetAttribute("role", "left");
-                relation.AppendChild(left);
-                XmlElement right = xmlDocument.CreateElement("member");
-                right.SetAttribute("type", "way");
-                right.SetAttribute("ref", lanelet.right.name);
-                right.SetAttribute("role", "right");
-                relation.AppendChild(right);
+                relation.AppendChild(doc.AddTag("type", "lanelet"));
+                relation.AppendChild(doc.AddTag("subtype", "road"));
+                switch (lanelet.turnDirection)
+                {
+                    case Lanelet.TurnDirection.Straight:
+                        relation.AppendChild(doc.AddTag("turn_direction", "straight"));
+                        break;
+                    case Lanelet.TurnDirection.Left:
+                        relation.AppendChild(doc.AddTag("turn_direction", "left"));
+                        break;
+                    case Lanelet.TurnDirection.Right:
+                        relation.AppendChild(doc.AddTag("turn_direction", "right"));
+                        break;
+                    default:
+                        break;
+                }
+                relation.AppendChild(doc.AddMember("way", lanelet.left.name, "left"));
+                relation.AppendChild(doc.AddMember("way", lanelet.right.name, "right"));
+                foreach (var item in members)
+                {
+                    if (item is Relation)
+                    {
+                        if (item.GetComponent<RegulatoryElement>())
+                        {
+                            relation.AppendChild(doc.AddMember("relation", item.name, "regulatory_element"));
+                        }
+                    }
+                }
             }
             else
             {
                 var regulatory_element = GetComponent<RegulatoryElement>();
                 if (regulatory_element)
                 {
-                    XmlElement type = xmlDocument.CreateElement("tag");
-                    type.SetAttribute("k", "type");
-                    type.SetAttribute("v", "regulatory_element");
-                    relation.AppendChild(type);
-                    XmlElement subtype = xmlDocument.CreateElement("tag");
-                    subtype.SetAttribute("k", "subtype");
-                    subtype.SetAttribute("v", regulatory_element.subType.ToString());
-                    relation.AppendChild(subtype);
+                    relation.AppendChild(doc.AddTag("type", "regulatory_element"));
+                    relation.AppendChild(doc.AddTag("subtype", regulatory_element.subType.ToString()));
+                    relation.AppendChild(doc.AddMember("way", regulatory_element.refers.name, "refers"));
+                    relation.AppendChild(doc.AddMember("way", regulatory_element.ref_line.name, "ref_line"));
                 }
             }
             return relation;
+        }
+        private void Start()
+        {
+            foreach (var member in members)
+            {
+                member.Ref.TryAdd(this);
+            }
         }
     }
 }

@@ -23,7 +23,6 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 
-
 namespace Packages.MapToolbox
 {
     [ExecuteInEditMode]
@@ -31,8 +30,9 @@ namespace Packages.MapToolbox
     {
         [SerializeField] List<Node> nodes = new List<Node>();
         public List<Node> Nodes => nodes;
-        public UnityAction<int, Vector3> OnNodeMoved { get; set; }
-        public UnityAction<int, Vector3> OnAddNode { get; set; }
+        public UnityAction<Node> OnNodeMoved { get; set; }
+        public UnityAction<Node> OnAddNode { get; set; }
+        public UnityAction<Node> OnRemoveNode { get; set; }
         Lanelet2Map Lanelet2Map => GetComponentInParent<Lanelet2Map>();
         protected void Start()
         {
@@ -41,11 +41,18 @@ namespace Packages.MapToolbox
             {
                 item.Ref.RemoveNull();
                 item.Ref.TryAdd(this);
-                item.OnNodeMoved -= OnNodeMovedAction;
-                item.OnNodeMoved += OnNodeMovedAction;
+                UnRegistNode(item);
+                RegistNode(item);
             }
         }
-        private void OnNodeMovedAction(Node node) => OnNodeMoved?.Invoke(nodes.IndexOf(node), node.Position);
+        private void OnDestroy()
+        {
+            nodes.RemoveNull();
+            foreach (var item in nodes)
+            {
+                item.Ref.TryRemove(this);
+            }
+        }
         internal void Load(XmlNode xmlNode)
         {
             name = xmlNode.Attributes["id"].Value;
@@ -64,79 +71,97 @@ namespace Packages.MapToolbox
                             case "line_thin":
                                 gameObject.AddComponent<LineThin>();
                                 break;
+                            case "stop_line":
+                                gameObject.AddComponent<StopLine>();
+                                break;
+                            case "traffic_sign":
+                                gameObject.AddComponent<TrafficSign>();
+                                break;
+                            case "traffic_light":
+                                gameObject.AddComponent<TrafficLight>();
+                                break;
                             default:
+                                Debug.LogWarning($"Unsupported Way type {tag.Attributes["v"].Value} on {name}");
                                 break;
                         }
                         break;
+                    case "subtype":
+                        switch (tag.Attributes["v"].Value)
+                        {
+                            case "solid":
+                                var lineThin = gameObject.GetComponent<LineThin>();
+                                if (lineThin)
+                                {
+                                    lineThin.subType = LineThin.SubType.solid;
+                                }
+                                break;
+                            case "dashed":
+                                lineThin = gameObject.GetComponent<LineThin>();
+                                if (lineThin)
+                                {
+                                    lineThin.subType = LineThin.SubType.dashed;
+                                }
+                                break;
+                            case "stop_sign":
+                                break;
+                            default:
+                                Debug.LogWarning($"Unsupported Way subtype {tag.Attributes["v"].Value} on {name}");
+                                break;
+                        }
+                        break;
+                    case "height":
+                        var traffic_light = gameObject.GetComponent<TrafficLight>();
+                        if (traffic_light)
+                        {
+                            traffic_light.height = float.Parse(tag.Attributes["v"].Value);
+                        }
+                        break;
                     default:
+                        Debug.LogWarning($"Unsupported Way tag {tag.Attributes["k"].Value} on {name}");
                         break;
                 }
             }
         }
-        internal XmlElement Save(XmlDocument xmlDocument)
+        internal XmlElement Save(XmlDocument doc)
         {
-            XmlElement way = xmlDocument.CreateElement("way");
+            XmlElement way = doc.CreateElement("way");
             way.SetAttribute("id", name);
             nodes.RemoveNull();
             foreach (var item in nodes)
             {
-                XmlElement nd = xmlDocument.CreateElement("nd");
+                XmlElement nd = doc.CreateElement("nd");
                 nd.SetAttribute("ref", item.name);
                 way.AppendChild(nd);
             }
             var line_thin = GetComponent<LineThin>();
             if (line_thin)
             {
-                XmlElement type = xmlDocument.CreateElement("tag");
-                type.SetAttribute("k", "type");
-                type.SetAttribute("v", "line_thin");
-                way.AppendChild(type);
-                XmlElement subType = xmlDocument.CreateElement("tag");
-                subType.SetAttribute("k", "subtype");
-                subType.SetAttribute("v", line_thin.subType.ToString());
-                way.AppendChild(subType);
+                way.AppendChild(doc.AddTag("type", "line_thin"));
+                way.AppendChild(doc.AddTag("subtype", line_thin.subType.ToString()));
             }
             else
             {
                 var stop_line = GetComponent<StopLine>();
                 if (stop_line)
                 {
-                    XmlElement type = xmlDocument.CreateElement("tag");
-                    type.SetAttribute("k", "type");
-                    type.SetAttribute("v", "stop_line");
-                    way.AppendChild(type);
-                    XmlElement subType = xmlDocument.CreateElement("tag");
-                    subType.SetAttribute("k", "subtype");
-                    subType.SetAttribute("v", "solid");
-                    way.AppendChild(subType);
+                    way.AppendChild(doc.AddTag("type", "stop_line"));
+                    way.AppendChild(doc.AddTag("subtype", "solid"));
                 }
                 else
                 {
                     var traffic_sign = GetComponent<TrafficSign>();
                     if (traffic_sign)
                     {
-                        XmlElement type = xmlDocument.CreateElement("tag");
-                        type.SetAttribute("k", "type");
-                        type.SetAttribute("v", "traffic_sign");
-                        way.AppendChild(type);
-                        XmlElement subType = xmlDocument.CreateElement("tag");
-                        subType.SetAttribute("k", "subtype");
-                        subType.SetAttribute("v", "stop_sign");
-                        way.AppendChild(subType);
+                        way.AppendChild(doc.AddTag("type", "traffic_sign"));
+                        way.AppendChild(doc.AddTag("subtype", "stop_sign"));
                     }
                     else
                     {
                         var traffic_light = GetComponent<TrafficLight>();
                         if (traffic_light)
                         {
-                            XmlElement type = xmlDocument.CreateElement("tag");
-                            type.SetAttribute("k", "type");
-                            type.SetAttribute("v", "traffic_light");
-                            way.AppendChild(type);
-                            XmlElement subType = xmlDocument.CreateElement("tag");
-                            subType.SetAttribute("k", "height");
-                            subType.SetAttribute("v", traffic_light.height.ToString());
-                            way.AppendChild(subType);
+                            way.AppendChild(doc.AddTag("type", "traffic_light"));
+                            way.AppendChild(doc.AddTag("height", traffic_light.height.ToString()));
                         }
                     }
                 }
@@ -159,17 +184,9 @@ namespace Packages.MapToolbox
                 }
             }
         }
-        private void OnNodeDestroyed(Node node)
+        internal void InsertNode(Node node, int index = int.MaxValue)
         {
-            node.OnDestroyed -= OnNodeDestroyed;
-            node.OnNodeMoved -= OnNodeMovedAction;
-            nodes.Remove(node);
-        }
-        internal void InsertNode(Vector3 position, int index = int.MaxValue)
-        {
-            var node = Node.AddNew(Lanelet2Map, position);
-            node.OnNodeMoved += OnNodeMovedAction;
-            node.OnDestroyed += OnNodeDestroyed;
+            RegistNode(node);
             node.Ref.Add(this);
             Undo.RegisterCreatedObjectUndo(node, "add node");
             if (index < 0)
@@ -181,7 +198,12 @@ namespace Packages.MapToolbox
                 index = nodes.Count;
             }
             nodes.Insert(index, node);
-            OnAddNode?.Invoke(index, position);
+            OnAddNode?.Invoke(node);
+        }
+        internal void InsertNode(Vector3 position, int index = int.MaxValue)
+        {
+            var node = Node.AddNew(Lanelet2Map, position);
+            InsertNode(node, index);
         }
         internal void RemoveNode(int index)
         {
@@ -198,17 +220,51 @@ namespace Packages.MapToolbox
                 index = nodes.Count - 1;
             }
             var tmp = nodes[index];
+            UnRegistNode(tmp);
+            OnRemoveNode?.Invoke(tmp);
             nodes.RemoveAt(index);
             Undo.DestroyObjectImmediate(tmp.gameObject);
+        }
+        private void RegistNode(Node node)
+        {
+            node.OnMoved += OnNodeMovedAction;
+            node.OnMerged += OnNodeMerged;
+            node.OnDestroyed += OnNodeDestroyed;
+        }
+        private void UnRegistNode(Node node)
+        {
+            node.OnMoved -= OnNodeMovedAction;
+            node.OnMerged -= OnNodeMerged;
+            node.OnDestroyed -= OnNodeDestroyed;
+        }
+        private void OnNodeMovedAction(Node node) => OnNodeMoved?.Invoke(node);
+        private void OnNodeMerged(Node oldNode, Node newNode)
+        {
+            UnRegistNode(oldNode);
+            RegistNode(newNode);
+            var index = nodes.IndexOf(oldNode);
+            nodes.Remove(oldNode);
+            nodes.Insert(index, newNode);
+        }
+        private void OnNodeDestroyed(Node node)
+        {
+            UnRegistNode(node);
+            OnRemoveNode?.Invoke(node);
+            nodes.Remove(node);
         }
     }
     [CustomEditor(typeof(Way))]
     [CanEditMultipleObjects]
     class WayEditor : Editor
     {
+        const int maxMultiEditorCount = 10;
         List<Way> Targets = new List<Way>();
         private void OnEnable()
         {
+            if (targets.Length > maxMultiEditorCount)
+            {
+                return;
+            }
             if (targets.Length > 0)
             {
                 foreach (Way item in targets)

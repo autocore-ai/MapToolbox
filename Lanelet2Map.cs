@@ -111,14 +111,6 @@ namespace Packages.MapToolbox
                     (target as Lanelet2Map).Save(saveFile);
                 }
             }
-            if (GUILayout.Button("Clear Filter"))
-            {
-                SceneModeUtility.SearchForType(null);
-            }
-            if (GUILayout.Button("Filter Lanelet"))
-            {
-                SceneModeUtility.SearchForType(typeof(Lanelet));
-            }
             if (GUILayout.Button("Add Lanelet"))
             {
                 (target as Lanelet2Map).AddLanelet();
@@ -130,6 +122,26 @@ namespace Packages.MapToolbox
             if (GUILayout.Button("Add TrafficSign"))
             {
                 (target as Lanelet2Map).AddTrafficSign();
+            }
+            if (GUILayout.Button("Clear Filter"))
+            {
+                SceneModeUtility.SearchForType(null);
+            }
+            if (GUILayout.Button("Filter Lanelet"))
+            {
+                SceneModeUtility.SearchForType(typeof(Lanelet));
+            }
+            if (GUILayout.Button("Filter StopLine"))
+            {
+                SceneModeUtility.SearchForType(typeof(StopLine));
+            }
+            if (GUILayout.Button("Filter TrafficLight"))
+            {
+                SceneModeUtility.SearchForType(typeof(TrafficLight));
+            }
+            if (GUILayout.Button("Filter TrafficSign"))
+            {
+                SceneModeUtility.SearchForType(typeof(TrafficSign));
             }
         }
     }
