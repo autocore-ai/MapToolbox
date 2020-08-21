@@ -51,7 +51,25 @@ namespace Packages.MapToolbox
                         }
                         break;
                     case "subtype":
-                        break;
+                        var relation_element = gameObject.GetComponent<RegulatoryElement>();
+                        if (relation_element)
+                        {
+                            switch (tag.Attributes["v"].Value)
+                            {
+                                case "traffic_light":
+                                    relation_element.subType = RegulatoryElement.SubType.traffic_light;
+                                    break;
+                                case "traffic_sign":
+                                    relation_element.subType = RegulatoryElement.SubType.traffic_sign;
+                                    break;
+                                case "road":
+                                    relation_element.subType = RegulatoryElement.SubType.road;
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                            break;
                     case "turn_direction":
                         var lanelet = gameObject.GetComponent<Lanelet>();
                         if (lanelet)
