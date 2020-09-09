@@ -44,8 +44,8 @@ namespace Packages.MapToolbox
             left.Way.OnNodeMoved += OnNodeMoved;
             right.Way.OnNodeMoved -= OnNodeMoved;
             right.Way.OnNodeMoved += OnNodeMoved;
-            left.Way.Ref.Add(Relation);
-            right.Way.Ref.Add(Relation);
+            left.Way.Ref.TryAdd(Relation);
+            right.Way.Ref.TryAdd(Relation);
             Relation.Members.TryAdd(left.Way);
             Relation.Members.TryAdd(right.Way);
             UpdateRenderer();
