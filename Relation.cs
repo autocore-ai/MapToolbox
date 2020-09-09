@@ -108,10 +108,10 @@ namespace Packages.MapToolbox
                         switch (member.Attributes["role"].Value)
                         {
                             case "left":
-                                GetComponent<Lanelet>().left = way.GetComponent<LineThin>();
+                                GetComponent<Lanelet>().left = way.GetOrAddComponent<LineThin>();
                                 break;
                             case "right":
-                                GetComponent<Lanelet>().right = way.GetComponent<LineThin>();
+                                GetComponent<Lanelet>().right = way.GetOrAddComponent<LineThin>();
                                 break;
                             case "ref_line":
                                 GetComponent<RegulatoryElement>().ref_line = way;

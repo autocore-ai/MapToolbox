@@ -73,6 +73,9 @@ namespace Packages.MapToolbox
             target.transform.position = component.transform.position;
             return target;
         }
+        public static void SetLocalX(this Transform transform, double x) => transform.SetLocalX((float)x);
+        public static void SetLocalY(this Transform transform, double y) => transform.SetLocalY((float)y);
+        public static void SetLocalZ(this Transform transform, double z) => transform.SetLocalZ((float)z);
         public static void SetLocalX(this Transform transform, float x) => transform.localPosition = new Vector3(x, transform.localPosition.y, transform.localPosition.z);
         public static void SetLocalY(this Transform transform, float y) => transform.localPosition = new Vector3(transform.localPosition.x, y, transform.localPosition.z);
         public static void SetLocalZ(this Transform transform, float z) => transform.localPosition = new Vector3(transform.localPosition.x, transform.localPosition.y, z);
@@ -103,6 +106,15 @@ namespace Packages.MapToolbox
             member.SetAttribute("ref", @ref);
             member.SetAttribute("role", role);
             return member;
+        }
+        public static T GetOrAddComponent<T>(this Component component) where T : Component
+        {
+            var com = component.GetComponent<T>();
+            if (com == null)
+            {
+                com = component.gameObject.AddComponent<T>();
+            }
+            return com;
         }
     }
 }

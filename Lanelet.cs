@@ -44,6 +44,10 @@ namespace Packages.MapToolbox
             left.Way.OnNodeMoved += OnNodeMoved;
             right.Way.OnNodeMoved -= OnNodeMoved;
             right.Way.OnNodeMoved += OnNodeMoved;
+            left.Way.Ref.Add(Relation);
+            right.Way.Ref.Add(Relation);
+            Relation.Members.TryAdd(left.Way);
+            Relation.Members.TryAdd(right.Way);
             UpdateRenderer();
         }
         private void OnNodeMoved(Node node) => UpdateRenderer();
@@ -127,6 +131,10 @@ namespace Packages.MapToolbox
         internal void OnEditorDisable()
         {
             SceneView.duringSceneGui -= DuringSceneGui;
+            if (destroyed)
+            {
+                return;
+            }
             if (gameObject != null)
             {
                 SceneVisibilityManager.instance.EnablePicking(gameObject, true);
@@ -143,6 +151,7 @@ namespace Packages.MapToolbox
                 }
             }
         }
+        private void OnDestroy() => destroyed = true;
         private void DuringSceneGui(SceneView obj)
         {
             if (EditorUpdate.MouseInSceneView)
@@ -161,14 +170,16 @@ namespace Packages.MapToolbox
                 }
             }
         }
-        enum ReversedMode
+        public enum ReversedMode
         {
             None,
             Left,
             Right,
             All
         }
-        ReversedMode CurrentReversedMode { get; set; } = ReversedMode.None;
+        public ReversedMode CurrentReversedMode = ReversedMode.None;
+        private bool destroyed;
+
         internal void UpdateRenderer()
         {
             MeshFilter.sharedMesh?.Clear();
@@ -176,40 +187,19 @@ namespace Packages.MapToolbox
             {
                 List<Vector3> leftPoints = left.Way.Nodes.Select(_ => _.Position).ToList();
                 List<Vector3> rightPoints = right.Way.Nodes.Select(_ => _.Position).ToList();
-                Mesh mesh = LinkLeftRightPointsMesh(leftPoints, rightPoints);
-                mesh.RecalculateNormals();
-                SwitchOrders(leftPoints,rightPoints);
+                MeshFilter.sharedMesh = LinkLeftRightPointsMesh(leftPoints, rightPoints);
                 for (int i = 0; i < 4; i++)
                 {
-                    if (NeedReUpdateRenderer(mesh))
+                    if (NeedReUpdateRenderer(ref leftPoints, ref rightPoints))
                     {
-                        SwitchOrders(leftPoints, rightPoints);
-                        mesh = LinkLeftRightPointsMesh(leftPoints, rightPoints);
-                        mesh.RecalculateNormals();
+                        MeshFilter.sharedMesh.Clear();
+                        MeshFilter.sharedMesh = LinkLeftRightPointsMesh(leftPoints, rightPoints);
                     }
                     else
                     {
                         break;
                     }
                 }
-                MeshFilter.sharedMesh = mesh;
-            }
-        }
-
-        private void SwitchOrders(List<Vector3> left, List<Vector3> right)
-        {
-            if (CurrentReversedMode == ReversedMode.All)
-            {
-                left.Reverse();
-                right.Reverse();
-            }
-            else if (CurrentReversedMode == ReversedMode.Left)
-            {
-                left.Reverse();
-            }
-            else if (CurrentReversedMode == ReversedMode.Right)
-            {
-                right.Reverse();
             }
         }
 
@@ -283,11 +273,11 @@ namespace Packages.MapToolbox
             ret.SetIndices(indices, MeshTopology.Triangles, 0);
             return ret;
         }
-        private bool NeedReUpdateRenderer(Mesh mesh)
+        private bool NeedReUpdateRenderer(ref List<Vector3> leftPoints, ref List<Vector3> rightPoints)
         {
             List<Vector3> normals = new List<Vector3>();
-            mesh.RecalculateNormals();
-            mesh.GetNormals(normals);
+            MeshFilter.sharedMesh.RecalculateNormals();
+            MeshFilter.sharedMesh.GetNormals(normals);
             if (normals.Count > 1)
             {
                 for (int i = 0; i < normals.Count; i++)
@@ -298,12 +288,21 @@ namespace Packages.MapToolbox
                         {
                             case ReversedMode.None:
                                 CurrentReversedMode = ReversedMode.Left;
+                                leftPoints.Reverse();
                                 return true;
                             case ReversedMode.Left:
                                 CurrentReversedMode = ReversedMode.Right;
+                                leftPoints.Reverse();
+                                rightPoints.Reverse();
                                 return true;
                             case ReversedMode.Right:
                                 CurrentReversedMode = ReversedMode.All;
+                                leftPoints.Reverse();
+                                return true;
+                            case ReversedMode.All:
+                                CurrentReversedMode = ReversedMode.None;
+                                leftPoints.Reverse();
+                                rightPoints.Reverse();
                                 return true;
                             default:
                                 return false;
@@ -376,6 +375,10 @@ namespace Packages.MapToolbox
                 {
                     Target.DuplicateRight();
                 }
+            }
+            if (GUILayout.Button("UpdateRenderer"))
+            {
+                Target.UpdateRenderer();
             }
         }
     }

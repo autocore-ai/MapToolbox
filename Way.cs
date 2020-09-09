@@ -33,6 +33,7 @@ namespace Packages.MapToolbox
         public UnityAction<Node> OnNodeMoved { get; set; }
         public UnityAction<Node> OnAddNode { get; set; }
         public UnityAction<Node> OnRemoveNode { get; set; }
+        public List<Tag> extermTags = new List<Tag>();
         Lanelet2Map Lanelet2Map => GetComponentInParent<Lanelet2Map>();
         protected void Start()
         {
@@ -80,7 +81,20 @@ namespace Packages.MapToolbox
                             case "traffic_light":
                                 gameObject.AddComponent<TrafficLight>();
                                 break;
+                            case "light_bulbs":
+                                gameObject.AddComponent<LightBulbs>();
+                                break;
+                            case "parking_space":
+                                gameObject.AddComponent<ParkingSpace>();
+                                break;
+                            case "parking_lot":
+                                gameObject.AddComponent<ParkingLot>();
+                                break;
+                            case "":
+                                extermTags.Add(new Tag(tag));
+                                break;
                             default:
+                                extermTags.Add(new Tag(tag));
                                 Debug.LogWarning($"Unsupported Way type {tag.Attributes["v"].Value} on {name}");
                                 break;
                         }
@@ -104,7 +118,11 @@ namespace Packages.MapToolbox
                                 break;
                             case "stop_sign":
                                 break;
+                            case "":
+                                extermTags.Add(new Tag(tag));
+                                break;
                             default:
+                                extermTags.Add(new Tag(tag));
                                 Debug.LogWarning($"Unsupported Way subtype {tag.Attributes["v"].Value} on {name}");
                                 break;
                         }
@@ -115,6 +133,19 @@ namespace Packages.MapToolbox
                         {
                             traffic_light.height = float.Parse(tag.Attributes["v"].Value);
                         }
+                        break;
+                    case "width":
+                        var parking_space = gameObject.GetComponent<ParkingSpace>();
+                        if (parking_space)
+                        {
+                            parking_space.Width = float.Parse(tag.Attributes["v"].Value);
+                        }
+                        break;
+                    case "area":
+                        extermTags.Add(new Tag(tag));
+                        break;
+                    case "traffic_light_id":
+                        extermTags.Add(new Tag(tag));
                         break;
                     default:
                         Debug.LogWarning($"Unsupported Way tag {tag.Attributes["k"].Value} on {name}");
@@ -165,6 +196,10 @@ namespace Packages.MapToolbox
                         }
                     }
                 }
+            }
+            foreach (var item in extermTags)
+            {
+                way.AppendChild(doc.AddTag(item.k, item.v));
             }
             return way;
         }
