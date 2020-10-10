@@ -103,9 +103,18 @@ namespace AutoCore.MapToolbox.Autoware
         public static void WriteCsv(string path)
         {
             ReIndex();
+            UpdateLinkLane();
             Utils.CleanOrCreateNew(path, file, header);
             Utils.AppendData(path, file, List.Select(_ => _.ToString()));
             Utils.RemoveEmpty(path, file);
+        }
+
+        private static void UpdateLinkLane()
+        {
+            if (ADASMapLane.List.Count > 0)
+            {
+                List.ForEach(_ => _.LinkLane = ADASMapLane.NearestLane(_.Vector.Point.Position));
+            }
         }
     }
 }

@@ -18,6 +18,7 @@
 
 
 using System.Linq;
+using UnityEngine;
 
 namespace AutoCore.MapToolbox.Autoware
 {
@@ -119,6 +120,16 @@ namespace AutoCore.MapToolbox.Autoware
                 return blane3;
             }
         }
+
+        internal static ADASMapLane NearestLane(Vector3 position)
+        {
+            if (List.Count > 0)
+            {
+                return List.OrderBy(_ => Vector3.Distance(position, _.BNode.Point.Position)).First();
+            }
+            return null;
+        }
+
         ADASMapLane blane4;
         public ADASMapLane BLane4
         {
