@@ -285,7 +285,8 @@ namespace AutoCore.MapToolbox.Autoware
                         LimitVel = int.Parse(item[18]),
                         RefVel = int.Parse(item[19]),
                         RoadSecID = int.Parse(item[20]),
-                        LaneChgFG = (ChgFG)int.Parse(item[21])
+                        LaneChgFG = (ChgFG)int.Parse(item[21]),
+                        DTLane = ADASMapDTLane.Dic[int.Parse(item[1])]
                     };
                 }
                 foreach (var item in List)

@@ -27,6 +27,20 @@ namespace AutoCore.MapToolbox.Autoware
     {
         public GameObject GameObject => gameObject;
         public MonoBehaviour MonoBehaviour => this;
+        [Range(0, 3)]
+        public float lw = 0;
+        [Range(0, 3)]
+        public float rw = 0;
+        public float LW
+        {
+            set => lw = value;
+            get => lw;
+        }
+        public float RW
+        {
+            set => rw = value;
+            get => rw;
+        }
         [HideInInspector] public List<ADASGoSlicesLane> bLane = new List<ADASGoSlicesLane>();
         [HideInInspector] public List<ADASGoSlicesLane> fLane = new List<ADASGoSlicesLane>();
         public CollectionLane CollectionLane { get; set; }

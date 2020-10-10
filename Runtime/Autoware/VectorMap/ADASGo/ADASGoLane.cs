@@ -17,7 +17,6 @@
 #endregion
 
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -63,6 +62,34 @@ namespace AutoCore.MapToolbox.Autoware
         public int refVel = 20;
         public static float tempDist;
         public const float minDistance = 0.2f;
+        [Range(0, 3)]
+        public float lw = 0;
+        [Range(0, 3)]
+        public float rw = 0;
+        public float LW
+        {
+            set => lw = value;
+            get
+            {
+                if (lw == 0)
+                {
+                    lw = Slices.LW;
+                }
+                return lw;
+            }
+        }
+        public float RW
+        {
+            set => rw = value;
+            get
+            {
+                if (rw == 0)
+                {
+                    rw = Slices.RW;
+                }
+                return rw;
+            }
+        }
         public ADASMapLane lane;
         public ADASMapLane Lane
         {
@@ -94,7 +121,9 @@ namespace AutoCore.MapToolbox.Autoware
                         DTLane = new ADASMapDTLane
                         {
                             Point = point,
-                            Dist = tempDist
+                            Dist = tempDist,
+                            LW = LW,
+                            RW = RW
                         },
                         BNode = new ADASMapNode
                         {
