@@ -17,21 +17,15 @@
 #endregion
 
 
-using UnityEditor;
-using UnityEngine;
+using System.Runtime.InteropServices;
 
 namespace Packages.MapToolbox
 {
-    class ParkingLot : Area<ParkingLot>
+    class GeographicWarpper
     {
-        private bool destroyed;
-        protected override void Start()
-        {
-            base.Start();
-            LineRenderer.startWidth = LineRenderer.endWidth = 0.2f;
-            LineRenderer.startColor = LineRenderer.endColor = Color.red;
-        }
+        [DllImport("GeographicWarpper")]
+        public extern static void UTMUPS_Forward(double lat, double lon, out int zone, out bool northp, out double x, out double y);
+        [DllImport("GeographicWarpper")]
+        public extern static void UTMUPS_Reverse(int zone, bool northp, double x, double y, out double lat, out double lon);
     }
-    [CustomEditor(typeof(ParkingLot))]
-    class ParkingLotEditor : AreaEditor<ParkingLot> { }
 }

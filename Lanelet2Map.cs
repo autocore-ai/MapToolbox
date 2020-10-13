@@ -34,6 +34,11 @@ namespace Packages.MapToolbox
             var doc = new XmlDocument();
             doc.Load(filename);
             var osm = doc.SelectSingleNode("osm");
+            var node_origin = osm.SelectSingleNode("origin");
+            if (node_origin != null)
+            {
+                gameObject.GetOrAddComponent<Origin>().Load(node_origin);
+            }
             foreach (XmlNode item in osm.SelectNodes("node"))
             {
                 this.AddChildGameObject<Node>().Load(item);
@@ -67,6 +72,7 @@ namespace Packages.MapToolbox
             XmlElement osm = doc.CreateElement("osm");
             osm.SetAttribute("generator", info.displayName);
             osm.SetAttribute("version", info.version);
+            osm.AppendChild(GetComponent<Origin>().Save(doc));
             doc.AppendChild(osm);
             foreach (var item in GetComponentsInChildren<Node>())
             {
@@ -93,6 +99,8 @@ namespace Packages.MapToolbox
         internal void AddLanelet() => Selection.activeObject = Lanelet.AddNew(this);
         internal void AddTrafficLight() => Selection.activeObject = TrafficLight.AddNew(this);
         internal void AddTrafficSign() => Selection.activeObject = TrafficSign.AddNew(this);
+        internal void AddParkingSpace() => Selection.activeObject = ParkingLot.AddNew(this);
+        internal void AddParkingLot() => Selection.activeObject = ParkingSpot.AddNew(this);
     }
 
     [CustomEditor(typeof(Lanelet2Map))]
@@ -103,7 +111,7 @@ namespace Packages.MapToolbox
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
-            if (GUILayout.Button("Save"))
+            if (GUILayout.Button("Save map"))
             {
                 string saveFile = EditorUtility.SaveFilePanel(string.Empty, Application.dataPath, "lanelet2_map", "osm");
                 if (!string.IsNullOrEmpty(saveFile))
@@ -122,6 +130,14 @@ namespace Packages.MapToolbox
             if (GUILayout.Button("Add TrafficSign"))
             {
                 (target as Lanelet2Map).AddTrafficSign();
+            }
+            if (GUILayout.Button("Add ParkingSpace"))
+            {
+                (target as Lanelet2Map).AddParkingSpace();
+            }
+            if (GUILayout.Button("Add ParkingLot"))
+            {
+                (target as Lanelet2Map).AddParkingLot();
             }
             if (GUILayout.Button("Clear Filter"))
             {

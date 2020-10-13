@@ -40,6 +40,8 @@ namespace Packages.MapToolbox
             Way.OnNodeMoved += OnPointsMoved;
             Way.OnAddNode -= OnAddNode;
             Way.OnAddNode += OnAddNode;
+            Way.OnRemoveNode -= OnRemoveNode;
+            Way.OnRemoveNode += OnRemoveNode;
             LineRenderer.positionCount = Way.Nodes.Count;
             LineRenderer.SetPositions(Way.Nodes.Select(_ => _.transform.localPosition).ToArray());
             LineRenderer.useWorldSpace = false;
@@ -50,6 +52,7 @@ namespace Packages.MapToolbox
         {
             Way.OnNodeMoved -= OnPointsMoved;
             Way.OnAddNode -= OnAddNode;
+            Way.OnRemoveNode -= OnRemoveNode;
         }
         internal void UpdateRenderer()
         {
@@ -58,28 +61,66 @@ namespace Packages.MapToolbox
             LineRenderer.SetPositions(Way.Nodes.Select(_ => _.Position).ToArray());
         }
         private void OnPointsMoved(Node node) => LineRenderer.SetPosition(Way.Nodes.IndexOf(node), node.Position);
+        internal void AddPointFirst(Vector3 point) => Way.InsertNode(point, 0);
         internal void AddPointFinal(Vector3 point) => Way.InsertNode(point);
+        internal void SetOrAddPointFinal(Vector3 point)
+        {
+            if (Way.Nodes.Count > 0)
+            {
+                Way.Nodes.Last().Position = point;
+            }
+            else
+            {
+                AddPointFinal(point);
+            }
+        }
         private void OnAddNode(Node node)
         {
             var index = Way.Nodes.IndexOf(node);
             LineRenderer.positionCount++;
             for (int i = LineRenderer.positionCount - 1; i > index; i--)
             {
-                LineRenderer.SetPosition(i - 1, LineRenderer.GetPosition(i));
+                LineRenderer.SetPosition(i, LineRenderer.GetPosition(i - 1));
             }
             LineRenderer.SetPosition(index, node.Position);
         }
-        internal void RemovePointFinal()
+        private void OnRemoveNode(Node node)
+        {
+            var index = Way.Nodes.IndexOf(node);
+            if (LineRenderer.positionCount > index)
+            {
+                for (int i = index; i < LineRenderer.positionCount - 1; i++)
+                {
+                    LineRenderer.SetPosition(index, LineRenderer.GetPosition(index + 1));
+                }
+                LineRenderer.positionCount--;
+            }
+        }
+        internal void RemoveNode()
+        {
+            if (NearLastPoint(Utils.MousePointInSceneView))
+            {
+                RemoveNodeLast();
+            }
+            else
+            {
+                RemoveNodeFirst();
+            }
+        }
+        internal bool NearLastPoint(Vector3 center) => Way.Nodes.Count <= 1
+|| Vector3.Distance(center, Way.Nodes.First().Position) >= Vector3.Distance(center, Way.Nodes.Last().Position);
+        internal void RemoveNodeFirst()
         {
             if (Way.Nodes.Count > 0)
             {
-                var lastNode = Way.Nodes.Last();
-                Way.Nodes.Remove(lastNode);
-                lastNode.RemoveRef(Way);
-                if (LineRenderer.positionCount > 0)
-                {
-                    LineRenderer.positionCount--;
-                }
+                Way.RemoveNode(Way.Nodes.First());
+            }
+        }
+        internal void RemoveNodeLast()
+        {
+            if (Way.Nodes.Count > 0)
+            {
+                Way.RemoveNode(Way.Nodes.Last());
             }
         }
         internal bool OnlyUsedBy(Member member) => Way.Ref.Count == 1 && Way.Ref.Contains(member);

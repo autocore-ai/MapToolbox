@@ -27,6 +27,7 @@ namespace Packages.MapToolbox
         [SerializeField] List<Member> members = new List<Member>();
         internal List<Member> Members => members;
         internal List<string> RelationId { get; set; } = new List<string>();
+        public List<Tag> extermTags = new List<Tag>();
         Lanelet2Map Lanelet2Map => GetComponentInParent<Lanelet2Map>();
         internal void Load(XmlNode xmlNode)
         {
@@ -40,12 +41,13 @@ namespace Packages.MapToolbox
                         switch (tag.Attributes["v"].Value)
                         {
                             case "lanelet":
-                                gameObject.AddComponent<Lanelet>();
+                                gameObject.GetOrAddComponent<Lanelet>();
                                 break;
                             case "regulatory_element":
-                                gameObject.AddComponent<RegulatoryElement>();
+                                gameObject.GetOrAddComponent<RegulatoryElement>();
                                 break;
                             default:
+                                extermTags.Add(new Tag(tag));
                                 Debug.LogWarning($"Unsupported Relation type {tag.Attributes["v"].Value} on {name}");
                                 break;
                         }
@@ -66,31 +68,46 @@ namespace Packages.MapToolbox
                                     relation_element.subType = RegulatoryElement.SubType.road;
                                     break;
                                 default:
-                                    break;
-                            }
-                        }
-                            break;
-                    case "turn_direction":
-                        var lanelet = gameObject.GetComponent<Lanelet>();
-                        if (lanelet)
-                        {
-                            switch (tag.Attributes["v"].Value)
-                            {
-                                case "straight":
-                                    lanelet.turnDirection = Lanelet.TurnDirection.Straight;
-                                    break;
-                                case "left":
-                                    lanelet.turnDirection = Lanelet.TurnDirection.Left;
-                                    break;
-                                case "right":
-                                    lanelet.turnDirection = Lanelet.TurnDirection.Right;
-                                    break;
-                                default:
+                                    extermTags.Add(new Tag(tag));
+                                    Debug.LogWarning($"Unsupported Relation subtype {tag.Attributes["v"].Value} on {name}");
                                     break;
                             }
                         }
                         break;
+                    case "turn_direction":
+                        switch (tag.Attributes["v"].Value)
+                        {
+                            case "straight":
+                                gameObject.GetOrAddComponent<Lanelet>().turnDirection = Lanelet.TurnDirection.Straight;
+                                break;
+                            case "left":
+                                gameObject.GetOrAddComponent<Lanelet>().turnDirection = Lanelet.TurnDirection.Left;
+                                break;
+                            case "right":
+                                gameObject.GetOrAddComponent<Lanelet>().turnDirection = Lanelet.TurnDirection.Right;
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    case "cad_id":
+                    case "direction":
+                    case "drivable":
+                    case "level":
+                    case "level2":
+                    case "location":
+                    case "next":
+                    case "parking_accesses":
+                    case "participant:vehicle":
+                    case "poi_type":
+                    case "prev":
+                    case "ref_road_cad_id":
+                    case "slope":
+                    case "ref_junction":
+                        extermTags.Add(new Tag(tag));
+                        break;
                     default:
+                        extermTags.Add(new Tag(tag));
                         Debug.LogWarning($"Unsupported Relation tag {tag.Attributes["k"].Value} on {name}");
                         break;
                 }
@@ -135,10 +152,24 @@ namespace Packages.MapToolbox
         {
             XmlElement relation = doc.CreateElement("relation");
             relation.SetAttribute("id", name);
+            relation.SetAttribute("visible", "true");
+            relation.SetAttribute("version", "1");
             members.RemoveNull();
             var lanelet = GetComponent<Lanelet>();
             if (lanelet)
             {
+                relation.AppendChild(doc.AddMember("way", lanelet.left.name, "left"));
+                relation.AppendChild(doc.AddMember("way", lanelet.right.name, "right"));
+                foreach (var item in members)
+                {
+                    if (item is Relation)
+                    {
+                        if (item.GetComponent<RegulatoryElement>())
+                        {
+                            relation.AppendChild(doc.AddMember("relation", item.name, "regulatory_element"));
+                        }
+                    }
+                }
                 relation.AppendChild(doc.AddTag("type", "lanelet"));
                 relation.AppendChild(doc.AddTag("subtype", "road"));
                 switch (lanelet.turnDirection)
@@ -155,17 +186,9 @@ namespace Packages.MapToolbox
                     default:
                         break;
                 }
-                relation.AppendChild(doc.AddMember("way", lanelet.left.name, "left"));
-                relation.AppendChild(doc.AddMember("way", lanelet.right.name, "right"));
-                foreach (var item in members)
+                foreach (var item in extermTags)
                 {
-                    if (item is Relation)
-                    {
-                        if (item.GetComponent<RegulatoryElement>())
-                        {
-                            relation.AppendChild(doc.AddMember("relation", item.name, "regulatory_element"));
-                        }
-                    }
+                    relation.AppendChild(doc.AddTag(item));
                 }
             }
             else

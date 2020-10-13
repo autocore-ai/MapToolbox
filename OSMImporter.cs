@@ -25,7 +25,7 @@ using UnityEngine;
 namespace Packages.MapToolbox
 {
     [ScriptedImporter(1, "osm")]
-    class OSMImporter : ScriptedImporter
+    class OsmImporter : ScriptedImporter
     {
         public override void OnImportAsset(AssetImportContext ctx)
         {

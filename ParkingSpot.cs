@@ -17,12 +17,14 @@
 #endregion
 
 
+using UnityEditor;
 using UnityEngine;
 
 namespace Packages.MapToolbox
 {
-    class ParkingSpace : WayTypeBase<ParkingSpace>
+    class ParkingSpot : Area<ParkingSpot>
     {
+        private bool destroyed;
         public float Width
         {
             set => LineRenderer.startWidth = LineRenderer.endWidth = value;
@@ -31,7 +33,10 @@ namespace Packages.MapToolbox
         protected override void Start()
         {
             base.Start();
+            LineRenderer.startWidth = LineRenderer.endWidth = 0.2f;
             LineRenderer.startColor = LineRenderer.endColor = Color.yellow;
         }
     }
+    [CustomEditor(typeof(ParkingSpot))]
+    class ParkingSpotEditor : AreaEditor<ParkingSpot> { }
 }

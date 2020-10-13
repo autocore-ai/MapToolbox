@@ -17,10 +17,8 @@
 #endregion
 
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Xml;
 using UnityEditor;
 using UnityEngine;
@@ -34,7 +32,7 @@ namespace Packages.MapToolbox
         public UnityAction<Node> OnMoved { get; set; }
         public UnityAction<Node> OnDestroyed { get; set; }
         public UnityAction<Node, Node> OnMerged { get; set; }
-        public List<Tag> extermTags = new List<Tag>();
+        public List<Tag> tags = new List<Tag>();
         internal Vector3 Position
         {
             get => transform.position;
@@ -53,35 +51,53 @@ namespace Packages.MapToolbox
         }
         private void Start() => gameObject.SetIcon(IconManager.ShapeIcon.CircleGray);
         protected void OnDestroy() => OnDestroyed?.Invoke(this);
-
-        [DllImport("GeographicWarpper")]
-        extern static void UTMUPS_Forward(double lat, double lon, out int zone, out bool northp, out double x, out double y);
         internal void Load(XmlNode xmlNode)
         {
             name = xmlNode.Attributes["id"].Value;
-            var lat = double.Parse(xmlNode.Attributes["lat"].Value);
-            var lon = double.Parse(xmlNode.Attributes["lon"].Value);
-            UTMUPS_Forward(lat, lon, out int zone, out bool northp, out double x, out double y);
-            x %= 1e5;
-            y %= 1e5;
-            transform.SetLocalX(x);
-            transform.SetLocalZ(y);
-            extermTags.Clear();
+            var lat = xmlNode.Attributes["lat"].ToDouble();
+            var lon = xmlNode.Attributes["lon"].ToDouble();
+            if (lat != 0 && lon != 0)
+            {
+                GeographicWarpper.UTMUPS_Forward(lat, lon, out int zone, out bool northp, out double x, out double y);
+                var origin = GetComponentInParent<Origin>();
+                if (origin)
+                {
+                    transform.SetLocalX(x - origin.x);
+                    transform.SetLocalZ(y - origin.y);
+                }
+                else
+                {
+                    origin = transform.parent.gameObject.AddComponent<Origin>();
+                    origin.latitude = lat;
+                    origin.longtitude = lon;
+                    origin.x = x;
+                    origin.y = y;
+                    origin.zone = zone;
+                    origin.northp = northp;
+                    transform.SetLocalX(0);
+                    transform.SetLocalZ(0);
+                }
+            }
+            else
+            {
+                transform.parent.gameObject.AddComponent<Origin>().localPosition = true;
+            }
+            tags.Clear();
             foreach (XmlNode tag in xmlNode.SelectNodes("tag"))
             {
+                tags.Add(new Tag(tag));
                 switch (tag.Attributes["k"].Value)
                 {
                     case "ele":
-                        transform.SetLocalY(float.Parse(tag.Attributes["v"].Value));
+                        transform.SetLocalY(tag.Attributes["v"].ToFloat());
                         break;
                     case "local_x":
-                        transform.SetLocalX(float.Parse(tag.Attributes["v"].Value));
+                        transform.SetLocalX(tag.Attributes["v"].ToFloat());
                         break;
                     case "local_y":
-                        transform.SetLocalZ(float.Parse(tag.Attributes["v"].Value));
+                        transform.SetLocalZ(tag.Attributes["v"].ToFloat());
                         break;
                     default:
-                        extermTags.Add(new Tag(tag));
                         break;
                 }
             }
@@ -90,12 +106,24 @@ namespace Packages.MapToolbox
         {
             XmlElement node = doc.CreateElement("node");
             node.SetAttribute("id", name);
-            node.SetAttribute("lat", "0");
-            node.SetAttribute("lon", "0");
-            node.AppendChild(doc.AddTag("ele", transform.localPosition.y.ToString()));
-            node.AppendChild(doc.AddTag("local_x", transform.localPosition.x.ToString()));
-            node.AppendChild(doc.AddTag("local_y", transform.localPosition.z.ToString()));
-            foreach (var item in extermTags)
+            node.SetAttribute("visible", "true");
+            node.SetAttribute("version", "1");
+            var origin = GetComponentInParent<Origin>();
+            if (origin.localPosition)
+            {
+                node.SetAttribute("lat", "0");
+                node.SetAttribute("lon", "0");
+                tags.SetOrAddTag("local_x", transform.localPosition.x.ToString());
+                tags.SetOrAddTag("local_y", transform.localPosition.z.ToString());
+            }
+            else
+            {
+                GeographicWarpper.UTMUPS_Reverse(origin.zone, origin.northp, origin.x + transform.localPosition.x, origin.y + transform.localPosition.z, out double lat, out double lon);
+                node.SetAttribute("lat", lat.ToString());
+                node.SetAttribute("lon", lon.ToString());
+            }
+            tags.SetOrAddTag("ele", transform.localPosition.y.ToString());
+            foreach (var item in tags)
             {
                 node.AppendChild(doc.AddTag(item.k, item.v));
             }

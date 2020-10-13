@@ -99,6 +99,21 @@ namespace Packages.MapToolbox
             tag.SetAttribute("v", value);
             return tag;
         }
+        public static XmlElement AddTag(this XmlDocument doc, Tag tag) => doc.AddTag(tag.k, tag.v);
+        public static Tag SetOrAddTag(this ICollection<Tag> tags, string key, string value)
+        {
+            var target = tags.Where(_ => _.k.Equals(key));
+            if (target.Count() > 0)
+            {
+                return target.First();
+            }
+            else
+            {
+                var tag = new Tag(key, value);
+                tags.Add(tag);
+                return tag;
+            }
+        }
         public static XmlElement AddMember(this XmlDocument doc, string type, string @ref, string role)
         {
             XmlElement member = doc.CreateElement("member");
@@ -107,14 +122,11 @@ namespace Packages.MapToolbox
             member.SetAttribute("role", role);
             return member;
         }
-        public static T GetOrAddComponent<T>(this Component component) where T : Component
-        {
-            var com = component.GetComponent<T>();
-            if (com == null)
-            {
-                com = component.gameObject.AddComponent<T>();
-            }
-            return com;
-        }
+        public static T GetOrAddComponent<T>(this GameObject gameObject) where T : Component => gameObject.GetComponent<T>() ?? gameObject.AddComponent<T>();
+        public static T GetOrAddComponent<T>(this Component component) where T : Component => component.gameObject.GetOrAddComponent<T>();
+        public static float ToFloat(this XmlAttribute attribute) => float.Parse(attribute.Value);
+        public static float ToFloat(this XmlNode node) => float.Parse(node.InnerText);
+        public static double ToDouble(this XmlAttribute attribute) => double.Parse(attribute.Value);
+        public static double ToDouble(this XmlNode node) => double.Parse(node.InnerText);
     }
 }

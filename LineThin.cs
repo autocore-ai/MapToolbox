@@ -17,12 +17,14 @@
 #endregion
 
 
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Packages.MapToolbox
 {
     class LineThin : WayTypeBase<LineThin>
     {
+        public List<Node> Nodes => Way.Nodes;
         public enum SubType
         {
             solid,

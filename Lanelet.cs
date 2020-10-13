@@ -54,7 +54,6 @@ namespace Packages.MapToolbox
         public MeshFilter MeshFilter => GetComponent<MeshFilter>() ?? gameObject.AddComponent<MeshFilter>();
         public MeshRenderer MeshRenderer => GetComponent<MeshRenderer>() ?? gameObject.AddComponent<MeshRenderer>();
         public Relation Relation => GetComponent<Relation>() ?? gameObject.AddComponent<Relation>();
-        public List<Vector3> CenterPoints { get; set; } = new List<Vector3>();
         public LineThin left;
         public LineThin right;
         public float width = 3.75f;
@@ -79,38 +78,50 @@ namespace Packages.MapToolbox
         }
         private void RemovePoints()
         {
-            if (CenterPoints.Count > 0)
-            {
-                CenterPoints.RemoveAt(CenterPoints.Count - 1);
-            }
-            left.RemovePointFinal();
-            right.RemovePointFinal();
+            left.RemoveNode();
+            right.RemoveNode();
         }
         private void AddPoints()
         {
-            var centerPoint = Utils.MousePointInSceneView;
-            centerPoint.y = 0;
-            if (CenterPoints.Count > 1)
+            if(left.Nodes.Count > 1 || right.Nodes.Count > 1)
             {
-                var lastPoint = CenterPoints.Last();
-                var leftPoint = centerPoint + Vector3.Cross(centerPoint - lastPoint, Vector3.up).normalized * width / 2;
-                var rightPoint = centerPoint + Vector3.Cross(centerPoint - lastPoint, Vector3.down).normalized * width / 2;
-                left.AddPointFinal(leftPoint);
-                right.AddPointFinal(rightPoint);
+                var center = Utils.MousePointInSceneView;
+                if (left.NearLastPoint(center) || right.NearLastPoint(center))
+                {
+                    center.y = 0;
+                    var lastPoint = (left.Nodes.Last().Position + right.Nodes.Last().Position) / 2;
+                    var leftPoint = center + Vector3.Cross(center - lastPoint, Vector3.up).normalized * width / 2;
+                    var rightPoint = center + Vector3.Cross(center - lastPoint, Vector3.down).normalized * width / 2;
+                    left.AddPointFinal(leftPoint);
+                    right.AddPointFinal(rightPoint);
+                }
+                else
+                {
+                    center.y = 0;
+                    var lastPoint = (left.Nodes.First().Position + right.Nodes.First().Position) / 2;
+                    var leftPoint = center - Vector3.Cross(center - lastPoint, Vector3.up).normalized * width / 2;
+                    var rightPoint = center - Vector3.Cross(center - lastPoint, Vector3.down).normalized * width / 2;
+                    left.AddPointFirst(leftPoint);
+                    right.AddPointFirst(rightPoint);
+                }
             }
-            else if (CenterPoints.Count == 1)
+            else if (left.Nodes.Count == 1 || right.Nodes.Count == 1)
             {
-                var lastPoint = CenterPoints.Last();
-                var leftPoint0 = lastPoint + Vector3.Cross(centerPoint - lastPoint, Vector3.up).normalized * width / 2;
-                var rightPoint0 = lastPoint + Vector3.Cross(centerPoint - lastPoint, Vector3.down).normalized * width / 2;
-                var leftPoint1 = centerPoint + Vector3.Cross(centerPoint - lastPoint, Vector3.up).normalized * width / 2;
-                var rightPoint1 = centerPoint + Vector3.Cross(centerPoint - lastPoint, Vector3.down).normalized * width / 2;
-                left.AddPointFinal(leftPoint0);
-                right.AddPointFinal(rightPoint0);
-                left.AddPointFinal(leftPoint1);
-                right.AddPointFinal(rightPoint1);
+                var center = Utils.MousePointInSceneView;
+                center.y = 0;
+                var lastPoint = (left.Nodes.Last().Position + right.Nodes.Last().Position) / 2;
+                left.SetOrAddPointFinal(lastPoint + Vector3.Cross(center - lastPoint, Vector3.up).normalized * width / 2);
+                right.SetOrAddPointFinal(lastPoint + Vector3.Cross(center - lastPoint, Vector3.down).normalized * width / 2);
+                left.AddPointFinal(center + Vector3.Cross(center - lastPoint, Vector3.up).normalized * width / 2);
+                right.AddPointFinal(center + Vector3.Cross(center - lastPoint, Vector3.down).normalized * width / 2);
             }
-            CenterPoints.Add(centerPoint);
+            else if (left.Nodes.Count == 0 && right.Nodes.Count == 0)
+            {
+                var center = Utils.MousePointInSceneView;
+                center.y = 0;
+                left.AddPointFirst(center);
+                right.AddPointFirst(center);
+            }
         }
         internal void OnEditorEnable()
         {
@@ -179,7 +190,6 @@ namespace Packages.MapToolbox
         }
         public ReversedMode CurrentReversedMode = ReversedMode.None;
         private bool destroyed;
-
         internal void UpdateRenderer()
         {
             MeshFilter.sharedMesh?.Clear();

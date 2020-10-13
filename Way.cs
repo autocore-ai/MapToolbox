@@ -70,28 +70,27 @@ namespace Packages.MapToolbox
                         switch (tag.Attributes["v"].Value)
                         {
                             case "line_thin":
-                                gameObject.AddComponent<LineThin>();
+                                gameObject.GetOrAddComponent<LineThin>();
                                 break;
                             case "stop_line":
-                                gameObject.AddComponent<StopLine>();
+                                gameObject.GetOrAddComponent<StopLine>();
                                 break;
                             case "traffic_sign":
-                                gameObject.AddComponent<TrafficSign>();
+                                gameObject.GetOrAddComponent<TrafficSign>();
                                 break;
                             case "traffic_light":
-                                gameObject.AddComponent<TrafficLight>();
+                                gameObject.GetOrAddComponent<TrafficLight>();
                                 break;
                             case "light_bulbs":
-                                gameObject.AddComponent<LightBulbs>();
+                                gameObject.GetOrAddComponent<LightBulbs>();
                                 break;
                             case "parking_space":
-                                gameObject.AddComponent<ParkingSpace>();
+                                gameObject.GetOrAddComponent<ParkingSpot>();
                                 break;
                             case "parking_lot":
-                                gameObject.AddComponent<ParkingLot>();
+                                gameObject.GetOrAddComponent<ParkingLot>();
                                 break;
-                            case "":
-                                extermTags.Add(new Tag(tag));
+                            case "area":
                                 break;
                             default:
                                 extermTags.Add(new Tag(tag));
@@ -103,23 +102,43 @@ namespace Packages.MapToolbox
                         switch (tag.Attributes["v"].Value)
                         {
                             case "solid":
-                                var lineThin = gameObject.GetComponent<LineThin>();
-                                if (lineThin)
-                                {
-                                    lineThin.subType = LineThin.SubType.solid;
-                                }
+                                gameObject.GetOrAddComponent<LineThin>().subType = LineThin.SubType.solid;
                                 break;
                             case "dashed":
-                                lineThin = gameObject.GetComponent<LineThin>();
-                                if (lineThin)
-                                {
-                                    lineThin.subType = LineThin.SubType.dashed;
-                                }
+                                gameObject.GetOrAddComponent<LineThin>().subType = LineThin.SubType.dashed;
                                 break;
                             case "stop_sign":
                                 break;
-                            case "":
-                                extermTags.Add(new Tag(tag));
+                            case "parking_access":
+                                gameObject.GetOrAddComponent<Area>().Type = Area.SubType.parking_access;
+                                break;
+                            case "parking_accesses":
+                                gameObject.GetOrAddComponent<Area>().Type = Area.SubType.parking_accesses;
+                                break;
+                            case "parking_spot":
+                                gameObject.GetOrAddComponent<ParkingSpot>();
+                                //gameObject.GetOrAddComponent<Area>().Type = Area.SubType.parking_spot;
+                                break;
+                            case "Floors":
+                                gameObject.GetOrAddComponent<Area>().Type = Area.SubType.Floors;
+                                break;
+                            case "Kerbs":
+                                gameObject.GetOrAddComponent<Area>().Type = Area.SubType.Kerbs;
+                                break;
+                            case "Columns":
+                                gameObject.GetOrAddComponent<Area>().Type = Area.SubType.Columns;
+                                break;
+                            case "Walls":
+                                gameObject.GetOrAddComponent<Area>().Type = Area.SubType.Walls;
+                                break;
+                            case "Windows":
+                                gameObject.GetOrAddComponent<Area>().Type = Area.SubType.Windows;
+                                break;
+                            case "Doors":
+                                gameObject.GetOrAddComponent<Area>().Type = Area.SubType.Doors;
+                                break;
+                            case "junction":
+                                gameObject.GetOrAddComponent<Area>().Type = Area.SubType.junction;
                                 break;
                             default:
                                 extermTags.Add(new Tag(tag));
@@ -128,26 +147,26 @@ namespace Packages.MapToolbox
                         }
                         break;
                     case "height":
-                        var traffic_light = gameObject.GetComponent<TrafficLight>();
-                        if (traffic_light)
-                        {
-                            traffic_light.height = float.Parse(tag.Attributes["v"].Value);
-                        }
+                        gameObject.GetOrAddComponent<TrafficLight>().height = tag.Attributes["v"].ToFloat();
                         break;
                     case "width":
-                        var parking_space = gameObject.GetComponent<ParkingSpace>();
-                        if (parking_space)
-                        {
-                            parking_space.Width = float.Parse(tag.Attributes["v"].Value);
-                        }
+                        gameObject.GetOrAddComponent<ParkingSpot>().Width = tag.Attributes["v"].ToFloat();
                         break;
                     case "area":
-                        extermTags.Add(new Tag(tag));
-                        break;
                     case "traffic_light_id":
+                    case "cad_id":
+                    case "drivable":
+                    case "geom_height":
+                    case "level":
+                    case "parking_accesses":
+                    case "parking_spots":
+                    case "center":
+                    case "ref_lanelet":
+                    case "poi_type":
                         extermTags.Add(new Tag(tag));
                         break;
                     default:
+                        extermTags.Add(new Tag(tag));
                         Debug.LogWarning($"Unsupported Way tag {tag.Attributes["k"].Value} on {name}");
                         break;
                 }
@@ -157,6 +176,8 @@ namespace Packages.MapToolbox
         {
             XmlElement way = doc.CreateElement("way");
             way.SetAttribute("id", name);
+            way.SetAttribute("visible", "true");
+            way.SetAttribute("version", "1");
             nodes.RemoveNull();
             foreach (var item in nodes)
             {
@@ -240,6 +261,17 @@ namespace Packages.MapToolbox
             var node = Node.AddNew(Lanelet2Map, position);
             InsertNode(node, index);
         }
+        internal void RemoveNode(Node node)
+        {
+            if (nodes.Contains(node))
+            {
+                node.Ref.TryRemove(this);
+                UnRegistNode(node);
+                OnRemoveNode?.Invoke(node);
+                nodes.Remove(node);
+                Undo.DestroyObjectImmediate(node.gameObject);
+            }
+        }
         internal void RemoveNode(int index)
         {
             if (nodes.Count == 0)
@@ -254,11 +286,7 @@ namespace Packages.MapToolbox
             {
                 index = nodes.Count - 1;
             }
-            var tmp = nodes[index];
-            UnRegistNode(tmp);
-            OnRemoveNode?.Invoke(tmp);
-            nodes.RemoveAt(index);
-            Undo.DestroyObjectImmediate(tmp.gameObject);
+            RemoveNode(nodes[index]);
         }
         private void RegistNode(Node node)
         {
