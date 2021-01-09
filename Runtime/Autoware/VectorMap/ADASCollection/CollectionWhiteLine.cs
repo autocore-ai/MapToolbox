@@ -48,7 +48,7 @@ namespace AutoCore.MapToolbox.Autoware
         }
         public ADASGoWhiteLine AddWhiteLine(Vector3 position)
         {
-            position.y = 0;
+            position.y = Utils.GetHeight(position);
             var slices = new GameObject(typeof(ADASGoSlicesWhiteLine).Name);
             slices.transform.SetParent(transform);
             slices.AddComponent<ADASGoSlicesWhiteLine>().SetupRenderer();

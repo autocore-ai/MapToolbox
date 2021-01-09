@@ -21,6 +21,7 @@ using AutoCore.MapToolbox.PCL;
 using System.IO;
 using UnityEditor;
 using UnityEditor.Experimental.AssetImporters;
+using UnityEditorInternal;
 using UnityEngine;
 
 namespace AutoCore.MapToolbox.Editor.PCL
@@ -52,8 +53,16 @@ namespace AutoCore.MapToolbox.Editor.PCL
             go.GetComponent<MeshFilter>().mesh = mesh;
             mesh.name = "points";
             go.GetComponent<MeshRenderer>().sharedMaterial = Resources.Load<Material>("MapToolbox/PointCloud");
+            var heightMesh = mesh.GetHeightMesh();
+            heightMesh.name = "height";
+            var goHeightMesh = new GameObject(heightMesh.name);
+            goHeightMesh.transform.parent = go.transform;
+            goHeightMesh.AddComponent<MeshFilter>().sharedMesh = heightMesh;
+            InternalEditorUtility.SetIsInspectorExpanded(goHeightMesh.GetComponent<MeshFilter>(), false);
+            InternalEditorUtility.SetIsInspectorExpanded(goHeightMesh.AddComponent<MeshCollider>(), false);
             ctx.AddObjectToAsset(mesh.name, mesh);
             ctx.AddObjectToAsset(go.name, go);
+            ctx.AddObjectToAsset(heightMesh.name, heightMesh);
             ctx.SetMainObject(go);
         }
     }

@@ -59,7 +59,7 @@ namespace AutoCore.MapToolbox.Autoware
         }
         public ADASGoSignal AddSignal(Vector3 position)
         {
-            position.y = 6;
+            position.y = Utils.GetHeight(position) + 6;
             var signal = new GameObject().AddComponent<ADASGoSignal>();
             signal.transform.SetParent(transform);
             signal.CollectionPole = AutowareADASMap.CollectionPole;

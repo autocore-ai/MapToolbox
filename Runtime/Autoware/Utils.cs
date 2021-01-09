@@ -20,6 +20,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UnityEngine;
 
 namespace AutoCore.MapToolbox.Autoware
 {
@@ -68,7 +69,21 @@ namespace AutoCore.MapToolbox.Autoware
             }
             return null;
         }
+
         public static IEnumerable<string[]> Split(this IEnumerable<string> lineStr, params char[] separator) => lineStr?.Select(_ => _.Split(separator));
 
+        internal static float GetHeight(Vector3 position)
+        {
+            const float maxHeight = 500;
+            var from = new Vector3(position.x, maxHeight, position.z);
+            if (Physics.Raycast(new Ray(from, Vector3.down), out RaycastHit hit, maxHeight * 2))
+            {
+                return hit.point.y;
+            }
+            else
+            {
+                return 0;
+            }
+        }
     }
 }
