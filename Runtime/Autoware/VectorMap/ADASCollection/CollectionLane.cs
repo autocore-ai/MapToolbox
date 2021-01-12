@@ -63,7 +63,7 @@ namespace AutoCore.MapToolbox.Autoware
         }
         public ADASGoLane AddLane(Vector3 position)
         {
-            position.y = Utils.GetHeight(position);
+            position.y = MapToolbox.Utils.GetHeight(position);
             var slices = new GameObject(typeof(ADASGoSlicesLane).Name);
             slices.transform.SetParent(transform);
             slices.AddComponent<ADASGoSlicesLane>().SetupRenderer();

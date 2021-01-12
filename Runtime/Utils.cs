@@ -78,5 +78,18 @@ namespace AutoCore.MapToolbox
                 return component.gameObject.activeSelf;
             }
         }
+        internal static float GetHeight(Vector3 position)
+        {
+            const float maxHeight = 500;
+            var from = new Vector3(position.x, maxHeight, position.z);
+            if (Physics.Raycast(new Ray(from, Vector3.down), out RaycastHit hit, maxHeight * 2))
+            {
+                return hit.point.y;
+            }
+            else
+            {
+                return 0;
+            }
+        }
     }
 }

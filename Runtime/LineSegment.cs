@@ -120,11 +120,13 @@ namespace AutoCore.MapToolbox
             if (last == null)
             {
                 target.localFrom = 2 * localFrom - localTo;
+                target.localFrom.y = Utils.GetHeight(target.localFrom);
             }
             else
             {
                 var temp = last.GetComponent<T>();
                 target.localFrom = (temp.localFrom + temp.localTo) / 2;
+                target.localFrom.y = Utils.GetHeight(target.localFrom);
                 temp.localTo = target.localFrom;
             }
             target.localTo = localFrom;
@@ -138,11 +140,13 @@ namespace AutoCore.MapToolbox
             if (next == null)
             {
                 target.localTo = 2 * localTo - localFrom;
+                target.localTo.y = Utils.GetHeight(target.localTo);
             }
             else
             {
                 var temp = next.GetComponent<T>();
                 target.localTo = (temp.localFrom + temp.localTo) / 2;
+                target.localTo.y = Utils.GetHeight(target.localTo);
                 temp.localFrom = target.localTo;
             }
             target.localFrom = localTo;
@@ -190,6 +194,7 @@ namespace AutoCore.MapToolbox
                 if (Vector3.Distance(current.From, point) > distance)
                 {
                     Vector3 dest = current.From + (point - current.From).normalized * distance;
+                    dest.y = Utils.GetHeight(dest);
                     current.To = dest;
                     var temp = current.AddAfter().GetComponent<LineSegment<T>>();
                     temp.DataCopy(current);

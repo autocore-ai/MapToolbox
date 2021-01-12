@@ -48,7 +48,7 @@ namespace AutoCore.MapToolbox.Autoware
         }
         public ADASGoRoadEdge AddRoadEdge(Vector3 position)
         {
-            position.y = Utils.GetHeight(position);
+            position.y = MapToolbox.Utils.GetHeight(position);
             var slices = new GameObject(typeof(ADASGoSlicesRoadEdge).Name);
             slices.transform.SetParent(transform);
             slices.AddComponent<ADASGoSlicesRoadEdge>().SetupRenderer();
