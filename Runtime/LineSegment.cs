@@ -120,13 +120,13 @@ namespace AutoCore.MapToolbox
             if (last == null)
             {
                 target.localFrom = 2 * localFrom - localTo;
-                target.localFrom.y = Utils.GetHeight(target.localFrom);
+                target.localFrom = target.localFrom.PCDHeight();
             }
             else
             {
                 var temp = last.GetComponent<T>();
                 target.localFrom = (temp.localFrom + temp.localTo) / 2;
-                target.localFrom.y = Utils.GetHeight(target.localFrom);
+                target.localFrom = target.localFrom.PCDHeight();
                 temp.localTo = target.localFrom;
             }
             target.localTo = localFrom;
@@ -134,19 +134,26 @@ namespace AutoCore.MapToolbox
             Parent.UpdateRenderer();
             return target.gameObject;
         }
+
+        internal void HeightFromPCD()
+        {
+            From = From.PCDHeight();
+            To = To.PCDHeight();
+        }
+
         internal override GameObject AddAfter()
         {
             var target = base.AddAfter().GetComponent<T>();
             if (next == null)
             {
                 target.localTo = 2 * localTo - localFrom;
-                target.localTo.y = Utils.GetHeight(target.localTo);
+                target.localTo = target.localTo.PCDHeight();
             }
             else
             {
                 var temp = next.GetComponent<T>();
                 target.localTo = (temp.localFrom + temp.localTo) / 2;
-                target.localTo.y = Utils.GetHeight(target.localTo);
+                target.localTo = target.localTo.PCDHeight();
                 temp.localFrom = target.localTo;
             }
             target.localFrom = localTo;
@@ -189,20 +196,21 @@ namespace AutoCore.MapToolbox
         internal void ApplySubdivisionPoints(Vector3[] points, float distance = 1)
         {
             LineSegment<T> current = this;
+            current.From = current.From.PCDHeight();
             foreach (var point in points)
             {
-                if (Vector3.Distance(current.From, point) > distance)
+                var ground_point = point.PCDHeight();
+                if (Vector3.Distance(current.From, ground_point) > distance)
                 {
-                    Vector3 dest = current.From + (point - current.From).normalized * distance;
-                    dest.y = Utils.GetHeight(dest);
-                    current.To = dest;
+                    Vector3 dest = current.From + (ground_point - current.From).normalized * distance;
+                    current.To = dest.PCDHeight();
                     var temp = current.AddAfter().GetComponent<LineSegment<T>>();
                     temp.DataCopy(current);
+                    temp.From = current.To;
                     current = temp;
-                    current.From = dest;
                 }
             }
-            current.To = points.Last();
+            current.To = points.Last().PCDHeight();
         }
 
         protected virtual void DataCopy(LineSegment<T> target) => name = target.name;

@@ -53,7 +53,7 @@ namespace AutoCore.MapToolbox.Autoware
         }
         public void AddCrossWalk(Vector3 position)
         {
-            position.y = MapToolbox.Utils.GetHeight(position);
+            position = position.PCDHeight();
             var crosswalk = new GameObject(typeof(ADASGoCrossWalk).Name).AddComponent<ADASGoCrossWalk>();
             crosswalk.transform.SetParent(transform);
             crosswalk.transform.position = position;

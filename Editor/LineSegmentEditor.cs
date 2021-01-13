@@ -56,14 +56,21 @@ namespace AutoCore.MapToolbox.Editor
                 }
                 else
                 {
-                    GUI.color = Color.yellow;
-                    if (GUILayout.Button(GetMethodName<T[]>(Target.Merge)))
+                    GUI.color = Color.white;
+                    if (GUILayout.Button("PCD Height"))
                     {
+                        foreach (var item in Targets)
+                        {
+                            item.HeightFromPCD();
+                        }
+                    }
+                    else if (GUILayout.Button(GetMethodName<T[]>(Target.Merge)))
+                    {
+                        GUI.color = Color.yellow;
                         Target.Merge(Targets);
                         GUI.color = Color.white;
                         return;
                     }
-                    GUI.color = Color.white;
                 }
             }
             InspectorGUIRemoveButton();
@@ -95,7 +102,11 @@ namespace AutoCore.MapToolbox.Editor
             }
             else
             {
-                if (GUILayout.Button("Subdivision"))
+                if (GUILayout.Button("PCD Height"))
+                {
+                    Target.HeightFromPCD();
+                }
+                else if (GUILayout.Button("Subdivision"))
                 {
                     Subdivision = true;
                     StartTangent = Target.From + (Target.To - Target.From) / 4;

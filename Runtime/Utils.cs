@@ -78,7 +78,7 @@ namespace AutoCore.MapToolbox
                 return component.gameObject.activeSelf;
             }
         }
-        internal static float GetHeight(Vector3 position)
+        public static float GetHeight(Vector3 position)
         {
             const float maxHeight = 500;
             var from = new Vector3(position.x, maxHeight, position.z);
@@ -90,6 +90,11 @@ namespace AutoCore.MapToolbox
             {
                 return 0;
             }
+        }
+        public static Vector3 PCDHeight(this Vector3 origin)
+        {
+            origin.y = GetHeight(origin);
+            return origin;
         }
     }
 }

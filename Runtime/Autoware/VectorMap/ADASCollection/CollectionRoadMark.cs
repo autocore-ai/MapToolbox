@@ -48,7 +48,7 @@ namespace AutoCore.MapToolbox.Autoware
         }
         public void AddRoadMark(Vector3 position)
         {
-            position.y = MapToolbox.Utils.GetHeight(position);
+            position = position.PCDHeight();
             var roadMark = new GameObject(typeof(ADASGoRoadMark).Name).AddComponent<ADASGoRoadMark>();
             roadMark.transform.SetParent(transform);
             roadMark.transform.position = position;

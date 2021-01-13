@@ -63,7 +63,7 @@ namespace AutoCore.MapToolbox.Autoware
         }
         public ADASGoStopLine AddStopLine(Vector3 position)
         {
-            position.y = MapToolbox.Utils.GetHeight(position);
+            position = position.PCDHeight();
             var slices = new GameObject(typeof(ADASGoSlicesStopLine).Name);
             slices.transform.SetParent(transform);
             slices.AddComponent<ADASGoSlicesStopLine>().SetupRenderer();
