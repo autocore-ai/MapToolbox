@@ -27,6 +27,13 @@ namespace Packages.MapToolbox
 {
     static class Utils
     {
+        private static string mgrs_code = "49QGF";
+        public static string MGRS_code
+        {
+            get { return mgrs_code;}
+            set { mgrs_code = value;} 
+        } 
+        
         public static void TryAdd<T>(this ICollection<T> collection, T target)
         {
             if (!collection.Contains(target))

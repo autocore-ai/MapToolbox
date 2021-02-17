@@ -46,7 +46,7 @@ namespace Packages.MapToolbox
         }
         internal static Node AddNew(Lanelet2Map map, Vector3 position)
         {
-            var ret = map.AddChildGameObject<Node>(map.transform.childCount.ToString());
+            var ret = map.AddChildGameObject<Node>((map.transform.childCount+1).ToString());
             ret.Position = position;
             ret.gameObject.RecordUndoCreateGo();
             return ret;
@@ -56,6 +56,22 @@ namespace Packages.MapToolbox
 
         [DllImport("GeographicWarpper")]
         extern static void UTMUPS_Forward(double lat, double lon, out int zone, out bool northp, out double x, out double y);
+        
+        [DllImport("GeographicWarpper")]
+        extern static void UTMUPS_Reverse(int zone, bool northp, double x, double y, out double lat, out double lon);
+        
+        [DllImport("GeographicWarpper")]
+        extern static void MGRS_Reverse(string mgrs, out int zone, out bool northp, out double x, out double y, out int prec, bool centerp);
+
+        private void Mgrs2Gps(string mgrs_code, double x, double y, out double lat, out double lon){
+            int zone;
+            bool northp;
+            int prec;
+            string mgrs= String.Format("{0}{1:00000}{2:00000}", Utils.MGRS_code, transform.localPosition.x, transform.localPosition.z);
+            MGRS_Reverse(mgrs, out zone, out northp, out x, out y, out prec, true);
+            UTMUPS_Reverse(zone, northp, x, y, out lat, out lon);
+        }
+
         internal void Load(XmlNode xmlNode)
         {
             name = xmlNode.Attributes["id"].Value;
@@ -90,8 +106,13 @@ namespace Packages.MapToolbox
         {
             XmlElement node = doc.CreateElement("node");
             node.SetAttribute("id", name);
-            node.SetAttribute("lat", "0");
-            node.SetAttribute("lon", "0");
+
+            double lat, lon;
+            Mgrs2Gps(Utils.MGRS_code, transform.localPosition.x, transform.localPosition.z, out lat, out lon);
+            node.SetAttribute("lat", lat.ToString());
+            node.SetAttribute("lon", lon.ToString());
+            node.SetAttribute("version", "1");
+            
             node.AppendChild(doc.AddTag("ele", transform.localPosition.y.ToString()));
             node.AppendChild(doc.AddTag("local_x", transform.localPosition.x.ToString()));
             node.AppendChild(doc.AddTag("local_y", transform.localPosition.z.ToString()));

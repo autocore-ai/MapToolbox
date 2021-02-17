@@ -157,6 +157,7 @@ namespace Packages.MapToolbox
         {
             XmlElement way = doc.CreateElement("way");
             way.SetAttribute("id", name);
+            way.SetAttribute("version", "1");
             nodes.RemoveNull();
             foreach (var item in nodes)
             {

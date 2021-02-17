@@ -135,6 +135,7 @@ namespace Packages.MapToolbox
         {
             XmlElement relation = doc.CreateElement("relation");
             relation.SetAttribute("id", name);
+            relation.SetAttribute("version", "1");
             members.RemoveNull();
             var lanelet = GetComponent<Lanelet>();
             if (lanelet)

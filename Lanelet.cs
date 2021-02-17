@@ -69,7 +69,7 @@ namespace Packages.MapToolbox
         internal Lanelet AddNew() => AddNew(Lanelet2Map);
         internal static Lanelet AddNew(Lanelet2Map map)
         {
-            var ret = map.AddChildGameObject<Lanelet>(map.transform.childCount.ToString());
+            var ret = map.AddChildGameObject<Lanelet>((map.transform.childCount+1).ToString());
             ret.gameObject.RecordUndoCreateGo();
             ret.left = LineThin.AddNew(map);
             ret.right = LineThin.AddNew(map);
@@ -318,7 +318,7 @@ namespace Packages.MapToolbox
         {
             if (CanDuplicateLeft)
             {
-                var lanelet = Lanelet2Map.AddChildGameObject<Lanelet>(Lanelet2Map.transform.childCount.ToString());
+                var lanelet = Lanelet2Map.AddChildGameObject<Lanelet>((Lanelet2Map.transform.childCount+1).ToString());
                 lanelet.gameObject.RecordUndoCreateGo();
                 lanelet.left = LineThin.AddNew(Lanelet2Map);
                 lanelet.right = left;
@@ -332,7 +332,7 @@ namespace Packages.MapToolbox
         {
             if (CanDuplicateRight)
             {
-                var lanelet = Lanelet2Map.AddChildGameObject<Lanelet>(Lanelet2Map.transform.childCount.ToString());
+                var lanelet = Lanelet2Map.AddChildGameObject<Lanelet>((Lanelet2Map.transform.childCount+1).ToString());
                 lanelet.gameObject.RecordUndoCreateGo();
                 lanelet.right = LineThin.AddNew(Lanelet2Map);
                 lanelet.left = right;

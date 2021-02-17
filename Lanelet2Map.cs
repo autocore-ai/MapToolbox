@@ -59,14 +59,15 @@ namespace Packages.MapToolbox
         {
             for (int i = 0; i < transform.childCount; i++)
             {
-                transform.GetChild(i).name = i.ToString();
+                transform.GetChild(i).name = (i+1).ToString();
             }
             var info = UnityEditor.PackageManager.PackageInfo.FindForAssembly(Assembly.GetExecutingAssembly());
             XmlDocument doc = new XmlDocument();
             doc.AppendChild(doc.CreateXmlDeclaration("1.0", "UTF-8", null));
             XmlElement osm = doc.CreateElement("osm");
             osm.SetAttribute("generator", info.displayName);
-            osm.SetAttribute("version", info.version);
+            // osm.SetAttribute("version", info.version);
+            osm.SetAttribute("version", "0.6");
             doc.AppendChild(osm);
             foreach (var item in GetComponentsInChildren<Node>())
             {
@@ -103,6 +104,7 @@ namespace Packages.MapToolbox
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
+            Utils.MGRS_code =EditorGUILayout.TextField("MGRS_CODE: ", Utils.MGRS_code);
             if (GUILayout.Button("Save"))
             {
                 string saveFile = EditorUtility.SaveFilePanel(string.Empty, Application.dataPath, "lanelet2_map", "osm");

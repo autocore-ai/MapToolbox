@@ -30,7 +30,7 @@ namespace Packages.MapToolbox
         public LineRenderer LineRenderer => GetComponent<LineRenderer>() ?? gameObject.AddComponent<LineRenderer>();
         internal static T AddNew(Lanelet2Map map)
         {
-            var ret = map.AddChildGameObject<T>(map.transform.childCount.ToString());
+            var ret = map.AddChildGameObject<T>((map.transform.childCount+1).ToString());
             ret.gameObject.RecordUndoCreateGo();
             return ret;
         }

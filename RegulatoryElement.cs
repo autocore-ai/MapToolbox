@@ -37,7 +37,7 @@ namespace Packages.MapToolbox
         public Relation Relation => GetComponent<Relation>() ?? gameObject.AddComponent<Relation>();
         internal static RegulatoryElement AddNew(Lanelet2Map map)
         {
-            var ret = map.AddChildGameObject<RegulatoryElement>(map.transform.childCount.ToString());
+            var ret = map.AddChildGameObject<RegulatoryElement>((map.transform.childCount+1).ToString());
             ret.gameObject.RecordUndoCreateGo();
             return ret;
         }
