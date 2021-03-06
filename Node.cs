@@ -67,9 +67,11 @@ namespace Packages.MapToolbox
             int zone;
             bool northp;
             int prec;
-            string mgrs= String.Format("{0}{1:00000}{2:00000}", Utils.MGRS_code, transform.localPosition.x, transform.localPosition.z);
-            MGRS_Reverse(mgrs, out zone, out northp, out x, out y, out prec, true);
-            UTMUPS_Reverse(zone, northp, x, y, out lat, out lon);
+            double utm_x, utm_y;
+            string mgrs= String.Format("{0}{1:00000.00}{2:00000.00}", Utils.MGRS_code, x, y);
+            mgrs = mgrs.Replace(".", "");
+            MGRS_Reverse(mgrs, out zone, out northp, out utm_x, out utm_y, out prec, true);
+            UTMUPS_Reverse(zone, northp, utm_x, utm_y, out lat, out lon);
         }
 
         internal void Load(XmlNode xmlNode)
