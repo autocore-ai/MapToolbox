@@ -1,7 +1,9 @@
 {
     "name": "AutoCore.MapToolbox.Editor",
+    "rootNamespace": "",
     "references": [
         "AutoCore.MapToolbox",
+        "Unity.Collections",
         "Unity.Mathematics"
     ],
     "includePlatforms": [

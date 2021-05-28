@@ -1,6 +1,6 @@
 ﻿#region License
 /******************************************************************************
-* Copyright 2018-2020 The AutoCore Authors. All Rights Reserved.
+* Copyright 2018-2021 The AutoCore Authors. All Rights Reserved.
 * 
 * Licensed under the GNU Lesser General Public License, Version 3.0 (the "License"); 
 * you may not use this file except in compliance with the License.
@@ -19,9 +19,11 @@
 
 using AutoCore.MapToolbox.PCL;
 using System.IO;
+using Unity.Mathematics;
+using UnityEditor.AssetImporters;
 using UnityEditor;
-using UnityEditor.Experimental.AssetImporters;
 using UnityEngine;
+using System.Collections.Generic;
 
 namespace AutoCore.MapToolbox.Editor.PCL
 {
@@ -34,27 +36,47 @@ namespace AutoCore.MapToolbox.Editor.PCL
             {
                 if (reader.PointXYZRGBAs.IsCreated)
                 {
-                    SaveMesh(ctx, reader.PointXYZRGBAs.CoordinateRosToUnity().ToUnityColor().ToMesh());
+                    SaveMeshes(ctx, reader.PointXYZRGBAs.CoordinateRosToUnity().ToUnityColor().PointsCell(new int2(100)).ToMeshes());
                 }
                 else if (reader.PointXYZIs.IsCreated)
                 {
                     var colored = reader.PointXYZIs.IntensityToColor();
-                    SaveMesh(ctx, colored.CoordinateRosToUnity().ToMesh());
+                    SaveMeshes(ctx, colored.CoordinateRosToUnity().PointsCell(new int2(100)).ToMeshes());
                     colored.Dispose();
                 }
             }
             AssetDatabase.Refresh();
+            Tools.lockedLayers = 1 << 3;
         }
-        private void SaveMesh(AssetImportContext ctx, Mesh mesh)
+        private void SaveMeshes(AssetImportContext ctx, List<(Vector3, Mesh)> meshes)
         {
-            var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            DestroyImmediate(go.GetComponent<BoxCollider>());
-            go.GetComponent<MeshFilter>().mesh = mesh;
-            mesh.name = "points";
-            go.GetComponent<MeshRenderer>().sharedMaterial = Resources.Load<Material>("MapToolbox/PointCloud");
-            ctx.AddObjectToAsset(mesh.name, mesh);
-            ctx.AddObjectToAsset(go.name, go);
-            ctx.SetMainObject(go);
+            var root = new GameObject();
+            root.layer = 3;
+            for(int i = 0; i < meshes.Count; i ++)
+            {
+                var mesh = meshes[i];
+                mesh.Item2.name = "points" + i;
+                var chunk = new GameObject();
+                chunk.layer = 3;
+                chunk.name = i.ToString();
+                chunk.transform.parent = root.transform;
+                chunk.transform.localPosition = mesh.Item1;
+                chunk.AddComponent<MeshFilter>().mesh = mesh.Item2;
+                chunk.AddComponent<MeshRenderer>().sharedMaterial = Resources.Load<Material>("MapToolbox/PointCloud");
+                var terrainData = mesh.Item2.GetTerrainData();
+                var terrain = chunk.AddComponent<Terrain>();
+                terrain.materialTemplate = AssetDatabase.GetBuiltinExtraResource<Material>("Default-Terrain-Standard.mat");
+                terrain.terrainData = terrainData;
+                chunk.AddComponent<TerrainCollider>().terrainData = terrainData;
+                ctx.AddObjectToAsset(chunk.name, chunk);
+                var path = Path.Combine(Path.GetDirectoryName(ctx.assetPath), Path.GetFileNameWithoutExtension(ctx.assetPath));
+                Directory.CreateDirectory(path);
+                AssetDatabase.CreateAsset(terrainData, path + "/" + terrainData.name + ".asset");
+                AssetDatabase.CreateAsset(mesh.Item2, path + "/" + mesh.Item2.name + ".asset");
+            }
+            AssetDatabase.SaveAssets();
+            ctx.AddObjectToAsset(root.name, root);
+            ctx.SetMainObject(root);
         }
     }
 }

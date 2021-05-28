@@ -1,6 +1,6 @@
 ﻿#region License
 /******************************************************************************
-* Copyright 2018-2020 The AutoCore Authors. All Rights Reserved.
+* Copyright 2018-2021 The AutoCore Authors. All Rights Reserved.
 * 
 * Licensed under the GNU Lesser General Public License, Version 3.0 (the "License"); 
 * you may not use this file except in compliance with the License.
@@ -19,17 +19,19 @@
 
 using System.Reflection;
 using System.Xml;
-using UnityEditor;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace Packages.MapToolbox
 {
     [ExecuteInEditMode]
-    class Lanelet2Map : MonoBehaviour
+    public class Lanelet2Map : MonoBehaviour
     {
         private void Awake() => EditorUpdate.Instance.transform.SetAsFirstSibling();
 
-        internal void Load(string filename)
+        public void Load(string filename)
         {
             var doc = new XmlDocument();
             doc.Load(filename);
@@ -57,10 +59,6 @@ namespace Packages.MapToolbox
         }
         public void Save(string filename)
         {
-            for (int i = 0; i < transform.childCount; i++)
-            {
-                transform.GetChild(i).name = i.ToString();
-            }
             var info = UnityEditor.PackageManager.PackageInfo.FindForAssembly(Assembly.GetExecutingAssembly());
             XmlDocument doc = new XmlDocument();
             doc.AppendChild(doc.CreateXmlDeclaration("1.0", "UTF-8", null));
@@ -93,6 +91,8 @@ namespace Packages.MapToolbox
         internal void AddLanelet() => Selection.activeObject = Lanelet.AddNew(this);
         internal void AddTrafficLight() => Selection.activeObject = TrafficLight.AddNew(this);
         internal void AddTrafficSign() => Selection.activeObject = TrafficSign.AddNew(this);
+        internal void AddParkingLot() => Selection.activeObject = ParkingLot.AddNew(this);
+        internal void AddParkingSpace() => Selection.activeObject = ParkingSpace.AddNew(this);
     }
 
     [CustomEditor(typeof(Lanelet2Map))]
@@ -123,6 +123,14 @@ namespace Packages.MapToolbox
             {
                 (target as Lanelet2Map).AddTrafficSign();
             }
+            if (GUILayout.Button("Add ParkingLot"))
+            {
+                (target as Lanelet2Map).AddParkingLot();
+            }
+            if (GUILayout.Button("Add ParkingSpace"))
+            {
+                (target as Lanelet2Map).AddParkingSpace();
+            }
             if (GUILayout.Button("Clear Filter"))
             {
                 SceneModeUtility.SearchForType(null);
@@ -142,6 +150,14 @@ namespace Packages.MapToolbox
             if (GUILayout.Button("Filter TrafficSign"))
             {
                 SceneModeUtility.SearchForType(typeof(TrafficSign));
+            }
+            if (GUILayout.Button("Filter ParkingLot"))
+            {
+                SceneModeUtility.SearchForType(typeof(ParkingLot));
+            }
+            if (GUILayout.Button("Filter ParkingSpace"))
+            {
+                SceneModeUtility.SearchForType(typeof(ParkingSpace));
             }
         }
     }

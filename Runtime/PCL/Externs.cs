@@ -1,6 +1,6 @@
 ﻿#region License
 /******************************************************************************
-* Copyright 2018-2020 The AutoCore Authors. All Rights Reserved.
+* Copyright 2018-2021 The AutoCore Authors. All Rights Reserved.
 * 
 * Licensed under the GNU Lesser General Public License, Version 3.0 (the "License"); 
 * you may not use this file except in compliance with the License.
@@ -17,12 +17,14 @@
 #endregion
 
 
+using System.Collections.Generic;
+using System.Linq;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
-using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine;
 
 namespace AutoCore.MapToolbox.PCL
 {
@@ -79,6 +81,38 @@ namespace AutoCore.MapToolbox.PCL
         {
             new JobPclToUnityColor { points = points }.Schedule(points.Length, 1024).Complete();
             return points;
+        }
+        [BurstCompile]
+        struct JobPointsCell : IJobParallelFor
+        {
+            [ReadOnly] internal int2 cell;
+            [ReadOnly] internal NativeArray<PointXYZRGBA> points;
+            [WriteOnly] internal NativeMultiHashMap<int, PointXYZRGBA>.ParallelWriter hashMap;
+            public void Execute(int index)
+            {
+                hashMap.Add(((int2)math.floor(((float3)points[index].xyz).xz / cell)).GetHashCode(), points[index]);
+            }
+        }
+        public static Dictionary<int3, NativeList<PointXYZRGBA>> PointsCell(this NativeArray<PointXYZRGBA> points, int2 cell)
+        {
+            var hashMap = new NativeMultiHashMap<int, PointXYZRGBA>(points.Length, Allocator.TempJob);
+            new JobPointsCell { cell = cell, points = points, hashMap = hashMap.AsParallelWriter() }.Schedule(points.Length, 128).Complete();
+            var keys = hashMap.GetUniqueKeyArray(Allocator.TempJob);
+            var ret = new Dictionary<int3, NativeList<PointXYZRGBA>>();
+            for (int i = 0; i < keys.Item2; i++)
+            {
+                var list = new NativeList<PointXYZRGBA>(Allocator.TempJob);
+                var enumerator = hashMap.GetValuesForKey(keys.Item1[i]);
+                while (enumerator.MoveNext())
+                {
+                    list.Add(enumerator.Current);
+                }
+                var id = (int2)math.floor((((float3)(list[0].xyz)).xz) / cell) * cell;
+                ret.Add(new int3(id.x, -500, id.y), list);
+            }
+            keys.Item1.Dispose();
+            hashMap.Dispose();
+            return ret;
         }
         [BurstCompile]
         struct JobIntensityToColor : IJobParallelFor
@@ -154,24 +188,28 @@ namespace AutoCore.MapToolbox.PCL
         [BurstCompile]
         struct GetMeshData : IJobParallelFor
         {
+            [ReadOnly] internal int3 offset;
             [ReadOnly] internal NativeArray<PointXYZRGBA> points;
             [WriteOnly] internal NativeArray<Vector3> vertices;
             [WriteOnly] internal NativeArray<Color32> colors32;
             [WriteOnly] internal NativeArray<int> indices;
             public void Execute(int index)
             {
-                vertices[index] = points[index].xyz;
+                vertices[index] = points[index].xyz - (Vector3)(float3)offset;
                 colors32[index] = points[index].bgra;
                 indices[index] = index;
             }
         }
-        public static Mesh ToMesh(this NativeArray<PointXYZRGBA> points)
+        public static List<(Vector3, Mesh)> ToMeshes(this Dictionary<int3, NativeList<PointXYZRGBA>> points) => points.Select(_ => _.Value.ToMesh(_.Key)).ToList();
+        public static (Vector3, Mesh) ToMesh(this NativeList<PointXYZRGBA> list, int3 offset)
         {
+            var points = list.AsArray();
             NativeArray<Vector3> vertices = new NativeArray<Vector3>(points.Length, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
             NativeArray<Color32> colors32 = new NativeArray<Color32>(points.Length, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
             NativeArray<int> indices = new NativeArray<int>(points.Length, Allocator.TempJob, NativeArrayOptions.UninitializedMemory);
             new GetMeshData
             {
+                offset = offset,
                 points = points,
                 vertices = vertices,
                 colors32 = colors32,
@@ -187,7 +225,8 @@ namespace AutoCore.MapToolbox.PCL
             vertices.Dispose();
             colors32.Dispose();
             indices.Dispose();
-            return mesh;
+            list.Dispose();
+            return ((Vector3)(float3)offset, mesh);
         }
     }
 }

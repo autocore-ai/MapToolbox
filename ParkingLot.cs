@@ -1,6 +1,6 @@
 ﻿#region License
 /******************************************************************************
-* Copyright 2018-2020 The AutoCore Authors. All Rights Reserved.
+* Copyright 2018-2021 The AutoCore Authors. All Rights Reserved.
 * 
 * Licensed under the GNU Lesser General Public License, Version 3.0 (the "License"); 
 * you may not use this file except in compliance with the License.
@@ -17,17 +17,48 @@
 #endregion
 
 
+using System.Linq;
 using UnityEngine;
 
 namespace Packages.MapToolbox
 {
-    class ParkingLot : WayTypeBase<ParkingLot>
+    [RequireComponent(typeof(AddOrRemovable))]
+    public class ParkingLot : WayTypeBase<ParkingLot>, IAddOrRemoveTarget
     {
         protected override void Start()
         {
             base.Start();
             LineRenderer.startWidth = LineRenderer.startWidth = 0.2f;
             LineRenderer.startColor = LineRenderer.endColor = Color.yellow;
+        }
+        public void OnAdd()
+        {
+            RemoveLoopNodesRef();
+            AddNextPoint(GetClickedPoint());
+            UseLoopNodesRef();
+            UpdateRenderer();
+        }
+        public void OnRemove()
+        {
+            RemoveLoopNodesRef();
+            RemoveLastNode();
+            UseLoopNodesRef();
+            UpdateRenderer();
+        }
+        public void MouseEnterInspector() { }
+        private void RemoveLoopNodesRef()
+        {
+            if (Way.Nodes.Count > 2 && Way.Nodes.First().Equals(Way.Nodes.Last()))
+            {
+                Way.Nodes.RemoveLast();
+            }
+        }
+        private void UseLoopNodesRef()
+        {
+            if (Way.Nodes.Count > 2 && !Way.Nodes.First().Equals(Way.Nodes.Last()))
+            {
+                Way.Nodes.Add(Way.Nodes.First());
+            }
         }
     }
 }

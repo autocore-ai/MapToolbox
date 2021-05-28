@@ -1,6 +1,6 @@
 ﻿#region License
 /******************************************************************************
-* Copyright 2018-2020 The AutoCore Authors. All Rights Reserved.
+* Copyright 2018-2021 The AutoCore Authors. All Rights Reserved.
 * 
 * Licensed under the GNU Lesser General Public License, Version 3.0 (the "License"); 
 * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ namespace Packages.MapToolbox
 {
     [ExecuteInEditMode]
     [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer), typeof(Relation))]
-    class Lanelet : MonoBehaviour
+    public class Lanelet : MonoBehaviour
     {
         static Material Material { get; set; }
         Lanelet2Map Lanelet2Map => GetComponentInParent<Lanelet2Map>();
@@ -69,7 +69,7 @@ namespace Packages.MapToolbox
         internal Lanelet AddNew() => AddNew(Lanelet2Map);
         internal static Lanelet AddNew(Lanelet2Map map)
         {
-            var ret = map.AddChildGameObject<Lanelet>(map.transform.childCount.ToString());
+            var ret = map.AddChildGameObject<Lanelet>(map.transform.ChildMapId());
             ret.gameObject.RecordUndoCreateGo();
             ret.left = LineThin.AddNew(map);
             ret.right = LineThin.AddNew(map);
@@ -89,14 +89,14 @@ namespace Packages.MapToolbox
         private void AddPoints()
         {
             var centerPoint = Utils.MousePointInSceneView;
-            centerPoint.y = 0;
+            centerPoint.y = Utils.GetHeight(centerPoint);
             if (CenterPoints.Count > 1)
             {
                 var lastPoint = CenterPoints.Last();
                 var leftPoint = centerPoint + Vector3.Cross(centerPoint - lastPoint, Vector3.up).normalized * width / 2;
                 var rightPoint = centerPoint + Vector3.Cross(centerPoint - lastPoint, Vector3.down).normalized * width / 2;
-                left.AddPointFinal(leftPoint);
-                right.AddPointFinal(rightPoint);
+                left.AddNextPoint(leftPoint);
+                right.AddNextPoint(rightPoint);
             }
             else if (CenterPoints.Count == 1)
             {
@@ -105,10 +105,10 @@ namespace Packages.MapToolbox
                 var rightPoint0 = lastPoint + Vector3.Cross(centerPoint - lastPoint, Vector3.down).normalized * width / 2;
                 var leftPoint1 = centerPoint + Vector3.Cross(centerPoint - lastPoint, Vector3.up).normalized * width / 2;
                 var rightPoint1 = centerPoint + Vector3.Cross(centerPoint - lastPoint, Vector3.down).normalized * width / 2;
-                left.AddPointFinal(leftPoint0);
-                right.AddPointFinal(rightPoint0);
-                left.AddPointFinal(leftPoint1);
-                right.AddPointFinal(rightPoint1);
+                left.AddNextPoint(leftPoint0);
+                right.AddNextPoint(rightPoint0);
+                left.AddNextPoint(leftPoint1);
+                right.AddNextPoint(rightPoint1);
             }
             CenterPoints.Add(centerPoint);
         }
@@ -318,7 +318,7 @@ namespace Packages.MapToolbox
         {
             if (CanDuplicateLeft)
             {
-                var lanelet = Lanelet2Map.AddChildGameObject<Lanelet>(Lanelet2Map.transform.childCount.ToString());
+                var lanelet = Lanelet2Map.AddChildGameObject<Lanelet>(Lanelet2Map.transform.ChildMapId());
                 lanelet.gameObject.RecordUndoCreateGo();
                 lanelet.left = LineThin.AddNew(Lanelet2Map);
                 lanelet.right = left;
@@ -332,7 +332,7 @@ namespace Packages.MapToolbox
         {
             if (CanDuplicateRight)
             {
-                var lanelet = Lanelet2Map.AddChildGameObject<Lanelet>(Lanelet2Map.transform.childCount.ToString());
+                var lanelet = Lanelet2Map.AddChildGameObject<Lanelet>(Lanelet2Map.transform.ChildMapId());
                 lanelet.gameObject.RecordUndoCreateGo();
                 lanelet.right = LineThin.AddNew(Lanelet2Map);
                 lanelet.left = right;

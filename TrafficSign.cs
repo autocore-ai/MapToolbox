@@ -1,6 +1,6 @@
 ﻿#region License
 /******************************************************************************
-* Copyright 2018-2020 The AutoCore Authors. All Rights Reserved.
+* Copyright 2018-2021 The AutoCore Authors. All Rights Reserved.
 * 
 * Licensed under the GNU Lesser General Public License, Version 3.0 (the "License"); 
 * you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
 *****************************************************************************/
 #endregion
 
-using UnityEditor;
 using UnityEngine;
 
 namespace Packages.MapToolbox
 {
-    class TrafficSign : WayTypeBase<TrafficSign>
+    [RequireComponent(typeof(AddOrRemovable))]
+    public class TrafficSign : WayTypeBase<TrafficSign>, IAddOrRemoveTarget
     {
         protected override void Start()
         {
@@ -29,58 +29,25 @@ namespace Packages.MapToolbox
             LineRenderer.startWidth = LineRenderer.endWidth = 0.1f;
             LineRenderer.startColor = LineRenderer.endColor = Color.blue;
         }
-        internal void OnEditorEnable()
+        public void OnAdd()
         {
-            SceneView.duringSceneGui -= DuringSceneGui;
-            SceneView.duringSceneGui += DuringSceneGui;
+            AddNextPoint(GetClickedPoint());
+            UpdateRenderer();
         }
-        internal void OnEditorDisable()
+        public void OnRemove()
         {
-            SceneView.duringSceneGui -= DuringSceneGui;
-            if (gameObject != null)
-            {
-                SceneVisibilityManager.instance.EnablePicking(gameObject, true);
-            }
+            RemoveLastNode();
+            UpdateRenderer();
         }
-        private void DuringSceneGui(SceneView obj)
+        internal override void AddNextPoint(Vector3 point)
         {
-            if (EditorUpdate.MouseInSceneView)
-            {
-                if (EditorUpdate.MouseLeftButtonDownWithCtrl && EditorUpdate.MouseLeftButtonDownWithShift)
-                {
-                    RemovePoints();
-                    UpdateRenderer();
-                    SceneVisibilityManager.instance.DisablePicking(gameObject, true);
-                }
-                else if (EditorUpdate.MouseLeftButtonDownWithCtrl)
-                {
-                    AddPoints();
-                    UpdateRenderer();
-                    SceneVisibilityManager.instance.DisablePicking(gameObject, true);
-                }
-            }
-        }
-
-        private void AddPoints()
-        {
-            var point = Utils.MousePointInSceneView;
-            point.y = 0;
             if (Way.Nodes.Count < 2)
             {
-                Way.InsertNode(point);
+                base.AddNextPoint(point);
             }
         }
-
-        private void RemovePoints()
+        public void MouseEnterInspector()
         {
-            Way.RemoveNode(Way.Nodes.Count - 1);
         }
-    }
-    [CustomEditor(typeof(TrafficSign))]
-    class TrafficSignEditor : Editor
-    {
-        TrafficSign Target => target as TrafficSign;
-        private void OnEnable() => Target.OnEditorEnable();
-        private void OnDisable() => Target.OnEditorDisable();
     }
 }

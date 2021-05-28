@@ -1,6 +1,6 @@
 ﻿#region License
 /******************************************************************************
-* Copyright 2018-2020 The AutoCore Authors. All Rights Reserved.
+* Copyright 2018-2021 The AutoCore Authors. All Rights Reserved.
 * 
 * Licensed under the GNU Lesser General Public License, Version 3.0 (the "License"); 
 * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 #endregion
 
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -29,7 +28,7 @@ using UnityEngine.Events;
 namespace Packages.MapToolbox
 {
     [ExecuteInEditMode]
-    class Node : Member
+    public class Node : Member
     {
         public UnityAction<Node> OnMoved { get; set; }
         public UnityAction<Node> OnDestroyed { get; set; }
@@ -46,7 +45,7 @@ namespace Packages.MapToolbox
         }
         internal static Node AddNew(Lanelet2Map map, Vector3 position)
         {
-            var ret = map.AddChildGameObject<Node>(map.transform.childCount.ToString());
+            var ret = map.AddChildGameObject<Node>(map.transform.ChildMapId());
             ret.Position = position;
             ret.gameObject.RecordUndoCreateGo();
             return ret;
@@ -160,6 +159,7 @@ namespace Packages.MapToolbox
                     if (!pos.Equals(item.Position))
                     {
                         movingNode = item;
+                        pos.y = Utils.GetHeight(pos);
                         movingNode.Position = pos;
                     }
                 }

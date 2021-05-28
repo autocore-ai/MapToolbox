@@ -1,6 +1,6 @@
 ﻿#region License
 /******************************************************************************
-* Copyright 2018-2020 The AutoCore Authors. All Rights Reserved.
+* Copyright 2018-2021 The AutoCore Authors. All Rights Reserved.
 * 
 * Licensed under the GNU Lesser General Public License, Version 3.0 (the "License"); 
 * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ namespace Packages.MapToolbox
 {
     [ExecuteInEditMode]
     [RequireComponent(typeof(Relation))]
-    class RegulatoryElement : MonoBehaviour
+    public class RegulatoryElement : MonoBehaviour
     {
         public Way ref_line;
         public Way refers;
@@ -37,7 +37,7 @@ namespace Packages.MapToolbox
         public Relation Relation => GetComponent<Relation>() ?? gameObject.AddComponent<Relation>();
         internal static RegulatoryElement AddNew(Lanelet2Map map)
         {
-            var ret = map.AddChildGameObject<RegulatoryElement>(map.transform.childCount.ToString());
+            var ret = map.AddChildGameObject<RegulatoryElement>(map.transform.ChildMapId());
             ret.gameObject.RecordUndoCreateGo();
             return ret;
         }

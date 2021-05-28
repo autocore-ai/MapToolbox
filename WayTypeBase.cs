@@ -1,6 +1,6 @@
 ﻿#region License
 /******************************************************************************
-* Copyright 2018-2020 The AutoCore Authors. All Rights Reserved.
+* Copyright 2018-2021 The AutoCore Authors. All Rights Reserved.
 * 
 * Licensed under the GNU Lesser General Public License, Version 3.0 (the "License"); 
 * you may not use this file except in compliance with the License.
@@ -24,13 +24,13 @@ namespace Packages.MapToolbox
 {
     [ExecuteInEditMode]
     [RequireComponent(typeof(Way), typeof(LineRenderer))]
-    abstract class WayTypeBase<T> : MonoBehaviour where T : WayTypeBase<T>
+    public abstract class WayTypeBase<T> : MonoBehaviour where T : WayTypeBase<T>
     {
         public Way Way => GetComponent<Way>() ?? gameObject.AddComponent<Way>();
         public LineRenderer LineRenderer => GetComponent<LineRenderer>() ?? gameObject.AddComponent<LineRenderer>();
         internal static T AddNew(Lanelet2Map map)
         {
-            var ret = map.AddChildGameObject<T>(map.transform.childCount.ToString());
+            var ret = map.AddChildGameObject<T>(map.transform.ChildMapId());
             ret.gameObject.RecordUndoCreateGo();
             return ret;
         }
@@ -58,7 +58,6 @@ namespace Packages.MapToolbox
             LineRenderer.SetPositions(Way.Nodes.Select(_ => _.Position).ToArray());
         }
         private void OnPointsMoved(Node node) => LineRenderer.SetPosition(Way.Nodes.IndexOf(node), node.Position);
-        internal void AddPointFinal(Vector3 point) => Way.InsertNode(point);
         private void OnAddNode(Node node)
         {
             var index = Way.Nodes.IndexOf(node);
@@ -82,6 +81,21 @@ namespace Packages.MapToolbox
                 }
             }
         }
+        protected virtual Vector3 GetClickedPoint() => GetClickedPoint(Vector3.zero);
+        protected virtual Vector3 GetClickedPoint(Vector3 offset)
+        {
+            var point = Utils.MousePointInSceneView;
+            point.y = Utils.GetHeight(point);
+            return point + offset;
+        }
+        internal virtual void AddNextPoint(Vector3 point)
+        {
+            Node node = Way.InsertNode(point);
+            var list = Selection.objects.ToList();
+            list.Remove(node.gameObject);
+            Selection.objects = list.ToArray();
+        }
+        internal virtual void RemoveLastNode() => Way.RemoveNode(Way.Nodes.Count - 1);
         internal bool OnlyUsedBy(Member member) => Way.Ref.Count == 1 && Way.Ref.Contains(member);
     }
 }

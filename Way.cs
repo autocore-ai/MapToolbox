@@ -1,6 +1,6 @@
 ﻿#region License
 /******************************************************************************
-* Copyright 2018-2020 The AutoCore Authors. All Rights Reserved.
+* Copyright 2018-2021 The AutoCore Authors. All Rights Reserved.
 * 
 * Licensed under the GNU Lesser General Public License, Version 3.0 (the "License"); 
 * you may not use this file except in compliance with the License.
@@ -19,14 +19,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace Packages.MapToolbox
 {
     [ExecuteInEditMode]
-    class Way : Member
+    public class Way : Member
     {
         [SerializeField] List<Node> nodes = new List<Node>();
         public List<Node> Nodes => nodes;
@@ -170,32 +172,35 @@ namespace Packages.MapToolbox
                 way.AppendChild(doc.AddTag("type", "line_thin"));
                 way.AppendChild(doc.AddTag("subtype", line_thin.subType.ToString()));
             }
-            else
+            var stop_line = GetComponent<StopLine>();
+            if (stop_line)
             {
-                var stop_line = GetComponent<StopLine>();
-                if (stop_line)
-                {
-                    way.AppendChild(doc.AddTag("type", "stop_line"));
-                    way.AppendChild(doc.AddTag("subtype", "solid"));
-                }
-                else
-                {
-                    var traffic_sign = GetComponent<TrafficSign>();
-                    if (traffic_sign)
-                    {
-                        way.AppendChild(doc.AddTag("type", "traffic_sign"));
-                        way.AppendChild(doc.AddTag("subtype", "stop_sign"));
-                    }
-                    else
-                    {
-                        var traffic_light = GetComponent<TrafficLight>();
-                        if (traffic_light)
-                        {
-                            way.AppendChild(doc.AddTag("type", "traffic_light"));
-                            way.AppendChild(doc.AddTag("height", traffic_light.height.ToString()));
-                        }
-                    }
-                }
+                way.AppendChild(doc.AddTag("type", "stop_line"));
+                way.AppendChild(doc.AddTag("subtype", "solid"));
+            }
+            var traffic_sign = GetComponent<TrafficSign>();
+            if (traffic_sign)
+            {
+                way.AppendChild(doc.AddTag("type", "traffic_sign"));
+                way.AppendChild(doc.AddTag("subtype", "stop_sign"));
+            }
+            var traffic_light = GetComponent<TrafficLight>();
+            if (traffic_light)
+            {
+                way.AppendChild(doc.AddTag("type", "traffic_light"));
+                way.AppendChild(doc.AddTag("height", traffic_light.height.ToString()));
+            }
+            var parking_lot = GetComponent<ParkingLot>();
+            if (parking_lot)
+            {
+                way.AppendChild(doc.AddTag("type", "parking_lot"));
+                way.AppendChild(doc.AddTag("area", "yes"));
+            }
+            var parking_space = GetComponent<ParkingSpace>();
+            if (parking_space)
+            {
+                way.AppendChild(doc.AddTag("type", "parking_space"));
+                way.AppendChild(doc.AddTag("width", parking_space.width.ToString()));
             }
             foreach (var item in extermTags)
             {
@@ -219,7 +224,7 @@ namespace Packages.MapToolbox
                 }
             }
         }
-        internal void InsertNode(Node node, int index = int.MaxValue)
+        internal Node InsertNode(Node node, int index = int.MaxValue)
         {
             RegistNode(node);
             node.Ref.Add(this);
@@ -234,11 +239,12 @@ namespace Packages.MapToolbox
             }
             nodes.Insert(index, node);
             OnAddNode?.Invoke(node);
+            return node;
         }
-        internal void InsertNode(Vector3 position, int index = int.MaxValue)
+        internal Node InsertNode(Vector3 position, int index = int.MaxValue)
         {
             var node = Node.AddNew(Lanelet2Map, position);
-            InsertNode(node, index);
+            return InsertNode(node, index);
         }
         internal void RemoveNode(int index)
         {
@@ -288,6 +294,7 @@ namespace Packages.MapToolbox
             nodes.Remove(node);
         }
     }
+#if UNITY_EDITOR
     [CustomEditor(typeof(Way))]
     [CanEditMultipleObjects]
     class WayEditor : Editor
@@ -369,4 +376,5 @@ namespace Packages.MapToolbox
             }
         }
     }
+#endif
 }

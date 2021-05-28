@@ -1,6 +1,6 @@
 ﻿#region License
 /******************************************************************************
-* Copyright 2018-2020 The AutoCore Authors. All Rights Reserved.
+* Copyright 2018-2021 The AutoCore Authors. All Rights Reserved.
 * 
 * Licensed under the GNU Lesser General Public License, Version 3.0 (the "License"); 
 * you may not use this file except in compliance with the License.
@@ -42,11 +42,11 @@ namespace Packages.MapToolbox
             }
         }
         public static void RemoveNull<T>(this List<T> list) => list.RemoveAll(_ => _ == null);
-        public static void RemoveLast<T>(this ICollection<T> collection)
+        public static void RemoveLast<T>(this IList<T> list)
         {
-            if (collection.Count > 0)
+            if (list.Count > 0)
             {
-                collection.Remove(collection.Last());
+                list.RemoveAt(list.Count - 1);
             }
         }
         public static void DestroyAll<T>(this ICollection<T> collection) where T : Object
@@ -73,6 +73,7 @@ namespace Packages.MapToolbox
             target.transform.position = component.transform.position;
             return target;
         }
+        public static string ChildMapId(this Transform transform) => (transform.childCount + 1).ToString();
         public static void SetLocalX(this Transform transform, double x) => transform.SetLocalX((float)x);
         public static void SetLocalY(this Transform transform, double y) => transform.SetLocalY((float)y);
         public static void SetLocalZ(this Transform transform, double z) => transform.SetLocalZ((float)z);
@@ -115,6 +116,19 @@ namespace Packages.MapToolbox
                 com = component.gameObject.AddComponent<T>();
             }
             return com;
+        }
+        public static float GetHeight(Vector3 position)
+        {
+            const float maxHeight = 10000;
+            var from = new Vector3(position.x, maxHeight, position.z);
+            if (Physics.Raycast(new Ray(from, Vector3.down), out RaycastHit hit, maxHeight * 2))
+            {
+                return hit.point.y + 0.1f;
+            }
+            else
+            {
+                return 0;
+            }
         }
     }
 }

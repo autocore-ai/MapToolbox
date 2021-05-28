@@ -1,11 +1,11 @@
 {
     "name": "com.autocore.map-toolbox",
     "displayName": "Autoware Map Toolbox",
-    "version": "0.2.0-preview.5",
+    "version": "0.2.2-preview.1",
     "unity": "2019.4",
     "description": "Map tools for Autoware",
     "dependencies": {
-        "com.unity.jobs": "0.2.10-preview.12"
+        "com.unity.jobs": "0.8.0-preview.23"
     },
     "type": "tool"
 }

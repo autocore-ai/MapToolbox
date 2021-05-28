@@ -1,6 +1,6 @@
 ﻿#region License
 /******************************************************************************
-* Copyright 2018-2020 The AutoCore Authors. All Rights Reserved.
+* Copyright 2018-2021 The AutoCore Authors. All Rights Reserved.
 * 
 * Licensed under the GNU Lesser General Public License, Version 3.0 (the "License"); 
 * you may not use this file except in compliance with the License.
@@ -21,8 +21,10 @@ using UnityEngine;
 
 namespace Packages.MapToolbox
 {
-    class ParkingSpace : WayTypeBase<ParkingSpace>
+    [RequireComponent(typeof(AddOrRemovable))]
+    public class ParkingSpace : WayTypeBase<ParkingSpace>, IAddOrRemoveTarget
     {
+        public float width = 2.5f;
         public float Width
         {
             set => LineRenderer.startWidth = LineRenderer.endWidth = value;
@@ -32,6 +34,30 @@ namespace Packages.MapToolbox
         {
             base.Start();
             LineRenderer.startColor = LineRenderer.endColor = Color.yellow;
+        }
+        public void OnAdd()
+        {
+            AddNextPoint(GetClickedPoint());
+            UpdateRenderer();
+        }
+        public void OnRemove()
+        {
+            RemoveLastNode();
+            UpdateRenderer();
+        }
+        internal override void AddNextPoint(Vector3 point)
+        {
+            if (Way.Nodes.Count < 2)
+            {
+                base.AddNextPoint(point);
+            }
+        }
+        public void MouseEnterInspector()
+        {
+            if (Width != width)
+            {
+                Width = width;
+            }
         }
     }
 }

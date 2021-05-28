@@ -1,7 +1,7 @@
 {
     "name": "Packages.MapToolbox",
+    "rootNamespace": "",
     "references": [],
-    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

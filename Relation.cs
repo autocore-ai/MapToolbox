@@ -1,6 +1,6 @@
 ﻿#region License
 /******************************************************************************
-* Copyright 2018-2020 The AutoCore Authors. All Rights Reserved.
+* Copyright 2018-2021 The AutoCore Authors. All Rights Reserved.
 * 
 * Licensed under the GNU Lesser General Public License, Version 3.0 (the "License"); 
 * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ using UnityEngine;
 namespace Packages.MapToolbox
 {
     [ExecuteInEditMode]
-    class Relation : Member
+    public class Relation : Member
     {
         [SerializeField] List<Member> members = new List<Member>();
         internal List<Member> Members => members;

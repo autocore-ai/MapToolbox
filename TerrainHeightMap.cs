@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 /******************************************************************************
 * Copyright 2018-2021 The AutoCore Authors. All Rights Reserved.
 * 
@@ -16,19 +16,12 @@
 *****************************************************************************/
 #endregion
 
+using UnityEngine;
 
-using Unity.Collections;
-
-namespace AutoCore.MapToolbox.PCL
+namespace Packages.MapToolbox
 {
-    static class Utils
+    public class TerrainHeightMap : MonoBehaviour
     {
-        public static void FillNativeArray<T>(this NativeArray<T> array, T data) where T : struct
-        {
-            for (int i = 0; i < array.Length; i++)
-            {
-                array[i] = data;
-            }
-        }
+
     }
 }
