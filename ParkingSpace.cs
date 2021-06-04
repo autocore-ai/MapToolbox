@@ -34,6 +34,7 @@ namespace Packages.MapToolbox
         {
             base.Start();
             LineRenderer.startColor = LineRenderer.endColor = Color.yellow;
+            LineRenderer.startWidth = LineRenderer.endWidth = width;
         }
         public void OnAdd()
         {
