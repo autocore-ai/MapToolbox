@@ -93,6 +93,13 @@ namespace Packages.MapToolbox
         internal void AddTrafficSign() => Selection.activeObject = TrafficSign.AddNew(this);
         internal void AddParkingLot() => Selection.activeObject = ParkingLot.AddNew(this);
         internal void AddParkingSpace() => Selection.activeObject = ParkingSpace.AddNew(this);
+        internal void ReIndex()
+        {
+            for(int i = 0; i< transform.childCount; i++)
+            {
+                transform.GetChild(i).name = (i + 1).ToString();
+            }
+        }
     }
 
     [CustomEditor(typeof(Lanelet2Map))]
@@ -130,6 +137,10 @@ namespace Packages.MapToolbox
             if (GUILayout.Button("Add ParkingSpace"))
             {
                 (target as Lanelet2Map).AddParkingSpace();
+            }
+            if (GUILayout.Button("ReIndex Entities"))
+            {
+                (target as Lanelet2Map).ReIndex();
             }
             if (GUILayout.Button("Clear Filter"))
             {
