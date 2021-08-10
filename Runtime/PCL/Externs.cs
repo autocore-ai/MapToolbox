@@ -52,6 +52,17 @@ namespace AutoCore.MapToolbox.PCL
                 PlayerPrefs.SetFloat(Const.IntensityPrecentMax, value);
             }
         }
+        public static float DefaultSpeedLimit
+        {
+            get
+            {
+                return PlayerPrefs.GetFloat(Const.IntensityPrecentMax, 60);
+            }
+            set
+            {
+                PlayerPrefs.SetFloat(Const.IntensityPrecentMax, value);
+            }
+        }
         [BurstCompile]
         struct JobPclCoordinateRosToUnity : IJobParallelFor
         {

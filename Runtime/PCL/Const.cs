@@ -25,5 +25,6 @@ namespace AutoCore.MapToolbox.PCL
         public const string unity_pcl_plugin = "unity_pcl";
         public const string IntensityPrecentMin = "IntensityPrecentMin";
         public const string IntensityPrecentMax = "IntensityPrecentMax";
+        public const string DefaultSpeedLimit = "DefaultSpeedLimit";
     }
 }

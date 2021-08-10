@@ -27,27 +27,31 @@ namespace AutoCore.MapToolbox.Editor.PCL
     {
         public static float min = Externs.IntensityPrecentMin;
         public static float max = Externs.IntensityPrecentMax;
+        public static float speed_limit = Externs.DefaultSpeedLimit;
         public IntensitySampleRangeEditor(string path, SettingsScope scopes) : base(path, scopes) { }
         [SettingsProvider] static SettingsProvider Project() => new IntensitySampleRangeEditor("Project/MapToolbox", SettingsScope.Project);
         public override void OnGUI(string searchContext)
         {
             base.OnGUI(searchContext);
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.MinMaxSlider("Intensity range to color",ref min, ref max, 0, 100);
+            EditorGUILayout.MinMaxSlider("Intensity range to color", ref min, ref max, 0, 100);
             EditorGUILayout.LabelField($"    {min:f3}%-{max:f3}%");
             EditorGUILayout.EndHorizontal();
+            EditorGUILayout.FloatField("Default speed Limit", speed_limit);
         }
         public override void OnActivate(string searchContext, VisualElement rootElement)
         {
             base.OnActivate(searchContext, rootElement);
             min = Externs.IntensityPrecentMin;
             max = Externs.IntensityPrecentMax;
+            speed_limit = Externs.DefaultSpeedLimit;
         }
         public override void OnDeactivate()
         {
             base.OnDeactivate();
             Externs.IntensityPrecentMin = min;
             Externs.IntensityPrecentMax = max;
+            Externs.DefaultSpeedLimit = speed_limit;
         }
     }
 }

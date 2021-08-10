@@ -16,6 +16,7 @@
 *****************************************************************************/
 #endregion
 
+using AutoCore.MapToolbox.PCL;
 using System.Collections.Generic;
 using System.Xml;
 using UnityEngine;
@@ -69,7 +70,7 @@ namespace Packages.MapToolbox
                                     break;
                             }
                         }
-                            break;
+                        break;
                     case "turn_direction":
                         var lanelet = gameObject.GetComponent<Lanelet>();
                         if (lanelet)
@@ -94,13 +95,13 @@ namespace Packages.MapToolbox
                         lanelet = gameObject.GetComponent<Lanelet>();
                         if (lanelet)
                         {
-                            if(tag.Attributes["v"].Value.Contains("km/h"))
+                            if (tag.Attributes["v"].Value.Contains("km/h"))
                             {
-                                lanelet.speed_limit = float.Parse(tag.Attributes["v"].Value.Replace("km/h",""));
+                                lanelet.speed_limit = float.Parse(tag.Attributes["v"].Value.Replace("km/h", ""));
                             }
                             else
                             {
-                                lanelet.speed_limit = Lanelet.default_speed_limit;
+                                lanelet.speed_limit = Externs.DefaultSpeedLimit;
                             }
                         }
                         break;

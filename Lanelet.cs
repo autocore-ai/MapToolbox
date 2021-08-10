@@ -17,6 +17,7 @@
 #endregion
 
 
+using AutoCore.MapToolbox.PCL;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -67,8 +68,7 @@ namespace Packages.MapToolbox
             Right
         }
         public TurnDirection turnDirection = TurnDirection.Null;
-        public const float default_speed_limit = 60f; // km/h
-        public float speed_limit = default_speed_limit;
+        public float speed_limit = Externs.DefaultSpeedLimit;
         internal Lanelet AddNew() => AddNew(Lanelet2Map);
         internal static Lanelet AddNew(Lanelet2Map map)
         {

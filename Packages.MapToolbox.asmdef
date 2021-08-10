@@ -1,7 +1,9 @@
 {
     "name": "Packages.MapToolbox",
     "rootNamespace": "",
-    "references": [],
+    "references": [
+        "AutoCore.MapToolbox"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
