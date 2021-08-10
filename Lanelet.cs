@@ -57,7 +57,8 @@ namespace Packages.MapToolbox
         public List<Vector3> CenterPoints { get; set; } = new List<Vector3>();
         public LineThin left;
         public LineThin right;
-        public float width = 3.75f;
+        public const float default_width = 3.75f; // m
+        public float width = default_width;
         public enum TurnDirection
         {
             Null,
@@ -66,6 +67,8 @@ namespace Packages.MapToolbox
             Right
         }
         public TurnDirection turnDirection = TurnDirection.Null;
+        public const float default_speed_limit = 60f; // km/h
+        public float speed_limit = default_speed_limit;
         internal Lanelet AddNew() => AddNew(Lanelet2Map);
         internal static Lanelet AddNew(Lanelet2Map map)
         {

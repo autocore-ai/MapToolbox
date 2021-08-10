@@ -90,6 +90,20 @@ namespace Packages.MapToolbox
                             }
                         }
                         break;
+                    case "speed_limit":
+                        lanelet = gameObject.GetComponent<Lanelet>();
+                        if (lanelet)
+                        {
+                            if(tag.Attributes["v"].Value.Contains("km/h"))
+                            {
+                                lanelet.speed_limit = float.Parse(tag.Attributes["v"].Value.Replace("km/h",""));
+                            }
+                            else
+                            {
+                                lanelet.speed_limit = Lanelet.default_speed_limit;
+                            }
+                        }
+                        break;
                     default:
                         Debug.LogWarning($"Unsupported Relation tag {tag.Attributes["k"].Value} on {name}");
                         break;
@@ -155,6 +169,7 @@ namespace Packages.MapToolbox
                     default:
                         break;
                 }
+                relation.AppendChild(doc.AddTag("speed_limit", string.Format("{0}km/h", lanelet.speed_limit)));
                 relation.AppendChild(doc.AddMember("way", lanelet.left.name, "left"));
                 relation.AppendChild(doc.AddMember("way", lanelet.right.name, "right"));
                 foreach (var item in members)
