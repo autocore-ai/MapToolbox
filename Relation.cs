@@ -26,6 +26,19 @@ namespace Packages.MapToolbox
     public class Relation : Member
     {
         [SerializeField] List<Member> members = new List<Member>();
+        internal virtual bool Valide
+        {
+            get
+            {
+                members.RemoveNull();
+                var lanelet = GetComponent<Lanelet>();
+                if (lanelet != null)
+                {
+                    return lanelet.Valide;
+                }
+                return true;
+            }
+        }
         internal List<Member> Members => members;
         internal List<string> RelationId { get; set; } = new List<string>();
         Lanelet2Map Lanelet2Map => GetComponentInParent<Lanelet2Map>();
@@ -148,60 +161,73 @@ namespace Packages.MapToolbox
         }
         internal XmlElement Save(XmlDocument doc)
         {
-            XmlElement relation = doc.CreateElement("relation");
-            relation.SetAttribute("id", name);
-            members.RemoveNull();
-            var lanelet = GetComponent<Lanelet>();
-            if (lanelet)
+            if (Valide)
             {
-                relation.AppendChild(doc.AddTag("type", "lanelet"));
-                relation.AppendChild(doc.AddTag("subtype", "road"));
-                switch (lanelet.turnDirection)
+                XmlElement relation = doc.CreateElement("relation");
+                relation.SetAttribute("id", name);
+                members.RemoveNull();
+                var lanelet = GetComponent<Lanelet>();
+                if (lanelet)
                 {
-                    case Lanelet.TurnDirection.Straight:
-                        relation.AppendChild(doc.AddTag("turn_direction", "straight"));
-                        break;
-                    case Lanelet.TurnDirection.Left:
-                        relation.AppendChild(doc.AddTag("turn_direction", "left"));
-                        break;
-                    case Lanelet.TurnDirection.Right:
-                        relation.AppendChild(doc.AddTag("turn_direction", "right"));
-                        break;
-                    default:
-                        break;
-                }
-                relation.AppendChild(doc.AddTag("speed_limit", string.Format("{0}km/h", lanelet.speed_limit)));
-                relation.AppendChild(doc.AddMember("way", lanelet.left.name, "left"));
-                relation.AppendChild(doc.AddMember("way", lanelet.right.name, "right"));
-                foreach (var item in members)
-                {
-                    if (item is Relation)
+                    relation.AppendChild(doc.AddTag("type", "lanelet"));
+                    relation.AppendChild(doc.AddTag("subtype", "road"));
+                    switch (lanelet.turnDirection)
                     {
-                        if (item.GetComponent<RegulatoryElement>())
+                        case Lanelet.TurnDirection.Straight:
+                            relation.AppendChild(doc.AddTag("turn_direction", "straight"));
+                            break;
+                        case Lanelet.TurnDirection.Left:
+                            relation.AppendChild(doc.AddTag("turn_direction", "left"));
+                            break;
+                        case Lanelet.TurnDirection.Right:
+                            relation.AppendChild(doc.AddTag("turn_direction", "right"));
+                            break;
+                        default:
+                            break;
+                    }
+                    relation.AppendChild(doc.AddTag("speed_limit", string.Format("{0}km/h", lanelet.speed_limit)));
+                    relation.AppendChild(doc.AddMember("way", lanelet.left.name, "left"));
+                    relation.AppendChild(doc.AddMember("way", lanelet.right.name, "right"));
+                    foreach (var item in members)
+                    {
+                        if (item is Relation)
                         {
-                            relation.AppendChild(doc.AddMember("relation", item.name, "regulatory_element"));
+                            if (item.GetComponent<RegulatoryElement>())
+                            {
+                                relation.AppendChild(doc.AddMember("relation", item.name, "regulatory_element"));
+                            }
                         }
                     }
                 }
-            }
-            else
-            {
-                var regulatory_element = GetComponent<RegulatoryElement>();
-                if (regulatory_element)
+                else
                 {
-                    relation.AppendChild(doc.AddTag("type", "regulatory_element"));
-                    relation.AppendChild(doc.AddTag("subtype", regulatory_element.subType.ToString()));
-                    relation.AppendChild(doc.AddMember("way", regulatory_element.refers.name, "refers"));
-                    relation.AppendChild(doc.AddMember("way", regulatory_element.ref_line.name, "ref_line"));
+                    var regulatory_element = GetComponent<RegulatoryElement>();
+                    if (regulatory_element)
+                    {
+                        relation.AppendChild(doc.AddTag("type", "regulatory_element"));
+                        relation.AppendChild(doc.AddTag("subtype", regulatory_element.subType.ToString()));
+                        relation.AppendChild(doc.AddMember("way", regulatory_element.refers.name, "refers"));
+                        relation.AppendChild(doc.AddMember("way", regulatory_element.ref_line.name, "ref_line"));
+                    }
                 }
+                return relation;
+
             }
-            return relation;
+            return null;
         }
         private void Start()
         {
-            foreach (var member in members)
+            try
             {
-                member.Ref.TryAdd(this);
+                foreach (var member in members)
+                {
+                    member.Ref.TryAdd(this);
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError(name);
+                throw e;
             }
         }
     }

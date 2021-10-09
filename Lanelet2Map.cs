@@ -59,6 +59,7 @@ namespace Packages.MapToolbox
         }
         public void Save(string filename)
         {
+            ReIndex();
             var info = UnityEditor.PackageManager.PackageInfo.FindForAssembly(Assembly.GetExecutingAssembly());
             XmlDocument doc = new XmlDocument();
             doc.AppendChild(doc.CreateXmlDeclaration("1.0", "UTF-8", null));
@@ -72,11 +73,25 @@ namespace Packages.MapToolbox
             }
             foreach (var item in GetComponentsInChildren<Way>())
             {
-                osm.AppendChild(item.Save(doc));
+                if (item.Valide)
+                {
+                    var xml = item.Save(doc);
+                    if (xml != null)
+                    {
+                        osm.AppendChild(xml);
+                    }
+                }
             }
             foreach (var item in GetComponentsInChildren<Relation>())
             {
-                osm.AppendChild(item.Save(doc));
+                if (item.Valide)
+                {
+                    var xml = item.Save(doc);
+                    if (xml != null)
+                    {
+                        osm.AppendChild(xml);
+                    }
+                }
             }
             doc.Save(filename);
             Undo.RegisterFullObjectHierarchyUndo(gameObject, "Save map");
@@ -95,7 +110,7 @@ namespace Packages.MapToolbox
         internal void AddParkingSpace() => Selection.activeObject = ParkingSpace.AddNew(this);
         internal void ReIndex()
         {
-            for(int i = 0; i< transform.childCount; i++)
+            for (int i = 0; i < transform.childCount; i++)
             {
                 transform.GetChild(i).name = (i + 1).ToString();
             }

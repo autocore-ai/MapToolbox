@@ -41,6 +41,8 @@ namespace Packages.MapToolbox
                 Material.SetColor("_Color", color);
             }
             MeshRenderer.sharedMaterial = Material;
+            width = Externs.DefaultWidth;
+            speed_limit = Externs.DefaultSpeedLimit;
             left.Way.OnNodeMoved -= OnNodeMoved;
             left.Way.OnNodeMoved += OnNodeMoved;
             right.Way.OnNodeMoved -= OnNodeMoved;
@@ -58,8 +60,8 @@ namespace Packages.MapToolbox
         public List<Vector3> CenterPoints { get; set; } = new List<Vector3>();
         public LineThin left;
         public LineThin right;
-        public const float default_width = 3.75f; // m
-        public float width = default_width;
+        public float width;
+        public float speed_limit;
         public enum TurnDirection
         {
             Null,
@@ -68,7 +70,6 @@ namespace Packages.MapToolbox
             Right
         }
         public TurnDirection turnDirection = TurnDirection.Null;
-        public float speed_limit = Externs.DefaultSpeedLimit;
         internal Lanelet AddNew() => AddNew(Lanelet2Map);
         internal static Lanelet AddNew(Lanelet2Map map)
         {
@@ -317,6 +318,8 @@ namespace Packages.MapToolbox
         }
         public bool CanDuplicateLeft => left.Way.Nodes.Count > 1 && left.OnlyUsedBy(Relation);
         public bool CanDuplicateRight => right.Way.Nodes.Count > 1 && right.OnlyUsedBy(Relation);
+        public bool CanReverse => true;
+        public bool Valide => left.Way.Valide && right.Way.Valide;
         internal void DuplicateLeft()
         {
             if (CanDuplicateLeft)
@@ -344,6 +347,12 @@ namespace Packages.MapToolbox
                 lanelet.right.DuplicateNodes(left, right);
                 UpdateRenderer();
             }
+        }
+        internal void Reverse()
+        {
+            var tmp = right;
+            right = left;
+            left = tmp;
         }
         internal void SelectLineThin() => Selection.objects = new[] { left.gameObject, right.gameObject };
     }
@@ -377,6 +386,13 @@ namespace Packages.MapToolbox
                 if (GUILayout.Button("Duplicate Right"))
                 {
                     Target.DuplicateRight();
+                }
+            }
+            if (Target.CanReverse)
+            {
+                if (GUILayout.Button("Reverse"))
+                {
+                    Target.Reverse();
                 }
             }
             if (GUILayout.Button("UpdateRenderer"))

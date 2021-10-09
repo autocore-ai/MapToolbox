@@ -56,11 +56,22 @@ namespace AutoCore.MapToolbox.PCL
         {
             get
             {
-                return PlayerPrefs.GetFloat(Const.IntensityPrecentMax, 60);
+                return PlayerPrefs.GetFloat(Const.DefaultSpeedLimit, 60);
             }
             set
             {
-                PlayerPrefs.SetFloat(Const.IntensityPrecentMax, value);
+                PlayerPrefs.SetFloat(Const.DefaultSpeedLimit, value);
+            }
+        }
+        public static float DefaultWidth
+        {
+            get
+            {
+                return PlayerPrefs.GetFloat(Const.DefaultWidth, 3.2f);
+            }
+            set
+            {
+                PlayerPrefs.SetFloat(Const.DefaultWidth, value);
             }
         }
         [BurstCompile]

@@ -67,6 +67,7 @@ namespace AutoCore.MapToolbox.Editor.PCL
                 var terrain = chunk.AddComponent<Terrain>();
                 terrain.materialTemplate = AssetDatabase.GetBuiltinExtraResource<Material>("Default-Terrain-Standard.mat");
                 terrain.terrainData = terrainData;
+                terrain.drawHeightmap = false;
                 chunk.AddComponent<TerrainCollider>().terrainData = terrainData;
                 ctx.AddObjectToAsset(chunk.name, chunk);
                 var path = Path.Combine(Path.GetDirectoryName(ctx.assetPath), Path.GetFileNameWithoutExtension(ctx.assetPath));

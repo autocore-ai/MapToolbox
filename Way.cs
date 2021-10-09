@@ -157,56 +157,59 @@ namespace Packages.MapToolbox
         }
         internal XmlElement Save(XmlDocument doc)
         {
-            XmlElement way = doc.CreateElement("way");
-            way.SetAttribute("id", name);
-            nodes.RemoveNull();
-            foreach (var item in nodes)
+            if(Valide)
             {
-                XmlElement nd = doc.CreateElement("nd");
-                nd.SetAttribute("ref", item.name);
-                way.AppendChild(nd);
+                XmlElement way = doc.CreateElement("way");
+                way.SetAttribute("id", name);
+                foreach (var item in nodes)
+                {
+                    XmlElement nd = doc.CreateElement("nd");
+                    nd.SetAttribute("ref", item.name);
+                    way.AppendChild(nd);
+                }
+                var line_thin = GetComponent<LineThin>();
+                if (line_thin)
+                {
+                    way.AppendChild(doc.AddTag("type", "line_thin"));
+                    way.AppendChild(doc.AddTag("subtype", line_thin.subType.ToString()));
+                }
+                var stop_line = GetComponent<StopLine>();
+                if (stop_line)
+                {
+                    way.AppendChild(doc.AddTag("type", "stop_line"));
+                    way.AppendChild(doc.AddTag("subtype", "solid"));
+                }
+                var traffic_sign = GetComponent<TrafficSign>();
+                if (traffic_sign)
+                {
+                    way.AppendChild(doc.AddTag("type", "traffic_sign"));
+                    way.AppendChild(doc.AddTag("subtype", "stop_sign"));
+                }
+                var traffic_light = GetComponent<TrafficLight>();
+                if (traffic_light)
+                {
+                    way.AppendChild(doc.AddTag("type", "traffic_light"));
+                    way.AppendChild(doc.AddTag("height", traffic_light.height.ToString()));
+                }
+                var parking_lot = GetComponent<ParkingLot>();
+                if (parking_lot)
+                {
+                    way.AppendChild(doc.AddTag("type", "parking_lot"));
+                    way.AppendChild(doc.AddTag("area", "yes"));
+                }
+                var parking_space = GetComponent<ParkingSpace>();
+                if (parking_space)
+                {
+                    way.AppendChild(doc.AddTag("type", "parking_space"));
+                    way.AppendChild(doc.AddTag("width", parking_space.width.ToString()));
+                }
+                foreach (var item in extermTags)
+                {
+                    way.AppendChild(doc.AddTag(item.k, item.v));
+                }
+                return way;
             }
-            var line_thin = GetComponent<LineThin>();
-            if (line_thin)
-            {
-                way.AppendChild(doc.AddTag("type", "line_thin"));
-                way.AppendChild(doc.AddTag("subtype", line_thin.subType.ToString()));
-            }
-            var stop_line = GetComponent<StopLine>();
-            if (stop_line)
-            {
-                way.AppendChild(doc.AddTag("type", "stop_line"));
-                way.AppendChild(doc.AddTag("subtype", "solid"));
-            }
-            var traffic_sign = GetComponent<TrafficSign>();
-            if (traffic_sign)
-            {
-                way.AppendChild(doc.AddTag("type", "traffic_sign"));
-                way.AppendChild(doc.AddTag("subtype", "stop_sign"));
-            }
-            var traffic_light = GetComponent<TrafficLight>();
-            if (traffic_light)
-            {
-                way.AppendChild(doc.AddTag("type", "traffic_light"));
-                way.AppendChild(doc.AddTag("height", traffic_light.height.ToString()));
-            }
-            var parking_lot = GetComponent<ParkingLot>();
-            if (parking_lot)
-            {
-                way.AppendChild(doc.AddTag("type", "parking_lot"));
-                way.AppendChild(doc.AddTag("area", "yes"));
-            }
-            var parking_space = GetComponent<ParkingSpace>();
-            if (parking_space)
-            {
-                way.AppendChild(doc.AddTag("type", "parking_space"));
-                way.AppendChild(doc.AddTag("width", parking_space.width.ToString()));
-            }
-            foreach (var item in extermTags)
-            {
-                way.AppendChild(doc.AddTag(item.k, item.v));
-            }
-            return way;
+            return null;
         }
         internal void EditPoints()
         {
@@ -266,6 +269,24 @@ namespace Packages.MapToolbox
             nodes.RemoveAt(index);
             Undo.DestroyObjectImmediate(tmp.gameObject);
         }
+        internal void RemoveDuplicatedNodes()
+        {
+            for (int i = 1; i < nodes.Count;)
+            {
+                if (nodes[i].Equals(nodes[i - 1]))
+                {
+                    nodes.RemoveAt(i);
+                }
+                i++;
+            }
+        }
+        internal bool Valide => NodeCount() > 1;
+        internal int NodeCount()
+        {
+            nodes.RemoveNull();
+            RemoveDuplicatedNodes();
+            return nodes.Count;
+        }
         private void RegistNode(Node node)
         {
             node.OnMoved += OnNodeMovedAction;
@@ -286,6 +307,7 @@ namespace Packages.MapToolbox
             var index = nodes.IndexOf(oldNode);
             nodes.Remove(oldNode);
             nodes.Insert(index, newNode);
+            RemoveDuplicatedNodes();
         }
         private void OnNodeDestroyed(Node node)
         {
@@ -301,6 +323,7 @@ namespace Packages.MapToolbox
     {
         const int maxMultiEditorCount = 10;
         List<Way> Targets = new List<Way>();
+        Way Target { get; set; }
         private void OnEnable()
         {
             if (targets.Length > maxMultiEditorCount)
@@ -309,6 +332,10 @@ namespace Packages.MapToolbox
             }
             if (targets.Length > 0)
             {
+                if (targets.Length == 1)
+                {
+                    Target = target as Way;
+                }
                 foreach (Way item in targets)
                 {
                     Targets.Add(item);
@@ -361,6 +388,13 @@ namespace Packages.MapToolbox
                             }
                         }
                     }
+                }
+            }
+            else
+            {
+                if (GUILayout.Button("Remove Duplicated Nodes"))
+                {
+                    Target.RemoveDuplicatedNodes();
                 }
             }
         }

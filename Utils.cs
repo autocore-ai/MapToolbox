@@ -123,7 +123,9 @@ namespace Packages.MapToolbox
             var from = new Vector3(position.x, maxHeight, position.z);
             if (Physics.Raycast(new Ray(from, Vector3.down), out RaycastHit hit, maxHeight * 2))
             {
-                return hit.point.y + 0.1f;
+                var height = hit.point.y + 0.1f;
+                PlayerPrefs.SetFloat("LastHeight", height);
+                return height;
             }
             else
             {
