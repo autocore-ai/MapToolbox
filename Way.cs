@@ -92,6 +92,9 @@ namespace Packages.MapToolbox
                             case "parking_lot":
                                 gameObject.AddComponent<ParkingLot>();
                                 break;
+                            case "pedestrian_marking":
+                                gameObject.AddComponent<PedestrianMarking>();
+                                break;
                             case "":
                                 extermTags.Add(new Tag(tag));
                                 break;
@@ -202,6 +205,11 @@ namespace Packages.MapToolbox
                 {
                     way.AppendChild(doc.AddTag("type", "parking_space"));
                     way.AppendChild(doc.AddTag("width", parking_space.width.ToString()));
+                }
+                var pedestrian_marking = GetComponent<PedestrianMarking>();
+                if (pedestrian_marking)
+                {
+                    way.AppendChild(doc.AddTag("type", "pedestrian_marking"));
                 }
                 foreach (var item in extermTags)
                 {

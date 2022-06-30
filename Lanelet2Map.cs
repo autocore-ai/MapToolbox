@@ -108,6 +108,7 @@ namespace Packages.MapToolbox
         internal void AddTrafficSign() => Selection.activeObject = TrafficSign.AddNew(this);
         internal void AddParkingLot() => Selection.activeObject = ParkingLot.AddNew(this);
         internal void AddParkingSpace() => Selection.activeObject = ParkingSpace.AddNew(this);
+        internal void AddPedestrianMarking() => Selection.activeObject = PedestrianMarking.AddNew(this);
         internal void ReIndex()
         {
             for (int i = 0; i < transform.childCount; i++)
@@ -153,6 +154,10 @@ namespace Packages.MapToolbox
             {
                 (target as Lanelet2Map).AddParkingSpace();
             }
+            if (GUILayout.Button("Add PedestrianMarking"))
+            {
+                (target as Lanelet2Map).AddPedestrianMarking();
+            }
             if (GUILayout.Button("ReIndex Entities"))
             {
                 (target as Lanelet2Map).ReIndex();
@@ -184,6 +189,10 @@ namespace Packages.MapToolbox
             if (GUILayout.Button("Filter ParkingSpace"))
             {
                 SceneModeUtility.SearchForType(typeof(ParkingSpace));
+            }
+            if (GUILayout.Button("Filter PedestrianMarking"))
+            {
+                SceneModeUtility.SearchForType(typeof(PedestrianMarking));
             }
         }
     }
