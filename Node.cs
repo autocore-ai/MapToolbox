@@ -33,7 +33,7 @@ namespace Packages.MapToolbox
         public UnityAction<Node> OnMoved { get; set; }
         public UnityAction<Node> OnDestroyed { get; set; }
         public UnityAction<Node, Node> OnMerged { get; set; }
-        public List<Tag> extermTags = new List<Tag>();
+        public List<Tag> externTags = new List<Tag>();
         internal Vector3 Position
         {
             get => transform.position;
@@ -53,7 +53,7 @@ namespace Packages.MapToolbox
         private void Start() => gameObject.SetIcon(IconManager.ShapeIcon.CircleGray);
         protected void OnDestroy() => OnDestroyed?.Invoke(this);
 
-        [DllImport("GeographicWarpper")]
+        [DllImport("geographic_warpper")]
         extern static void UTMUPS_Forward(double lat, double lon, out int zone, out bool northp, out double x, out double y);
         internal void Load(XmlNode xmlNode)
         {
@@ -65,7 +65,7 @@ namespace Packages.MapToolbox
             y %= 1e5;
             transform.SetLocalX(x);
             transform.SetLocalZ(y);
-            extermTags.Clear();
+            externTags.Clear();
             foreach (XmlNode tag in xmlNode.SelectNodes("tag"))
             {
                 switch (tag.Attributes["k"].Value)
@@ -80,7 +80,7 @@ namespace Packages.MapToolbox
                         transform.SetLocalZ(float.Parse(tag.Attributes["v"].Value));
                         break;
                     default:
-                        extermTags.Add(new Tag(tag));
+                        externTags.Add(new Tag(tag));
                         break;
                 }
             }
@@ -94,7 +94,7 @@ namespace Packages.MapToolbox
             node.AppendChild(doc.AddTag("ele", transform.localPosition.y.ToString()));
             node.AppendChild(doc.AddTag("local_x", transform.localPosition.x.ToString()));
             node.AppendChild(doc.AddTag("local_y", transform.localPosition.z.ToString()));
-            foreach (var item in extermTags)
+            foreach (var item in externTags)
             {
                 node.AppendChild(doc.AddTag(item.k, item.v));
             }

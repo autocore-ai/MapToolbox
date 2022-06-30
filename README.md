@@ -11,7 +11,7 @@ This a unity plugin helps user create lanelet2 maps for [Autoware](https://githu
 For vector map format (which will become obsoleted), ref to [vector_map](https://github.com/autocore-ai/MapToolbox/tree/vector_map) branch.
 
 ## Requirements
-* Windows 10, patched to build 1803 or later
+* Ubuntu 20.04
 * [Unity 2019.4.0](https://store.unity.com/download?ref=personal) or above
 * [Git](https://www.git-scm.com/download/)
 
