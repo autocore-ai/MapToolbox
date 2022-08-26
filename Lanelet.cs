@@ -29,6 +29,12 @@ namespace Packages.MapToolbox
     [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer), typeof(Relation))]
     public class Lanelet : MonoBehaviour
     {
+        public enum SubType
+        {
+            road,
+            crosswalk,
+        }
+        public SubType subType;
         static Material Material { get; set; }
         Lanelet2Map Lanelet2Map => GetComponentInParent<Lanelet2Map>();
         private void Start()
