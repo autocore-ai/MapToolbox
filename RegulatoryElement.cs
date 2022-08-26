@@ -30,6 +30,7 @@ namespace Packages.MapToolbox
         public enum SubType
         {
             road,
+            crosswalk,
             traffic_light,
             traffic_sign
         }

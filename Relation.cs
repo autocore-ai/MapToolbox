@@ -65,23 +65,22 @@ namespace Packages.MapToolbox
                         }
                         break;
                     case "subtype":
-                        var relation_element = gameObject.GetComponent<RegulatoryElement>();
-                        if (relation_element)
+                        switch (tag.Attributes["v"].Value)
                         {
-                            switch (tag.Attributes["v"].Value)
-                            {
-                                case "traffic_light":
-                                    relation_element.subType = RegulatoryElement.SubType.traffic_light;
-                                    break;
-                                case "traffic_sign":
-                                    relation_element.subType = RegulatoryElement.SubType.traffic_sign;
-                                    break;
-                                case "road":
-                                    relation_element.subType = RegulatoryElement.SubType.road;
-                                    break;
-                                default:
-                                    break;
-                            }
+                            case "traffic_light":
+                                gameObject.GetComponent<RegulatoryElement>().subType = RegulatoryElement.SubType.traffic_light;
+                                break;
+                            case "traffic_sign":
+                                gameObject.GetComponent<RegulatoryElement>().subType = RegulatoryElement.SubType.traffic_sign;
+                                break;
+                            case "road":
+                                gameObject.GetComponent<Lanelet>().subType = Lanelet.SubType.road;
+                                break;
+                            case "crosswalk":
+                                gameObject.GetComponent<Lanelet>().subType = Lanelet.SubType.crosswalk;
+                                break;
+                            default:
+                                break;
                         }
                         break;
                     case "turn_direction":
@@ -170,7 +169,7 @@ namespace Packages.MapToolbox
                 if (lanelet)
                 {
                     relation.AppendChild(doc.AddTag("type", "lanelet"));
-                    relation.AppendChild(doc.AddTag("subtype", "road"));
+                    relation.AppendChild(doc.AddTag("subtype", lanelet.subType.ToString()));
                     switch (lanelet.turnDirection)
                     {
                         case Lanelet.TurnDirection.Straight:

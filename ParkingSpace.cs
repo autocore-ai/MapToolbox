@@ -27,7 +27,7 @@ namespace Packages.MapToolbox
         public float width = 2.5f;
         public float Width
         {
-            set => LineRenderer.startWidth = LineRenderer.endWidth = value;
+            set => LineRenderer.startWidth = LineRenderer.endWidth = width = value;
             get => LineRenderer.startWidth;
         }
         protected override void Start()

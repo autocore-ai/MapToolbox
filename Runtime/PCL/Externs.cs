@@ -109,7 +109,7 @@ namespace AutoCore.MapToolbox.PCL
         {
             [ReadOnly] internal int2 cell;
             [ReadOnly] internal NativeArray<PointXYZRGBA> points;
-            [WriteOnly] internal NativeMultiHashMap<int, PointXYZRGBA>.ParallelWriter hashMap;
+            [WriteOnly] internal NativeParallelMultiHashMap<int, PointXYZRGBA>.ParallelWriter hashMap;
             public void Execute(int index)
             {
                 hashMap.Add(((int2)math.floor(((float3)points[index].xyz).xz / cell)).GetHashCode(), points[index]);
@@ -117,7 +117,7 @@ namespace AutoCore.MapToolbox.PCL
         }
         public static Dictionary<int3, NativeList<PointXYZRGBA>> PointsCell(this NativeArray<PointXYZRGBA> points, int2 cell)
         {
-            var hashMap = new NativeMultiHashMap<int, PointXYZRGBA>(points.Length, Allocator.TempJob);
+            var hashMap = new NativeParallelMultiHashMap<int, PointXYZRGBA>(points.Length, Allocator.TempJob);
             new JobPointsCell { cell = cell, points = points, hashMap = hashMap.AsParallelWriter() }.Schedule(points.Length, 128).Complete();
             var keys = hashMap.GetUniqueKeyArray(Allocator.TempJob);
             var ret = new Dictionary<int3, NativeList<PointXYZRGBA>>();
