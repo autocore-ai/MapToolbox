@@ -75,6 +75,8 @@ namespace Packages.MapToolbox
                                 break;
                             case "road":
                                 gameObject.GetComponent<Lanelet>().subType = Lanelet.SubType.road;
+                            case "road_shoulder":
+                                gameObject.GetComponent<Lanelet>().subType = Lanelet.SubType.road_shoulder;
                                 break;
                             case "crosswalk":
                                 gameObject.GetComponent<Lanelet>().subType = Lanelet.SubType.crosswalk;
