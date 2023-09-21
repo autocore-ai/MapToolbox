@@ -36,7 +36,7 @@ namespace AutoCore.MapToolbox.PCL
                 int2 grid = new int2(65);
                 int2 size = new int2(100);
                 var originVertices = new NativeArray<Vector3>(mesh.vertices, Allocator.TempJob);
-                var hashMap = new NativeParallelMultiHashMap<int2, float3>(mesh.vertices.Length, Allocator.TempJob);
+                var hashMap = new NativeMultiHashMap<int2, float3>(mesh.vertices.Length, Allocator.TempJob);
                 new GetHashMapPoints()
                 {
                     size = size,
@@ -45,7 +45,7 @@ namespace AutoCore.MapToolbox.PCL
                     hashMap = hashMap.AsParallelWriter(),
                 }.Schedule(originVertices.Length, 128).Complete();
                 originVertices.Dispose();
-                var heightMap = new NativeParallelMultiHashMap<int2, float>(grid.x * grid.y, Allocator.TempJob);
+                var heightMap = new NativeMultiHashMap<int2, float>(grid.x * grid.y, Allocator.TempJob);
                 new GetHeights()
                 {
                     hashMap = hashMap,
@@ -78,7 +78,7 @@ namespace AutoCore.MapToolbox.PCL
             [ReadOnly] internal int2 size;
             [ReadOnly] internal int2 grid;
             [ReadOnly] internal NativeArray<Vector3> vertices;
-            [WriteOnly] internal NativeParallelMultiHashMap<int2, float3>.ParallelWriter hashMap;
+            [WriteOnly] internal NativeMultiHashMap<int2, float3>.ParallelWriter hashMap;
             public void Execute(int index)
             {
                 var key = (int2)math.floor(((float3)vertices[index]).xz) % size * grid / size;
@@ -89,13 +89,13 @@ namespace AutoCore.MapToolbox.PCL
         struct GetHeights : IJobParallelFor
         {
             [ReadOnly] internal int2 grid;
-            [ReadOnly] internal NativeParallelMultiHashMap<int2, float3> hashMap;
-            [WriteOnly] internal NativeParallelMultiHashMap<int2, float>.ParallelWriter heightMap;
+            [ReadOnly] internal NativeMultiHashMap<int2, float3> hashMap;
+            [WriteOnly] internal NativeMultiHashMap<int2, float>.ParallelWriter heightMap;
             public void Execute(int index)
             {
                 int2 id = new int2(index / grid.x, index % grid.y);
                 float height = float.MaxValue;
-                if (hashMap.TryGetFirstValue(id, out float3 point, out NativeParallelMultiHashMapIterator<int2> it))
+                if (hashMap.TryGetFirstValue(id, out float3 point, out NativeMultiHashMapIterator<int2> it))
                 {
                     do
                     {
