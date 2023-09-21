@@ -75,6 +75,7 @@ namespace Packages.MapToolbox
                                 break;
                             case "road":
                                 gameObject.GetComponent<Lanelet>().subType = Lanelet.SubType.road;
+                                break;
                             case "road_shoulder":
                                 gameObject.GetComponent<Lanelet>().subType = Lanelet.SubType.road_shoulder;
                                 break;
@@ -171,7 +172,20 @@ namespace Packages.MapToolbox
                 if (lanelet)
                 {
                     relation.AppendChild(doc.AddTag("type", "lanelet"));
-                    relation.AppendChild(doc.AddTag("subtype", lanelet.subType.ToString()));
+                    switch (lanelet.subType)
+                    {
+                        case Lanelet.SubType.road:
+                            relation.AppendChild(doc.AddTag("subtype", "road"));
+                            break;
+                        case Lanelet.SubType.road_shoulder:
+                            relation.AppendChild(doc.AddTag("subtype", "road_shoulder"));
+                            break;
+                        case Lanelet.SubType.crosswalk:
+                            relation.AppendChild(doc.AddTag("subtype", "crosswalk"));
+                            break;
+                        default:
+                            break;
+                    }
                     switch (lanelet.turnDirection)
                     {
                         case Lanelet.TurnDirection.Straight:

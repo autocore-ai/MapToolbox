@@ -32,6 +32,7 @@ namespace Packages.MapToolbox
         public enum SubType
         {
             road,
+            road_shoulder,
             crosswalk,
         }
         public SubType subType;
