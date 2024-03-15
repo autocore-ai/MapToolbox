@@ -17,6 +17,7 @@
 #endregion
 
 using AutoCore.MapToolbox.PCL;
+using System;
 using System.Collections.Generic;
 using System.Xml;
 using UnityEngine;
@@ -65,44 +66,22 @@ namespace Packages.MapToolbox
                         }
                         break;
                     case "subtype":
-                        switch (tag.Attributes["v"].Value)
+                        if (Enum.TryParse<RegulatoryElement.SubType>(tag.Attributes["v"].Value, out var subType))
                         {
-                            case "traffic_light":
-                                gameObject.GetComponent<RegulatoryElement>().subType = RegulatoryElement.SubType.traffic_light;
-                                break;
-                            case "traffic_sign":
-                                gameObject.GetComponent<RegulatoryElement>().subType = RegulatoryElement.SubType.traffic_sign;
-                                break;
-                            case "road":
-                                gameObject.GetComponent<Lanelet>().subType = Lanelet.SubType.road;
-                                break;
-                            case "road_shoulder":
-                                gameObject.GetComponent<Lanelet>().subType = Lanelet.SubType.road_shoulder;
-                                break;
-                            case "crosswalk":
-                                gameObject.GetComponent<Lanelet>().subType = Lanelet.SubType.crosswalk;
-                                break;
-                            default:
-                                break;
+                            gameObject.GetComponent<RegulatoryElement>().subType = subType;
+                        }
+                        if (Enum.TryParse<Lanelet.SubType>(tag.Attributes["v"].Value, out var subType1))
+                        {
+                            gameObject.GetComponent<Lanelet>().subType = subType1;
                         }
                         break;
                     case "turn_direction":
                         var lanelet = gameObject.GetComponent<Lanelet>();
                         if (lanelet)
                         {
-                            switch (tag.Attributes["v"].Value)
+                            if (Enum.TryParse<Lanelet.TurnDirection>(tag.Attributes["v"].Value, out var result))
                             {
-                                case "straight":
-                                    lanelet.turnDirection = Lanelet.TurnDirection.Straight;
-                                    break;
-                                case "left":
-                                    lanelet.turnDirection = Lanelet.TurnDirection.Left;
-                                    break;
-                                case "right":
-                                    lanelet.turnDirection = Lanelet.TurnDirection.Right;
-                                    break;
-                                default:
-                                    break;
+                                lanelet.turnDirection = result;
                             }
                         }
                         break;
@@ -172,34 +151,8 @@ namespace Packages.MapToolbox
                 if (lanelet)
                 {
                     relation.AppendChild(doc.AddTag("type", "lanelet"));
-                    switch (lanelet.subType)
-                    {
-                        case Lanelet.SubType.road:
-                            relation.AppendChild(doc.AddTag("subtype", "road"));
-                            break;
-                        case Lanelet.SubType.road_shoulder:
-                            relation.AppendChild(doc.AddTag("subtype", "road_shoulder"));
-                            break;
-                        case Lanelet.SubType.crosswalk:
-                            relation.AppendChild(doc.AddTag("subtype", "crosswalk"));
-                            break;
-                        default:
-                            break;
-                    }
-                    switch (lanelet.turnDirection)
-                    {
-                        case Lanelet.TurnDirection.Straight:
-                            relation.AppendChild(doc.AddTag("turn_direction", "straight"));
-                            break;
-                        case Lanelet.TurnDirection.Left:
-                            relation.AppendChild(doc.AddTag("turn_direction", "left"));
-                            break;
-                        case Lanelet.TurnDirection.Right:
-                            relation.AppendChild(doc.AddTag("turn_direction", "right"));
-                            break;
-                        default:
-                            break;
-                    }
+                    relation.AppendChild(doc.AddTag("subtype", lanelet.subType.ToString()));
+                    relation.AppendChild(doc.AddTag("turn_direction", lanelet.turnDirection.ToString()));
                     relation.AppendChild(doc.AddTag("speed_limit", string.Format("{0}km/h", lanelet.speed_limit)));
                     relation.AppendChild(doc.AddMember("way", lanelet.left.name, "left"));
                     relation.AppendChild(doc.AddMember("way", lanelet.right.name, "right"));

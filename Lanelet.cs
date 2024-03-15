@@ -34,6 +34,15 @@ namespace Packages.MapToolbox
             road,
             road_shoulder,
             crosswalk,
+            unknown,
+            freeway,
+            expressway,
+            national_road,
+            provincial_road,
+            city_road,
+            rual_road,
+            ramp,
+            others
         }
         public SubType subType;
         static Material Material { get; set; }
@@ -71,12 +80,11 @@ namespace Packages.MapToolbox
         public float speed_limit;
         public enum TurnDirection
         {
-            Null,
-            Straight,
-            Left,
-            Right
+            straight,
+            left,
+            right
         }
-        public TurnDirection turnDirection = TurnDirection.Null;
+        public TurnDirection turnDirection = TurnDirection.straight;
         internal Lanelet AddNew() => AddNew(Lanelet2Map);
         internal static Lanelet AddNew(Lanelet2Map map)
         {
