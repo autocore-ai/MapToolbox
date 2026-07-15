@@ -20,7 +20,7 @@ For vector map format (which will become obsoleted), ref to [vector_map](https:/
 * In unity editor menu bar, click Window -> Package Manager -> ➕ -> Add package from git URL...
 * Paste this git URL in text field
 ```
-https://github.com/NorahXiong/MapToolbox.git#lanelet2_linux_unity2022.3
+https://github.com/autocore-ai/MapToolbox.gitgit#ubuntu2404_unity2022.3
 ```
 * If any error message appears, try restart unity editor.
 * Import PCD by right click in Project Panel and Import New Asset... then drag pcd file to hierarchy.
